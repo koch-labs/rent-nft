@@ -12,6 +12,7 @@ pub fn create_group(ctx: Context<CreateGroup>, id: Pubkey, price_per_time_unit: 
     let group = &mut ctx.accounts.group;
 
     group.id = id;
+    group.admin_mint = ctx.accounts.admin_mint.key();
     group.tax_mint = ctx.accounts.tax_mint.key();
     group.price_per_time_unit = price_per_time_unit;
 

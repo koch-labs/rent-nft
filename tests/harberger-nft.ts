@@ -5,7 +5,6 @@ import {
   createMint,
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
-  mintTo,
   mintToChecked,
 } from "@solana/spl-token";
 import { getDepositsKey, getGroupKey, getTreasuryKey } from "../sdk/src";

@@ -7,6 +7,9 @@ pub struct HarbergerGroup {
     /// Unique identifier of the group
     pub id: Pubkey,
 
+    /// Mint of the authority token
+    pub admin_mint: Pubkey,
+
     /// The mint of the tax token
     pub tax_mint: Pubkey,
 
@@ -22,24 +25,16 @@ impl HarbergerGroup {
 }
 
 #[account]
-pub struct HarbergerToken {
+pub struct HarbergerWrapper {
+    /// The Harberger group
+    pub group: Pubkey,
+
     /// The mint of the token
     pub mint: Pubkey,
-
-    /// The claimant
-    pub claimant: Pubkey,
-
-    /// The accumulated shares at the last update
-    pub accumulated_stake: u64,
-
-    /// The last time the bribe was updated
-    pub last_update: i64,
 }
 
-impl HarbergerToken {
+impl HarbergerWrapper {
     pub const LEN: usize = 8 // Discriminator
         + 32 // Bribe
-        + 32 // Claimant
-        + 8  // Accumulated stake
-        + 8; // Update
+        + 32; // Claimant
 }
