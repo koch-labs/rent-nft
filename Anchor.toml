@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-harberger_nft = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+harberger_nft = "Nm6XtrnTEFrFwVA54Au6LrCnEy8FKi5masevtj86Fmr"
 
 [registry]
 url = "https://api.apr.dev"
