@@ -14,11 +14,14 @@ declare_id!("Nm6XtrnTEFrFwVA54Au6LrCnEy8FKi5masevtj86Fmr");
 pub mod harberger_nft {
     use super::*;
 
-    pub fn create_config(
-        ctx: Context<CreateGroup>,
-        id: Pubkey,
+    pub fn create_collection(
+        ctx: Context<CreateCollection>,
         price_per_time_unit: u64,
     ) -> Result<()> {
-        instructions::create_group(ctx, id, price_per_time_unit)
+        instructions::create_collection(ctx, price_per_time_unit)
+    }
+
+    pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
+        instructions::create_token(ctx)
     }
 }

@@ -4,6 +4,11 @@ skip-lint = false
 [programs.localnet]
 harberger_nft = "Nm6XtrnTEFrFwVA54Au6LrCnEy8FKi5masevtj86Fmr"
 
+[test.validator]
+url = "https://api.mainnet-beta.solana.com"
+[[test.validator.clone]]
+address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+
 [registry]
 url = "https://api.apr.dev"
 

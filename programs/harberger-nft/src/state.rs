@@ -3,9 +3,9 @@ use anchor_lang::prelude::*;
 /// A group contains all the parameters required to compute taxes.
 /// It's used to save space in each token account.
 #[account]
-pub struct HarbergerGroup {
-    /// Unique identifier of the group
-    pub id: Pubkey,
+pub struct CollectionConfig {
+    /// The mint of the tax token
+    pub collection_mint: Pubkey,
 
     /// Mint of the authority token
     pub admin_mint: Pubkey,
@@ -17,10 +17,11 @@ pub struct HarbergerGroup {
     pub price_per_time_unit: u64,
 }
 
-impl HarbergerGroup {
+impl CollectionConfig {
     pub const LEN: usize = 8 // Discriminator
-        + 32 // ID
-        + 32 // Mint
+        + 32 // Collection
+        + 32 // Admin
+        + 32 // Tax
         + 8; // Price
 }
 

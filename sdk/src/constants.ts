@@ -5,3 +5,4 @@ export const HARBERGER_PROGRAM_ID = new PublicKey(
 );
 export const DEPOSITS_SEED = "deposits";
 export const TREASURY_SEED = "treasury";
+export const COLLECTION_AUTHORITY_SEED = "collection";

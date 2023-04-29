@@ -1,22 +1,30 @@
 import * as anchor from "@coral-xyz/anchor";
 
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import {
+  ComputeBudgetProgram,
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+} from "@solana/web3.js";
 import {
   createMint,
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   mintToChecked,
 } from "@solana/spl-token";
-import { getDepositsKey, getGroupKey, getTreasuryKey } from "../sdk/src";
+import { getCollectionAuthorityKey, getConfigKey } from "../sdk/src";
 
 import { HarbergerNft } from "../target/types/harberger_nft";
+import { Metaplex } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
+import { generateSeededKeypair } from "./utils";
 
 const suiteName = "harberger-nft";
 describe(suiteName, () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env();
   const connection = provider.connection;
+  const metaplex = new Metaplex(connection);
   anchor.setProvider(provider);
 
   const program = anchor.workspace.HarbergerNft as Program<HarbergerNft>;
@@ -73,34 +81,21 @@ describe(suiteName, () => {
     const admin = users[0];
     const adminMintKeypair = Keypair.generate();
 
-    const groupId = Keypair.fromSeed(
-      anchor.utils.bytes.utf8
-        .encode(anchor.utils.sha256.hash(`${suiteName}+group`))
-        .slice(0, 32)
-    ).publicKey;
+    const collectionMintKeypair = generateSeededKeypair(
+      `${suiteName}+collection`
+    );
     const price = new anchor.BN(10);
 
-    const groupKey = getGroupKey(groupId);
-    const depositsKey = getDepositsKey(groupId);
-    const treasuryKey = getTreasuryKey(groupId);
+    const configKey = getConfigKey(collectionMintKeypair.publicKey);
+    const collectionAuthority = getCollectionAuthorityKey(
+      collectionMintKeypair.publicKey
+    );
 
     await program.methods
-      .createConfig(groupId, price)
+      .createCollection(price)
       .accounts({
-        group: groupKey,
-        deposits: depositsKey,
-        treasury: treasuryKey,
+        config: configKey,
         taxMint,
-        depositsAccount: getAssociatedTokenAddressSync(
-          taxMint,
-          depositsKey,
-          true
-        ),
-        treasuryAccount: getAssociatedTokenAddressSync(
-          taxMint,
-          treasuryKey,
-          true
-        ),
         admin: admin.publicKey,
         adminMint: adminMintKeypair.publicKey,
         adminAccount: getAssociatedTokenAddressSync(
@@ -108,10 +103,29 @@ describe(suiteName, () => {
           admin.publicKey,
           true
         ),
+        collectionAuthority,
+        collectionMint: collectionMintKeypair.publicKey,
+        collectionMetadata: metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: collectionMintKeypair.publicKey }),
+        collectionMasterEdition: metaplex
+          .nfts()
+          .pdas()
+          .masterEdition({ mint: collectionMintKeypair.publicKey }),
+        collectionAccount: getAssociatedTokenAddressSync(
+          collectionMintKeypair.publicKey,
+          collectionAuthority,
+          true
+        ),
+        metadataProgram: metaplex.programs().getTokenMetadata().address,
       })
-      .signers([adminMintKeypair])
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 350_000 }),
+      ])
+      .signers([adminMintKeypair, collectionMintKeypair])
       .rpc({ skipPreflight: true });
 
-    console.log(await program.account.harbergerGroup.fetch(groupKey));
+    console.log(await program.account.collectionConfig.fetch(configKey));
   });
 });

@@ -1,4 +1,5 @@
 import {
+  COLLECTION_AUTHORITY_SEED,
   DEPOSITS_SEED,
   HARBERGER_PROGRAM_ID,
   TREASURY_SEED,
@@ -18,9 +19,15 @@ export const getTreasuryKey = (id: PublicKey) => {
     HARBERGER_PROGRAM_ID
   )[0];
 };
-export const getGroupKey = (id: PublicKey) => {
+export const getCollectionAuthorityKey = (collectionMint: PublicKey) => {
   return PublicKey.findProgramAddressSync(
-    [id.toBuffer()],
+    [collectionMint.toBuffer(), Buffer.from(COLLECTION_AUTHORITY_SEED)],
+    HARBERGER_PROGRAM_ID
+  )[0];
+};
+export const getConfigKey = (collectionMint: PublicKey) => {
+  return PublicKey.findProgramAddressSync(
+    [collectionMint.toBuffer()],
     HARBERGER_PROGRAM_ID
   )[0];
 };
