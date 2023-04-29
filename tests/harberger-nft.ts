@@ -12,7 +12,11 @@ import {
   getOrCreateAssociatedTokenAccount,
   mintToChecked,
 } from "@solana/spl-token";
-import { getCollectionAuthorityKey, getConfigKey } from "../sdk/src";
+import {
+  getCollectionAuthorityKey,
+  getConfigKey,
+  getTokenStateKey,
+} from "../sdk/src";
 
 import { HarbergerNft } from "../target/types/harberger_nft";
 import { Metaplex } from "@metaplex-foundation/js";
@@ -121,11 +125,61 @@ describe(suiteName, () => {
         metadataProgram: metaplex.programs().getTokenMetadata().address,
       })
       .preInstructions([
-        ComputeBudgetProgram.setComputeUnitLimit({ units: 350_000 }),
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
       ])
       .signers([adminMintKeypair, collectionMintKeypair])
       .rpc({ skipPreflight: true });
 
     console.log(await program.account.collectionConfig.fetch(configKey));
+
+    const tokenMintKeypair = generateSeededKeypair(`${suiteName}+token-1`);
+    const tokenStateKey = getTokenStateKey(
+      collectionMintKeypair.publicKey,
+      tokenMintKeypair.publicKey
+    );
+
+    await program.methods
+      .createToken()
+      .accounts({
+        config: configKey,
+        admin: admin.publicKey,
+        adminMint: adminMintKeypair.publicKey,
+        adminAccount: getAssociatedTokenAddressSync(
+          adminMintKeypair.publicKey,
+          admin.publicKey,
+          true
+        ),
+        collectionAuthority,
+        collectionMint: collectionMintKeypair.publicKey,
+        collectionMetadata: metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: collectionMintKeypair.publicKey }),
+        collectionMasterEdition: metaplex
+          .nfts()
+          .pdas()
+          .masterEdition({ mint: collectionMintKeypair.publicKey }),
+        tokenState: tokenStateKey,
+        tokenMint: tokenMintKeypair.publicKey,
+        tokenMetadata: metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: tokenMintKeypair.publicKey }),
+        tokenMasterEdition: metaplex
+          .nfts()
+          .pdas()
+          .masterEdition({ mint: tokenMintKeypair.publicKey }),
+        tokenAccount: getAssociatedTokenAddressSync(
+          tokenMintKeypair.publicKey,
+          collectionAuthority,
+          true
+        ),
+        metadataProgram: metaplex.programs().getTokenMetadata().address,
+      })
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
+      ])
+      .signers([admin, tokenMintKeypair])
+      .rpc({ skipPreflight: true });
   });
 });

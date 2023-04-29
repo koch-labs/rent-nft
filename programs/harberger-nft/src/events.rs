@@ -14,14 +14,14 @@ pub struct CollectionCreated {
 }
 
 #[event]
-pub struct WrapperCreated {
-    /// The group
+pub struct TokenCreated {
+    /// The config
+    pub config: Pubkey,
+
+    /// The created mint
     #[index]
-    pub group: Pubkey,
+    pub mint: Pubkey,
 
-    /// The wrapper
-    pub wrapper: Pubkey,
-
-    /// The wrapped mint
-    pub original_mint: Pubkey,
+    /// The collection mint
+    pub collection_mint: Pubkey,
 }

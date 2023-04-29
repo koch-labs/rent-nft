@@ -26,16 +26,16 @@ impl CollectionConfig {
 }
 
 #[account]
-pub struct HarbergerWrapper {
-    /// The Harberger group
-    pub group: Pubkey,
+pub struct TokenState {
+    /// The collection config
+    pub config: Pubkey,
 
     /// The mint of the token
     pub mint: Pubkey,
 }
 
-impl HarbergerWrapper {
+impl TokenState {
     pub const LEN: usize = 8 // Discriminator
-        + 32 // Bribe
-        + 32; // Claimant
+        + 32 // Config
+        + 32; // Mint
 }

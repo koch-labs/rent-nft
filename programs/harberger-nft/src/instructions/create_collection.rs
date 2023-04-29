@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::metadata::{
     create_master_edition_v3, create_metadata_accounts_v3, CreateMasterEditionV3,
-    CreateMetadataAccountsV3, MasterEditionAccount, MetadataAccount,
+    CreateMetadataAccountsV3,
 };
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
 use mpl_token_metadata::state::{Creator, DataV2};
@@ -105,7 +105,7 @@ pub fn create_collection(ctx: Context<CreateCollection>, price_per_time_unit: u6
             },
             signer_seeds,
         ),
-        None,
+        Some(0),
     )?;
 
     emit!(CollectionCreated {

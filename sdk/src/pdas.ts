@@ -31,3 +31,12 @@ export const getConfigKey = (collectionMint: PublicKey) => {
     HARBERGER_PROGRAM_ID
   )[0];
 };
+export const getTokenStateKey = (
+  collectionMint: PublicKey,
+  tokenMint: PublicKey
+) => {
+  return PublicKey.findProgramAddressSync(
+    [collectionMint.toBuffer(), tokenMint.toBuffer()],
+    HARBERGER_PROGRAM_ID
+  )[0];
+};
