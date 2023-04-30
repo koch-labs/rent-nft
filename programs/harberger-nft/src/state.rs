@@ -34,7 +34,7 @@ pub struct TokenState {
     pub token_mint: Pubkey,
 
     /// The sum of all deposits
-    pub sum_deposits: u64,
+    pub deposited: u64,
 }
 
 impl TokenState {
@@ -53,7 +53,7 @@ pub struct DepositState {
     pub depositor: Pubkey,
 
     /// The amount deposited
-    pub amount_deposited: u64,
+    pub amount: u64,
 }
 
 impl DepositState {

@@ -28,4 +28,8 @@ pub mod harberger_nft {
     pub fn create_deposit_account(ctx: Context<CreateDepositAccount>) -> Result<()> {
         instructions::create_deposit_account(ctx)
     }
+
+    pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
+        instructions::update_deposit(ctx, amount)
+    }
 }

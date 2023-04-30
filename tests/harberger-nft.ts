@@ -19,6 +19,7 @@ import {
   getTokenStateKey,
 } from "../sdk/src";
 
+import { BN } from "bn.js";
 import { HarbergerNft } from "../target/types/harberger_nft";
 import { Metaplex } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
@@ -204,6 +205,33 @@ describe(suiteName, () => {
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
       ])
+      .rpc({ skipPreflight: true });
+
+    const depositedAmount = new BN(10);
+    await program.methods
+      .updateDeposit(depositedAmount)
+      .accounts({
+        depositor: holder.publicKey,
+        config: configKey,
+        collectionAuthority,
+        tokenState: tokenStateKey,
+        depositState,
+        taxMint,
+        depositorAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          holder.publicKey,
+          true
+        ),
+        depositAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          collectionAuthority,
+          true
+        ),
+      })
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
+      ])
+      .signers([holder])
       .rpc({ skipPreflight: true });
   });
 });

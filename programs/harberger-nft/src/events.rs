@@ -38,3 +38,18 @@ pub struct CreatedDepositAccount {
     /// The collection mint
     pub collection_mint: Pubkey,
 }
+
+#[event]
+pub struct DepositUpdated {
+    /// The collection mint
+    pub collection_mint: Pubkey,
+
+    /// The depositor
+    pub depositor: Pubkey,
+
+    /// The created mint
+    #[index]
+    pub mint: Pubkey,
+
+    pub amount: i128,
+}
