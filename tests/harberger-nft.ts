@@ -15,6 +15,7 @@ import {
 import {
   getCollectionAuthorityKey,
   getConfigKey,
+  getDepositStateKey,
   getTokenStateKey,
 } from "../sdk/src";
 
@@ -83,6 +84,7 @@ describe(suiteName, () => {
 
   it("Is initialized!", async () => {
     const admin = users[0];
+    const holder = users[1];
     const adminMintKeypair = Keypair.generate();
 
     const collectionMintKeypair = generateSeededKeypair(
@@ -142,6 +144,7 @@ describe(suiteName, () => {
       .createToken()
       .accounts({
         config: configKey,
+        receiver: holder.publicKey,
         admin: admin.publicKey,
         adminMint: adminMintKeypair.publicKey,
         adminAccount: getAssociatedTokenAddressSync(
@@ -171,7 +174,7 @@ describe(suiteName, () => {
           .masterEdition({ mint: tokenMintKeypair.publicKey }),
         tokenAccount: getAssociatedTokenAddressSync(
           tokenMintKeypair.publicKey,
-          collectionAuthority,
+          holder.publicKey,
           true
         ),
         metadataProgram: metaplex.programs().getTokenMetadata().address,
@@ -180,6 +183,27 @@ describe(suiteName, () => {
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
       ])
       .signers([admin, tokenMintKeypair])
+      .rpc({ skipPreflight: true });
+
+    console.log(await program.account.tokenState.fetch(tokenStateKey));
+
+    const depositState = getDepositStateKey(
+      collectionMintKeypair.publicKey,
+      tokenMintKeypair.publicKey,
+      holder.publicKey
+    );
+    await program.methods
+      .createDepositAccount()
+      .accounts({
+        depositor: holder.publicKey,
+        config: configKey,
+        collectionAuthority,
+        tokenState: tokenStateKey,
+        depositState,
+      })
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
+      ])
       .rpc({ skipPreflight: true });
   });
 });

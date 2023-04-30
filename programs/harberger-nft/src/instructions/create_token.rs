@@ -19,7 +19,7 @@ pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
     let token_state = &mut ctx.accounts.token_state;
 
     token_state.config = config.key();
-    token_state.mint = ctx.accounts.token_mint.key();
+    token_state.token_mint = ctx.accounts.token_mint.key();
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
@@ -125,8 +125,10 @@ pub struct CreateToken<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    /// CHECK: Delegatable creation
     pub admin: Signer<'info>,
+
+    /// CHECK: Delegatable creation
+    pub receiver: UncheckedAccount<'info>,
 
     /// CHECK: Seeded authority
     #[account(
@@ -202,7 +204,7 @@ pub struct CreateToken<'info> {
         init_if_needed,
         payer = payer,
         associated_token::mint = token_mint,
-        associated_token::authority = collection_authority,
+        associated_token::authority = receiver,
     )]
     pub token_account: Box<Account<'info, TokenAccount>>,
 

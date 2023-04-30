@@ -25,3 +25,16 @@ pub struct TokenCreated {
     /// The collection mint
     pub collection_mint: Pubkey,
 }
+
+#[event]
+pub struct CreatedDepositAccount {
+    /// The depositor
+    pub depositor: Pubkey,
+
+    /// The created mint
+    #[index]
+    pub mint: Pubkey,
+
+    /// The collection mint
+    pub collection_mint: Pubkey,
+}

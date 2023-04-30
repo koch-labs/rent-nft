@@ -40,3 +40,13 @@ export const getTokenStateKey = (
     HARBERGER_PROGRAM_ID
   )[0];
 };
+export const getDepositStateKey = (
+  collectionMint: PublicKey,
+  tokenMint: PublicKey,
+  depositor: PublicKey
+) => {
+  return PublicKey.findProgramAddressSync(
+    [collectionMint.toBuffer(), tokenMint.toBuffer(), depositor.toBuffer()],
+    HARBERGER_PROGRAM_ID
+  )[0];
+};

@@ -24,4 +24,8 @@ pub mod harberger_nft {
     pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
         instructions::create_token(ctx)
     }
+
+    pub fn create_deposit_account(ctx: Context<CreateDepositAccount>) -> Result<()> {
+        instructions::create_deposit_account(ctx)
+    }
 }
