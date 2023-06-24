@@ -1,10 +1,9 @@
-use anchor_lang::prelude::*;
-use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{transfer_checked, Mint, Token, TokenAccount, TransferChecked};
-
 use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
+use anchor_lang::prelude::*;
+use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::token::{transfer, Mint, Token, TokenAccount, Transfer};
 
 pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
     msg!("Creating a deposit account");
@@ -19,18 +18,16 @@ pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
         token_state.deposited += amount;
         deposit_state.amount += amount;
 
-        transfer_checked(
+        transfer(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
-                TransferChecked {
+                Transfer {
                     from: ctx.accounts.depositor_account.to_account_info(),
-                    mint: ctx.accounts.tax_mint.to_account_info(),
                     to: ctx.accounts.deposit_account.to_account_info(),
                     authority: ctx.accounts.depositor.to_account_info(),
                 },
             ),
             amount,
-            ctx.accounts.tax_mint.decimals,
         )?;
     } else {
         let amount = if amount as u64 > deposit_state.amount {
@@ -50,19 +47,17 @@ pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
         ];
         let signer_seeds = &[&authority_seeds[..]];
 
-        transfer_checked(
+        transfer(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
-                TransferChecked {
+                Transfer {
                     from: ctx.accounts.deposit_account.to_account_info(),
-                    mint: ctx.accounts.tax_mint.to_account_info(),
                     to: ctx.accounts.depositor_account.to_account_info(),
                     authority: ctx.accounts.depositor.to_account_info(),
                 },
                 signer_seeds,
             ),
             amount,
-            ctx.accounts.tax_mint.decimals,
         )?;
     }
 

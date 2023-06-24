@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-harberger_nft = "Nm6XtrnTEFrFwVA54Au6LrCnEy8FKi5masevtj86Fmr"
+harberger_nft = "9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu"
 
 [[test.genesis]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -16,9 +16,9 @@ program = "./deps/metaplex-program-library/token-metadata/target/deploy/mpl_toke
 # - toml below
 # - stake_programmable.rs inside the stake program.
 #
-[[test.genesis]]
-address = "H2yQahQ7eQH8HXXPtJSJn8MURRFEWVesTd8PsracXp1S"
-program = "./deps/cardinal-staking/target/deploy/cardinal_reward_distributor.so"
+# [[test.genesis]]
+# address = "H2yQahQ7eQH8HXXPtJSJn8MURRFEWVesTd8PsracXp1S"
+# program = "./deps/cardinal-staking/target/deploy/cardinal_reward_distributor.so"
 
 #
 # If this ever changes, make sure to change the
@@ -27,14 +27,24 @@ program = "./deps/cardinal-staking/target/deploy/cardinal_reward_distributor.so"
 # - program binary (declare id)
 # - toml below
 #
-[[test.genesis]]
-address = "2gvBmibwtBnbkLExmgsijKy6hGXJneou8X6hkyWQvYnF"
-program = "./deps/cardinal-staking/target/deploy/cardinal_stake_pool.so"
+# [[test.genesis]]
+# address = "2gvBmibwtBnbkLExmgsijKy6hGXJneou8X6hkyWQvYnF"
+# program = "./deps/cardinal-staking/target/deploy/cardinal_stake_pool.so"
 
 [test.validator]
 url = "https://api.mainnet-beta.solana.com"
-[[test.validator.clone]]
-address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+# [test.validator]
+# url = "https://swr.xnfts.dev/rpc-proxy"
+
+# [[test.validator.clone]]
+# address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+
+# [[test.validator.account]]
+# address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+# filename = "./deps/metaplex.json"
+# [[test.validator.account]]
+# address = "PwDiXFxQsGra4sFFTT8r1QWRMd4vfumiWC1jfWNfdYT"
+# filename = "./deps/metaplex_executable.json"
 
 [registry]
 url = "https://api.apr.dev"

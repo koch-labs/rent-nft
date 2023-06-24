@@ -21,23 +21,27 @@ import {
 
 import { BN } from "bn.js";
 import { HarbergerNft } from "../target/types/harberger_nft";
-import { Metaplex } from "@metaplex-foundation/js";
+import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
 import { generateSeededKeypair } from "./utils";
+
+import idl from "../target/idl/harberger_nft.json"
 
 const suiteName = "harberger-nft";
 describe(suiteName, () => {
   // Configure the client to use the local cluster.
-  const provider = anchor.AnchorProvider.env();
+  const provider = anchor.AnchorProvider.local("http://0.0.0.0:8899");
+  anchor.setProvider(provider);
   const connection = provider.connection;
   const metaplex = new Metaplex(connection);
-  anchor.setProvider(provider);
 
+  // const program = new Program<HarbergerNft>(idl as any, "9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu", provider)
   const program = anchor.workspace.HarbergerNft as Program<HarbergerNft>;
   let users: Keypair[];
   let taxMint: PublicKey;
 
   before(async () => {
+    console.log(provider.publicKey.toString());
     users = await Promise.all(
       Array(3)
         .fill(0)
@@ -47,22 +51,31 @@ describe(suiteName, () => {
               .encode(anchor.utils.sha256.hash(`${suiteName}+${i}`))
               .slice(0, 32)
           );
+          console.log(kp.publicKey.toString());
 
           await connection.confirmTransaction(
             await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
           );
+          console.log("requested");
 
           return kp;
         })
     );
 
-    taxMint = await createMint(
-      connection,
-      users[0],
-      users[0].publicKey,
-      users[0].publicKey,
-      6
-    );
+    metaplex.use(keypairIdentity(users[0]));
+
+    const { mint } = await metaplex
+      .tokens()
+      .createMint({ mintAuthority: users[0].publicKey, decimals: 6 });
+    taxMint = mint.address
+    // taxMint = await createMint(
+    //   connection,
+    //   users[0],
+    //   users[0].publicKey,
+    //   users[0].publicKey,
+    //   6
+    // );
+    console.log("minted", taxMint, mint)
 
     await getOrCreateAssociatedTokenAccount(
       connection,
@@ -98,40 +111,45 @@ describe(suiteName, () => {
       collectionMintKeypair.publicKey
     );
 
+    console.log(await connection.getAccountInfo(new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s")))
+    console.log(provider.connection.rpcEndpoint)
+
+    const createCollectionAccounts = {
+      config: configKey,
+      taxMint,
+      admin: admin.publicKey,
+      adminMint: adminMintKeypair.publicKey,
+      adminAccount: getAssociatedTokenAddressSync(
+        adminMintKeypair.publicKey,
+        admin.publicKey,
+        true
+      ),
+      collectionAuthority,
+      collectionMint: collectionMintKeypair.publicKey,
+      collectionMetadata: metaplex
+        .nfts()
+        .pdas()
+        .metadata({ mint: collectionMintKeypair.publicKey }),
+      collectionMasterEdition: metaplex
+        .nfts()
+        .pdas()
+        .masterEdition({ mint: collectionMintKeypair.publicKey }),
+      collectionAccount: getAssociatedTokenAddressSync(
+        collectionMintKeypair.publicKey,
+        collectionAuthority,
+        true
+      ),
+      metadataProgram: metaplex.programs().getTokenMetadata().address,
+    }
+    console.log(createCollectionAccounts)
     await program.methods
       .createCollection(price)
-      .accounts({
-        config: configKey,
-        taxMint,
-        admin: admin.publicKey,
-        adminMint: adminMintKeypair.publicKey,
-        adminAccount: getAssociatedTokenAddressSync(
-          adminMintKeypair.publicKey,
-          admin.publicKey,
-          true
-        ),
-        collectionAuthority,
-        collectionMint: collectionMintKeypair.publicKey,
-        collectionMetadata: metaplex
-          .nfts()
-          .pdas()
-          .metadata({ mint: collectionMintKeypair.publicKey }),
-        collectionMasterEdition: metaplex
-          .nfts()
-          .pdas()
-          .masterEdition({ mint: collectionMintKeypair.publicKey }),
-        collectionAccount: getAssociatedTokenAddressSync(
-          collectionMintKeypair.publicKey,
-          collectionAuthority,
-          true
-        ),
-        metadataProgram: metaplex.programs().getTokenMetadata().address,
-      })
+      .accounts(createCollectionAccounts)
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
       ])
       .signers([adminMintKeypair, collectionMintKeypair])
-      .rpc({ skipPreflight: true });
+      .rpc();
 
     console.log(await program.account.collectionConfig.fetch(configKey));
 

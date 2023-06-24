@@ -1,11 +1,10 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::metadata::{
-    create_master_edition_v3, create_metadata_accounts_v3, CreateMasterEditionV3,
-    CreateMetadataAccountsV3,
-};
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
-use mpl_token_metadata::state::{Creator, DataV2};
+use mpl_token_metadata::instruction::builders::CreateBuilder;
+use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder};
+use mpl_token_metadata::state::{AssetData, Collection, PrintSupply, TokenStandard};
 
 use crate::constants::*;
 use crate::events::*;
@@ -27,7 +26,7 @@ pub fn create_collection(ctx: Context<CreateCollection>, price_per_time_unit: u6
         COLLECTION_AUTHORITY_SEED.as_bytes(),
         &[authority_bump],
     ];
-    let signer_seeds = &[&authority_seeds[..]];
+    let signers_seeds = &[&authority_seeds[..]];
 
     // Mint the admin token
     token::mint_to(
@@ -38,75 +37,119 @@ pub fn create_collection(ctx: Context<CreateCollection>, price_per_time_unit: u6
                 to: ctx.accounts.admin_account.to_account_info(),
                 authority: ctx.accounts.collection_authority.to_account_info(),
             },
-            signer_seeds,
+            signers_seeds,
         ),
         1,
     )?;
 
     // Mint the collection mint
-    token::mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            MintTo {
-                mint: ctx.accounts.collection_mint.to_account_info(),
-                to: ctx.accounts.collection_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        1,
+    let mut asset_data = AssetData::new(
+        TokenStandard::NonFungible,
+        "name".to_string(),
+        "HARBIE".to_string(),
+        "uri".to_string(),
+    );
+    // asset_data.collection = Some(Collection {
+    //     verified: true,
+    //     key: config.collection_mint,
+    // });
+
+    invoke_signed(
+        &CreateBuilder::new()
+            .mint(ctx.accounts.collection_mint.key())
+            .metadata(ctx.accounts.collection_metadata.key())
+            .master_edition(ctx.accounts.collection_master_edition.key())
+            .authority(ctx.accounts.collection_authority.key())
+            .update_authority(ctx.accounts.collection_authority.key())
+            .update_authority_as_signer(true)
+            .initialize_mint(true)
+            .payer(ctx.accounts.payer.key())
+            .spl_token_program(ctx.accounts.token_program.key())
+            .sysvar_instructions(ctx.accounts.system_program.key())
+            .system_program(ctx.accounts.system_program.key())
+            .build(CreateArgs::V1 {
+                asset_data,
+                decimals: None,
+                print_supply: Some(PrintSupply::Zero),
+            })
+            .unwrap()
+            .instruction(),
+        &[
+            ctx.accounts.collection_master_edition.to_account_info(),
+            ctx.accounts.collection_metadata.to_account_info(),
+            ctx.accounts.collection_mint.to_account_info(),
+            ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
+        ],
+        signers_seeds,
     )?;
 
-    create_metadata_accounts_v3(
-        CpiContext::new_with_signer(
-            ctx.accounts.metadata_program.to_account_info(),
-            CreateMetadataAccountsV3 {
-                metadata: ctx.accounts.collection_metadata.to_account_info(),
-                mint: ctx.accounts.collection_mint.to_account_info(),
-                mint_authority: ctx.accounts.collection_authority.to_account_info(),
-                payer: ctx.accounts.payer.to_account_info(),
-                update_authority: ctx.accounts.collection_authority.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-                rent: ctx.accounts.rent.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        DataV2 {
-            name: "Name".to_string(),
-            symbol: "NAME".to_string(),
-            uri: "".to_string(),
-            seller_fee_basis_points: 0,
-            creators: Some(vec![Creator {
-                address: ctx.accounts.collection_authority.key(),
-                verified: true,
-                share: 100,
-            }]),
-            collection: None,
-            uses: None,
-        },
-        true,
-        true,
-        None,
-    )?;
+    // token::mint_to(
+    //     CpiContext::new_with_signer(
+    //         ctx.accounts.token_program.to_account_info(),
+    //         MintTo {
+    //             mint: ctx.accounts.collection_mint.to_account_info(),
+    //             to: ctx.accounts.collection_account.to_account_info(),
+    //             authority: ctx.accounts.collection_authority.to_account_info(),
+    //         },
+    //         signer_seeds,
+    //     ),
+    //     1,
+    // )?;
 
-    create_master_edition_v3(
-        CpiContext::new_with_signer(
-            ctx.accounts.metadata_program.to_account_info(),
-            CreateMasterEditionV3 {
-                edition: ctx.accounts.collection_master_edition.to_account_info(),
-                mint: ctx.accounts.collection_mint.to_account_info(),
-                update_authority: ctx.accounts.collection_authority.to_account_info(),
-                mint_authority: ctx.accounts.collection_authority.to_account_info(),
-                payer: ctx.accounts.payer.to_account_info(),
-                metadata: ctx.accounts.collection_metadata.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-                rent: ctx.accounts.rent.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        Some(0),
-    )?;
+    // create_metadata_accounts_v3(
+    //     CpiContext::new_with_signer(
+    //         ctx.accounts.metadata_program.to_account_info(),
+    //         CreateMetadataAccountsV3 {
+    //             metadata: ctx.accounts.collection_metadata.to_account_info(),
+    //             mint: ctx.accounts.collection_mint.to_account_info(),
+    //             mint_authority: ctx.accounts.collection_authority.to_account_info(),
+    //             payer: ctx.accounts.payer.to_account_info(),
+    //             update_authority: ctx.accounts.collection_authority.to_account_info(),
+    //             system_program: ctx.accounts.system_program.to_account_info(),
+    //             rent: ctx.accounts.rent.to_account_info(),
+    //         },
+    //         signer_seeds,
+    //     ),
+    //     DataV2 {
+    //         name: "Name".to_string(),
+    //         symbol: "NAME".to_string(),
+    //         uri: "".to_string(),
+    //         seller_fee_basis_points: 0,
+    //         creators: Some(vec![Creator {
+    //             address: ctx.accounts.collection_authority.key(),
+    //             verified: true,
+    //             share: 100,
+    //         }]),
+    //         collection: None,
+    //         uses: None,
+    //     },
+    //     true,
+    //     true,
+    //     None,
+    // )?;
+
+    // create_master_edition_v3(
+    //     CpiContext::new_with_signer(
+    //         ctx.accounts.metadata_program.to_account_info(),
+    //         CreateMasterEditionV3 {
+    //             edition: ctx.accounts.collection_master_edition.to_account_info(),
+    //             mint: ctx.accounts.collection_mint.to_account_info(),
+    //             update_authority: ctx.accounts.collection_authority.to_account_info(),
+    //             mint_authority: ctx.accounts.collection_authority.to_account_info(),
+    //             payer: ctx.accounts.payer.to_account_info(),
+    //             metadata: ctx.accounts.collection_metadata.to_account_info(),
+    //             token_program: ctx.accounts.token_program.to_account_info(),
+    //             system_program: ctx.accounts.system_program.to_account_info(),
+    //             rent: ctx.accounts.rent.to_account_info(),
+    //         },
+    //         signer_seeds,
+    //     ),
+    //     Some(0),
+    // )?;
 
     emit!(CollectionCreated {
         collection: ctx.accounts.collection_mint.key(),

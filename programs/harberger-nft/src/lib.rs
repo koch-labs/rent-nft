@@ -8,7 +8,7 @@ use anchor_lang::prelude::*;
 
 use instructions::*;
 
-declare_id!("Nm6XtrnTEFrFwVA54Au6LrCnEy8FKi5masevtj86Fmr");
+declare_id!("9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu");
 
 #[program]
 pub mod harberger_nft {
