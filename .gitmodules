@@ -1,6 +1,6 @@
 [submodule "deps/metaplex-program-library"]
-path = deps/metaplex-program-library
-url = git@github.com:metaplex-foundation/metaplex-program-library.git
+	path = deps/metaplex-program-library
+	url = https://github.com/metaplex-foundation/metaplex-program-library
 [submodule "deps/cardinal-staking"]
-path = deps/cardinal-staking
-url = git@github.com:coral-xyz/cardinal-staking.git
+	path = deps/cardinal-staking
+	url = https://github.com/coral-xyz/cardinal-staking
