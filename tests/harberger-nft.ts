@@ -224,7 +224,7 @@ describe(suiteName, () => {
     );
     expect(tokenState.deposited.toString()).to.equal("0");
 
-    const bidState = getBidStateKey(
+    const bidStateKey = getBidStateKey(
       collectionMintKeypair.publicKey,
       tokenMintKeypair.publicKey,
       holder.publicKey
@@ -236,12 +236,17 @@ describe(suiteName, () => {
         config: configKey,
         collectionAuthority,
         tokenState: tokenStateKey,
-        bidState,
+        bidState: bidStateKey,
       })
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
       ])
       .rpc({ skipPreflight: true });
+
+    let bidState = await program.account.bidState.fetch(bidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
+    expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
+    expect(bidState.amount.toString()).to.equal("0");
 
     const depositedAmount = new BN(10);
     await program.methods
@@ -251,7 +256,7 @@ describe(suiteName, () => {
         config: configKey,
         collectionAuthority,
         tokenState: tokenStateKey,
-        bidState,
+        bidState: bidStateKey,
         taxMint,
         depositorAccount: getAssociatedTokenAddressSync(
           taxMint,
@@ -269,5 +274,10 @@ describe(suiteName, () => {
       ])
       .signers([holder])
       .rpc({ skipPreflight: true });
+
+    bidState = await program.account.bidState.fetch(bidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
+    expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
+    expect(bidState.amount.toString()).to.equal(depositedAmount.toString());
   });
 });
