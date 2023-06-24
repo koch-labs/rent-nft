@@ -2,8 +2,8 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Mint, Token, TokenAccount};
-use mpl_token_metadata::instruction::builders::CreateBuilder;
-use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder};
+use mpl_token_metadata::instruction::builders::{CreateBuilder, VerifyBuilder};
+use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, VerificationArgs};
 use mpl_token_metadata::state::{AssetData, Collection, PrintSupply, TokenStandard};
 
 use crate::constants::*;
@@ -70,87 +70,31 @@ pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
         signers_seeds,
     )?;
 
-    // // Mint
-    // token::mint_to(
-    //     CpiContext::new_with_signer(
-    //         ctx.accounts.token_program.to_account_info(),
-    //         MintTo {
-    //             mint: ctx.accounts.token_mint.to_account_info(),
-    //             to: ctx.accounts.token_account.to_account_info(),
-    //             authority: ctx.accounts.collection_authority.to_account_info(),
-    //         },
-    //         signers_seeds,
-    //     ),
-    //     1,
-    // )?;
-
-    // create_metadata_accounts_v3(
-    //     CpiContext::new_with_signer(
-    //         ctx.accounts.metadata_program.to_account_info(),
-    //         CreateMetadataAccountsV3 {
-    //             metadata: ctx.accounts.token_metadata.to_account_info(),
-    //             mint: ctx.accounts.token_mint.to_account_info(),
-    //             mint_authority: ctx.accounts.collection_authority.to_account_info(),
-    //             payer: ctx.accounts.payer.to_account_info(),
-    //             update_authority: ctx.accounts.collection_authority.to_account_info(),
-    //             system_program: ctx.accounts.system_program.to_account_info(),
-    //             rent: ctx.accounts.rent.to_account_info(),
-    //         },
-    //         signers_seeds,
-    //     ),
-    //     DataV2 {
-    //         name: "Name".to_string(),
-    //         symbol: "NAME".to_string(),
-    //         uri: "".to_string(),
-    //         seller_fee_basis_points: 0,
-    //         creators: Some(vec![Creator {
-    //             address: ctx.accounts.collection_authority.key(),
-    //             verified: true,
-    //             share: 100,
-    //         }]),
-    //         collection: None,
-    //         uses: None,
-    //     },
-    //     true,
-    //     true,
-    //     None,
-    // )?;
-
-    // create_master_edition_v3(
-    //     CpiContext::new_with_signer(
-    //         ctx.accounts.metadata_program.to_account_info(),
-    //         CreateMasterEditionV3 {
-    //             edition: ctx.accounts.token_master_edition.to_account_info(),
-    //             mint: ctx.accounts.token_mint.to_account_info(),
-    //             update_authority: ctx.accounts.collection_authority.to_account_info(),
-    //             mint_authority: ctx.accounts.collection_authority.to_account_info(),
-    //             payer: ctx.accounts.payer.to_account_info(),
-    //             metadata: ctx.accounts.token_metadata.to_account_info(),
-    //             token_program: ctx.accounts.token_program.to_account_info(),
-    //             system_program: ctx.accounts.system_program.to_account_info(),
-    //             rent: ctx.accounts.rent.to_account_info(),
-    //         },
-    //         signers_seeds,
-    //     ),
-    //     None,
-    // )?;
-
-    // set_and_verify_collection(
-    //     CpiContext::new_with_signer(
-    //         ctx.accounts.metadata_program.to_account_info(),
-    //         SetAndVerifyCollection {
-    //             metadata: ctx.accounts.token_metadata.to_account_info(),
-    //             update_authority: ctx.accounts.collection_authority.to_account_info(),
-    //             collection_authority: ctx.accounts.collection_authority.to_account_info(),
-    //             collection_mint: ctx.accounts.collection_mint.to_account_info(),
-    //             collection_metadata: ctx.accounts.collection_metadata.to_account_info(),
-    //             collection_master_edition: ctx.accounts.collection_master_edition.to_account_info(),
-    //             payer: ctx.accounts.payer.to_account_info(),
-    //         },
-    //         signers_seeds,
-    //     ),
-    //     None,
-    // )?;
+    invoke_signed(
+        &VerifyBuilder::new()
+            .metadata(ctx.accounts.token_metadata.key())
+            .collection_master_edition(ctx.accounts.collection_master_edition.key())
+            .authority(ctx.accounts.collection_authority.key())
+            .collection_metadata(ctx.accounts.collection_metadata.key())
+            .collection_mint(ctx.accounts.collection_mint.key())
+            .delegate_record(ctx.accounts.delegate_record.key())
+            .sysvar_instructions(ctx.accounts.system_program.key())
+            .build(VerificationArgs::CollectionV1)
+            .unwrap()
+            .instruction(),
+        &[
+            ctx.accounts.token_metadata.to_account_info(),
+            ctx.accounts.collection_master_edition.to_account_info(),
+            ctx.accounts.collection_metadata.to_account_info(),
+            ctx.accounts.collection_mint.to_account_info(),
+            ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.delegate_record.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
+        ],
+        signers_seeds,
+    )?;
 
     emit!(TokenCreated {
         config: config.key(),
@@ -230,15 +174,20 @@ pub struct CreateToken<'info> {
     )]
     pub token_mint: Box<Account<'info, Mint>>,
 
-    /// Metadata of the collection
+    /// Metadata of the token
     /// CHECK: Verified by Metaplex
     #[account(mut)]
     pub token_metadata: UncheckedAccount<'info>,
 
-    /// Master edition of the collection
+    /// Master edition of the token
     /// CHECK: Verified by Metaplex
     #[account(mut)]
     pub token_master_edition: UncheckedAccount<'info>,
+
+    /// Delegate record of the programmable token
+    /// CHECK: Verified by Metaplex
+    #[account(mut)]
+    pub delegate_record: UncheckedAccount<'info>,
 
     /// The account storing the collection token
     #[account(
