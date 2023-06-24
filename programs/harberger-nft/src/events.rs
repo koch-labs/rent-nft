@@ -40,7 +40,7 @@ pub struct CreatedDepositAccount {
 }
 
 #[event]
-pub struct DepositUpdated {
+pub struct BidUpdated {
     /// The collection mint
     pub collection_mint: Pubkey,
 

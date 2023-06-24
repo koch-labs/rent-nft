@@ -40,7 +40,7 @@ export const getTokenStateKey = (
     HARBERGER_PROGRAM_ID
   )[0];
 };
-export const getDepositStateKey = (
+export const getBidStateKey = (
   collectionMint: PublicKey,
   tokenMint: PublicKey,
   depositor: PublicKey

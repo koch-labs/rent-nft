@@ -6,15 +6,15 @@ use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
 
-pub fn create_deposit_account(ctx: Context<CreateDepositAccount>) -> Result<()> {
+pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
     msg!("Creating a deposit account");
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
-    let deposit_state = &mut ctx.accounts.deposit_state;
+    let bid_state = &mut ctx.accounts.bid_state;
 
-    deposit_state.depositor = ctx.accounts.depositor.key();
-    deposit_state.token_state = token_state.key();
+    bid_state.depositor = ctx.accounts.depositor.key();
+    bid_state.token_state = token_state.key();
 
     emit!(CreatedDepositAccount {
         depositor: ctx.accounts.depositor.key(),
@@ -26,7 +26,7 @@ pub fn create_deposit_account(ctx: Context<CreateDepositAccount>) -> Result<()> 
 }
 
 #[derive(Accounts)]
-pub struct CreateDepositAccount<'info> {
+pub struct CreateBid<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -67,7 +67,7 @@ pub struct CreateDepositAccount<'info> {
     #[account(
         init,
         payer = payer,
-        space = DepositState::LEN,
+        space = BidState::LEN,
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes(),
@@ -75,7 +75,7 @@ pub struct CreateDepositAccount<'info> {
         ],
         bump,
     )]
-    pub deposit_state: Box<Account<'info, DepositState>>,
+    pub bid_state: Box<Account<'info, BidState>>,
 
     /// Common Solana programs
     pub token_program: Program<'info, Token>,

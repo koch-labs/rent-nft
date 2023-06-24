@@ -5,18 +5,18 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{transfer, Mint, Token, TokenAccount, Transfer};
 
-pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
+pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
     msg!("Creating a deposit account");
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
-    let deposit_state = &mut ctx.accounts.deposit_state;
+    let bid_state = &mut ctx.accounts.bid_state;
 
     if amount > 0 {
         let amount = amount as u64;
 
         token_state.deposited += amount;
-        deposit_state.amount += amount;
+        bid_state.amount += amount;
 
         transfer(
             CpiContext::new(
@@ -30,14 +30,14 @@ pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
             amount,
         )?;
     } else {
-        let amount = if amount as u64 > deposit_state.amount {
-            deposit_state.amount
+        let amount = if amount as u64 > bid_state.amount {
+            bid_state.amount
         } else {
             amount as u64
         };
 
         token_state.deposited -= amount;
-        deposit_state.amount -= amount;
+        bid_state.amount -= amount;
 
         let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
         let authority_seeds = &[
@@ -61,7 +61,7 @@ pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
         )?;
     }
 
-    emit!(DepositUpdated {
+    emit!(BidUpdated {
         collection_mint: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
         depositor: ctx.accounts.depositor.key(),
@@ -72,7 +72,7 @@ pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
 }
 
 #[derive(Accounts)]
-pub struct UpdateDeposit<'info> {
+pub struct UpdateBid<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -123,7 +123,7 @@ pub struct UpdateDeposit<'info> {
         ],
         bump,
     )]
-    pub deposit_state: Box<Account<'info, DepositState>>,
+    pub bid_state: Box<Account<'info, BidState>>,
 
     #[account(
         init_if_needed,

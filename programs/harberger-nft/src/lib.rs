@@ -25,11 +25,11 @@ pub mod harberger_nft {
         instructions::create_token(ctx)
     }
 
-    pub fn create_deposit_account(ctx: Context<CreateDepositAccount>) -> Result<()> {
-        instructions::create_deposit_account(ctx)
+    pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
+        instructions::create_bid(ctx)
     }
 
-    pub fn update_deposit(ctx: Context<UpdateDeposit>, amount: i128) -> Result<()> {
-        instructions::update_deposit(ctx, amount)
+    pub fn update_deposit(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
+        instructions::update_bid(ctx, amount)
     }
 }

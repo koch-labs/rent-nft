@@ -45,20 +45,24 @@ impl TokenState {
 }
 
 #[account]
-pub struct DepositState {
+pub struct BidState {
     /// The token state
     pub token_state: Pubkey,
 
     /// The owner of the deposit
     pub depositor: Pubkey,
 
+    /// Timestamp of the last update
+    pub last_update: i64,
+
     /// The amount deposited
     pub amount: u64,
 }
 
-impl DepositState {
+impl BidState {
     pub const LEN: usize = 8 // Discriminator
         + 32 // Token state
         + 32 // Depositor
+        + 8 // Update
         + 8; // Amount
 }

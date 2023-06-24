@@ -13,9 +13,9 @@ import {
   mintToChecked,
 } from "@solana/spl-token";
 import {
+  getBidStateKey,
   getCollectionAuthorityKey,
   getConfigKey,
-  getDepositStateKey,
   getTokenStateKey,
 } from "../sdk/src";
 
@@ -95,6 +95,7 @@ describe(suiteName, () => {
       collectionMintKeypair.publicKey
     );
 
+    // Mint collection
     const createCollectionAccounts = {
       config: configKey,
       taxMint,
@@ -156,6 +157,7 @@ describe(suiteName, () => {
       tokenMintKeypair.publicKey
     );
 
+    // Mint a token
     await program.methods
       .createToken()
       .accounts({
@@ -222,19 +224,19 @@ describe(suiteName, () => {
     );
     expect(tokenState.deposited.toString()).to.equal("0");
 
-    const depositState = getDepositStateKey(
+    const bidState = getBidStateKey(
       collectionMintKeypair.publicKey,
       tokenMintKeypair.publicKey,
       holder.publicKey
     );
     await program.methods
-      .createDepositAccount()
+      .createBid()
       .accounts({
         depositor: holder.publicKey,
         config: configKey,
         collectionAuthority,
         tokenState: tokenStateKey,
-        depositState,
+        bidState,
       })
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
@@ -249,7 +251,7 @@ describe(suiteName, () => {
         config: configKey,
         collectionAuthority,
         tokenState: tokenStateKey,
-        depositState,
+        bidState,
         taxMint,
         depositorAccount: getAssociatedTokenAddressSync(
           taxMint,
