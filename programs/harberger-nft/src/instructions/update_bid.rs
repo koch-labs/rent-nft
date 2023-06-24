@@ -22,18 +22,18 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
                 Transfer {
-                    from: ctx.accounts.depositor_account.to_account_info(),
-                    to: ctx.accounts.deposit_account.to_account_info(),
-                    authority: ctx.accounts.depositor.to_account_info(),
+                    from: ctx.accounts.bidder_account.to_account_info(),
+                    to: ctx.accounts.bid_account.to_account_info(),
+                    authority: ctx.accounts.bidder.to_account_info(),
                 },
             ),
             amount,
         )?;
     } else {
-        let amount = if amount as u64 > bid_state.amount {
+        let amount = if (-amount) as u64 > bid_state.amount {
             bid_state.amount
         } else {
-            amount as u64
+            (-amount) as u64
         };
 
         token_state.deposited -= amount;
@@ -51,9 +51,9 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
                 Transfer {
-                    from: ctx.accounts.deposit_account.to_account_info(),
-                    to: ctx.accounts.depositor_account.to_account_info(),
-                    authority: ctx.accounts.depositor.to_account_info(),
+                    from: ctx.accounts.bid_account.to_account_info(),
+                    to: ctx.accounts.bidder_account.to_account_info(),
+                    authority: ctx.accounts.collection_authority.to_account_info(),
                 },
                 signer_seeds,
             ),
@@ -64,7 +64,7 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
     emit!(BidUpdated {
         collection_mint: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
-        depositor: ctx.accounts.depositor.key(),
+        depositor: ctx.accounts.bidder.key(),
         amount
     });
 
@@ -76,7 +76,7 @@ pub struct UpdateBid<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    pub depositor: Signer<'info>,
+    pub bidder: Signer<'info>,
 
     /// CHECK: Seeded authority
     #[account(
@@ -119,7 +119,7 @@ pub struct UpdateBid<'info> {
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes(),
-            &depositor.key().to_bytes(),
+            &bidder.key().to_bytes(),
         ],
         bump,
     )]
@@ -129,9 +129,9 @@ pub struct UpdateBid<'info> {
         init_if_needed,
         payer = payer,
         associated_token::mint = tax_mint,
-        associated_token::authority = depositor
+        associated_token::authority = bidder
     )]
-    pub depositor_account: Box<Account<'info, TokenAccount>>,
+    pub bidder_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
@@ -139,7 +139,7 @@ pub struct UpdateBid<'info> {
         associated_token::mint = tax_mint,
         associated_token::authority = collection_authority
     )]
-    pub deposit_account: Box<Account<'info, TokenAccount>>,
+    pub bid_account: Box<Account<'info, TokenAccount>>,
 
     /// Common Solana programs
     pub token_program: Program<'info, Token>,

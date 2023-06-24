@@ -250,20 +250,53 @@ describe(suiteName, () => {
 
     const depositedAmount = new BN(10);
     await program.methods
-      .updateDeposit(depositedAmount)
+      .updateDeposit(depositedAmount.mul(new BN(2)))
       .accounts({
-        depositor: holder.publicKey,
+        bidder: holder.publicKey,
         config: configKey,
         collectionAuthority,
         tokenState: tokenStateKey,
         bidState: bidStateKey,
         taxMint,
-        depositorAccount: getAssociatedTokenAddressSync(
+        bidderAccount: getAssociatedTokenAddressSync(
           taxMint,
           holder.publicKey,
           true
         ),
-        depositAccount: getAssociatedTokenAddressSync(
+        bidAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          collectionAuthority,
+          true
+        ),
+      })
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
+      ])
+      .signers([holder])
+      .rpc({ skipPreflight: true });
+
+    bidState = await program.account.bidState.fetch(bidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
+    expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
+    expect(bidState.amount.toString()).to.equal(
+      depositedAmount.mul(new BN(2)).toString()
+    );
+
+    await program.methods
+      .updateDeposit(depositedAmount.neg())
+      .accounts({
+        bidder: holder.publicKey,
+        config: configKey,
+        collectionAuthority,
+        tokenState: tokenStateKey,
+        bidState: bidStateKey,
+        taxMint,
+        bidderAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          holder.publicKey,
+          true
+        ),
+        bidAccount: getAssociatedTokenAddressSync(
           taxMint,
           collectionAuthority,
           true
