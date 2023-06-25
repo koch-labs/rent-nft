@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Mint, Token, TokenAccount};
+use mpl_token_auth_rules::types::RuleSet;
 use mpl_token_metadata::instruction::builders::{CreateBuilder, VerifyBuilder};
 use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, VerificationArgs};
 use mpl_token_metadata::state::{AssetData, Collection, PrintSupply, TokenStandard};

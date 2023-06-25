@@ -752,6 +752,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "mpl-token-auth-rules",
  "mpl-token-metadata",
  "solana-program",
 ]
@@ -1040,11 +1041,12 @@ dependencies = [
 
 [[package]]
 name = "mpl-token-auth-rules"
-version = "1.3.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24dcb2b0ec0e9246f6f035e0336ba3359c21f6928dfd90281999e2c8e8ab53eb"
+checksum = "c376f2cc7dae80e2949cd6ca8a2420b3c61c1ecb7a275c6433d9a4d2d24f994d"
 dependencies = [
  "borsh",
+ "bytemuck",
  "mpl-token-metadata-context-derive",
  "num-derive",
  "num-traits",

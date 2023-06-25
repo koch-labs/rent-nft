@@ -53,3 +53,17 @@ pub struct BidUpdated {
 
     pub amount: i128,
 }
+
+#[event]
+pub struct ClaimedToken {
+    /// The collection mint
+    #[index]
+    pub collection_mint: Pubkey,
+
+    /// The created mint
+    #[index]
+    pub mint: Pubkey,
+
+    /// The new owner claiming the token
+    pub claimant: Pubkey,
+}

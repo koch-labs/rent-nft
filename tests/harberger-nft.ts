@@ -23,9 +23,14 @@ import { BN } from "bn.js";
 import { HarbergerNft } from "../target/types/harberger_nft";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
-import { generateSeededKeypair } from "./utils";
+import { createTokenAuthorizationRules, generateSeededKeypair } from "./utils";
 
 import { expect } from "chai";
+import { createPassRuleSet } from "../deps/metaplex-program-library/token-metadata/js/test/utils/programmable";
+import {
+  getRuleSetRevisionFromJson,
+  serializeRuleSetRevision,
+} from "@metaplex-foundation/mpl-token-auth-rules";
 
 const suiteName = "harberger-nft";
 describe(suiteName, () => {
@@ -94,6 +99,38 @@ describe(suiteName, () => {
     const collectionAuthority = getCollectionAuthorityKey(
       collectionMintKeypair.publicKey
     );
+
+    // const ruleSetKey = await createTokenAuthorizationRules(
+    //   connection,
+    //   admin,
+    //   `${suiteName}+rules`,
+    //   serializeRuleSetRevision(
+    //     getRuleSetRevisionFromJson(
+    //       JSON.stringify({
+    //         libVersion: 2,
+    //         name: "Program Owned Rule Set",
+    //         owner: admin.publicKey.toString(),
+    //         operations: {
+    //           "Transfer:Holder": {
+    //             type: "Any",
+    //             rules: [
+    //               {
+    //                 type: "PubkeyMatch",
+    //                 publicKey: "2PxKnBob4KBH2UWnrCmyYotXTaE6Zytaf29vHfWRbXio",
+    //                 field: "Destination",
+    //               },
+    //               {
+    //                 type: "PubkeyMatch",
+    //                 publicKey: "",
+    //                 field: "Source",
+    //               },
+    //             ],
+    //           },
+    //         },
+    //       })
+    //     )
+    //   )
+    // );
 
     // Mint collection
     const createCollectionAccounts = {
