@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Mint, Token, TokenAccount};
-use mpl_token_auth_rules::types::RuleSet;
 use mpl_token_metadata::instruction::builders::{CreateBuilder, VerifyBuilder};
 use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, VerificationArgs};
 use mpl_token_metadata::state::{AssetData, Collection, PrintSupply, TokenStandard};
@@ -20,6 +19,10 @@ pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
 
     token_state.config = config.key();
     token_state.token_mint = ctx.accounts.token_mint.key();
+    token_state.last_period = Clock::get()?.unix_timestamp;
+    token_state
+        .total_bids_window
+        .resize(config.contest_window_size as usize, 0);
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
@@ -203,7 +206,7 @@ pub struct CreateToken<'info> {
     #[account(
         init,
         payer = payer,
-        space = TokenState::LEN,
+        space = TokenState::len(config.contest_window_size),
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_mint.key().to_bytes()

@@ -3,6 +3,7 @@ mod errors;
 mod events;
 mod instructions;
 mod state;
+mod utils;
 
 use anchor_lang::prelude::*;
 
@@ -17,8 +18,10 @@ pub mod harberger_nft {
     pub fn create_collection(
         ctx: Context<CreateCollection>,
         price_per_time_unit: u64,
+        time_period: u32,
+        contest_window_size: u8,
     ) -> Result<()> {
-        instructions::create_collection(ctx, price_per_time_unit)
+        instructions::create_collection(ctx, price_per_time_unit, time_period, contest_window_size)
     }
 
     pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {

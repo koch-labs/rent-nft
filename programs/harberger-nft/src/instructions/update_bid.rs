@@ -6,7 +6,7 @@ use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{transfer, Mint, Token, TokenAccount, Transfer};
 
 pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
-    msg!("Creating a deposit account");
+    msg!("Updating bid account");
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;

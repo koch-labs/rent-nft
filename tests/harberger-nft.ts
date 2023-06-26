@@ -94,6 +94,8 @@ describe(suiteName, () => {
       `${suiteName}+collection`
     );
     const price = new anchor.BN(10);
+    const timePeriod = 10;
+    const contestWindowSize = 100;
 
     const configKey = getConfigKey(collectionMintKeypair.publicKey);
     const collectionAuthority = getCollectionAuthorityKey(
@@ -161,7 +163,7 @@ describe(suiteName, () => {
       metadataProgram: metaplex.programs().getTokenMetadata().address,
     };
     await program.methods
-      .createCollection(price)
+      .createCollection(price, timePeriod, contestWindowSize)
       .accounts(createCollectionAccounts)
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),

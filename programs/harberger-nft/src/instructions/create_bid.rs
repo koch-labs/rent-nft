@@ -7,14 +7,18 @@ use crate::events::*;
 use crate::state::*;
 
 pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
-    msg!("Creating a deposit account");
+    msg!("Creating a bid account");
 
     let config = &mut ctx.accounts.config;
+    msg!("{}", config.contest_window_size);
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
     bid_state.depositor = ctx.accounts.depositor.key();
     bid_state.token_state = token_state.key();
+    bid_state
+        .bids_window
+        .resize(config.contest_window_size as usize, 0);
 
     emit!(CreatedDepositAccount {
         depositor: ctx.accounts.depositor.key(),
@@ -67,7 +71,7 @@ pub struct CreateBid<'info> {
     #[account(
         init,
         payer = payer,
-        space = BidState::LEN,
+        space = BidState::len(config.contest_window_size),
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes(),

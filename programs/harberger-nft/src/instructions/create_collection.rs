@@ -10,7 +10,12 @@ use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
 
-pub fn create_collection(ctx: Context<CreateCollection>, price_per_time_unit: u64) -> Result<()> {
+pub fn create_collection(
+    ctx: Context<CreateCollection>,
+    price_per_time_unit: u64,
+    time_period: u32,
+    contest_window_size: u8,
+) -> Result<()> {
     msg!("Creating a collection");
 
     let config = &mut ctx.accounts.config;
@@ -18,6 +23,8 @@ pub fn create_collection(ctx: Context<CreateCollection>, price_per_time_unit: u6
     config.collection_mint = ctx.accounts.collection_mint.key();
     config.admin_mint = ctx.accounts.admin_mint.key();
     config.tax_mint = ctx.accounts.tax_mint.key();
+    config.time_period = time_period;
+    config.contest_window_size = contest_window_size;
     config.price_per_time_unit = price_per_time_unit;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
