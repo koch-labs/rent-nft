@@ -1,9 +1,10 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{Mint, Token, TokenAccount};
-use mpl_token_metadata::instruction::builders::{CreateBuilder, VerifyBuilder};
-use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, VerificationArgs};
+use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
+use mpl_token_metadata::instruction::builders::{CreateBuilder, MintBuilder, VerifyBuilder};
+use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, MintArgs, VerificationArgs};
+use mpl_token_metadata::processor::AuthorizationData;
 use mpl_token_metadata::state::{AssetData, Collection, PrintSupply, TokenStandard};
 
 use crate::constants::*;
@@ -100,6 +101,40 @@ pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
         signers_seeds,
     )?;
 
+    invoke_signed(
+        &MintBuilder::new()
+            .mint(ctx.accounts.token_mint.key())
+            .metadata(ctx.accounts.token_metadata.key())
+            .master_edition(ctx.accounts.token_master_edition.key())
+            .token(ctx.accounts.token_account.key())
+            .authority(ctx.accounts.collection_authority.key())
+            .token_owner(ctx.accounts.receiver.key())
+            .delegate_record(ctx.accounts.delegate_record.key())
+            .token_record(ctx.accounts.token_record.key())
+            .payer(ctx.accounts.payer.key())
+            .sysvar_instructions(ctx.accounts.system_program.key())
+            .build(MintArgs::V1 {
+                amount: 1,
+                authorization_data: None,
+            })
+            .unwrap()
+            .instruction(),
+        &[
+            ctx.accounts.token_mint.to_account_info(),
+            ctx.accounts.token_metadata.to_account_info(),
+            ctx.accounts.token_master_edition.to_account_info(),
+            ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.receiver.to_account_info(),
+            ctx.accounts.delegate_record.to_account_info(),
+            ctx.accounts.token_record.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
+        ],
+        signers_seeds,
+    )?;
+
     emit!(TokenCreated {
         config: config.key(),
         mint: ctx.accounts.token_mint.key(),
@@ -137,22 +172,18 @@ pub struct CreateToken<'info> {
         ],
         bump,
         has_one = collection_mint,
-        has_one = admin_mint,
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
-
-    /// The token representing the group authority
-    pub admin_mint: Box<Account<'info, Mint>>,
 
     /// The account that receives the token
     #[account(
         init_if_needed,
         payer = payer,
-        associated_token::mint = admin_mint,
+        associated_token::mint = collection_mint,
         associated_token::authority = admin,
-        constraint = admin_account.amount == 1 @ HarbergerError::NotAdmin,
+        constraint = admin_collection_account.amount == 1 @ HarbergerError::NotAdmin,
     )]
-    pub admin_account: Box<Account<'info, TokenAccount>>,
+    pub admin_collection_account: Box<Account<'info, TokenAccount>>,
 
     /// The mint of the collection
     #[account(mut)]
@@ -192,6 +223,10 @@ pub struct CreateToken<'info> {
     /// CHECK: Verified by Metaplex
     #[account(mut)]
     pub delegate_record: UncheckedAccount<'info>,
+
+    /// CHECK: Verified by Metaplex
+    #[account(mut)]
+    pub token_record: UncheckedAccount<'info>,
 
     /// The account storing the collection token
     #[account(

@@ -88,7 +88,6 @@ describe(suiteName, () => {
   it("Mint collection", async () => {
     const admin = users[0];
     const holder = users[1];
-    const adminMintKeypair = Keypair.generate();
 
     const collectionMintKeypair = generateSeededKeypair(
       `${suiteName}+collection`
@@ -135,41 +134,43 @@ describe(suiteName, () => {
     // );
 
     // Mint collection
-    const createCollectionAccounts = {
-      config: configKey,
-      taxMint,
-      admin: admin.publicKey,
-      adminMint: adminMintKeypair.publicKey,
-      adminAccount: getAssociatedTokenAddressSync(
-        adminMintKeypair.publicKey,
-        admin.publicKey,
-        true
-      ),
-      collectionAuthority,
-      collectionMint: collectionMintKeypair.publicKey,
-      collectionMetadata: metaplex
-        .nfts()
-        .pdas()
-        .metadata({ mint: collectionMintKeypair.publicKey }),
-      collectionMasterEdition: metaplex
-        .nfts()
-        .pdas()
-        .masterEdition({ mint: collectionMintKeypair.publicKey }),
-      collectionAccount: getAssociatedTokenAddressSync(
-        collectionMintKeypair.publicKey,
-        collectionAuthority,
-        true
-      ),
-      metadataProgram: metaplex.programs().getTokenMetadata().address,
-    };
     await program.methods
       .createCollection(price, timePeriod, contestWindowSize)
-      .accounts(createCollectionAccounts)
+      .accounts({
+        config: configKey,
+        taxMint,
+        admin: admin.publicKey,
+        adminCollectionAccount: getAssociatedTokenAddressSync(
+          collectionMintKeypair.publicKey,
+          admin.publicKey,
+          true
+        ),
+        collectionAuthority,
+        collectionMint: collectionMintKeypair.publicKey,
+        collectionMetadata: metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: collectionMintKeypair.publicKey }),
+        collectionMasterEdition: metaplex
+          .nfts()
+          .pdas()
+          .masterEdition({ mint: collectionMintKeypair.publicKey }),
+        metadataProgram: metaplex.programs().getTokenMetadata().address,
+      })
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
       ])
-      .signers([adminMintKeypair, collectionMintKeypair])
-      .rpc();
+      .signers([collectionMintKeypair])
+      .rpc({ skipPreflight: true });
+
+    let adminCollectionAccount = await connection.getTokenAccountBalance(
+      getAssociatedTokenAddressSync(
+        collectionMintKeypair.publicKey,
+        admin.publicKey,
+        true
+      )
+    );
+    expect(adminCollectionAccount.value.amount.toString()).to.equal("1");
 
     let collectionMetadata = await metaplex
       .nfts()
@@ -181,9 +182,6 @@ describe(suiteName, () => {
     );
     expect(collectionConfig.collectionMint.toString()).to.equal(
       collectionMintKeypair.publicKey.toString()
-    );
-    expect(collectionConfig.adminMint.toString()).to.equal(
-      adminMintKeypair.publicKey.toString()
     );
     expect(collectionConfig.taxMint.toString()).to.equal(taxMint.toString());
     expect(collectionConfig.pricePerTimeUnit.toString()).to.equal(
@@ -203,9 +201,8 @@ describe(suiteName, () => {
         config: configKey,
         receiver: holder.publicKey,
         admin: admin.publicKey,
-        adminMint: adminMintKeypair.publicKey,
-        adminAccount: getAssociatedTokenAddressSync(
-          adminMintKeypair.publicKey,
+        adminCollectionAccount: getAssociatedTokenAddressSync(
+          collectionMintKeypair.publicKey,
           admin.publicKey,
           true
         ),
@@ -240,6 +237,17 @@ describe(suiteName, () => {
           delegate: collectionAuthority,
           updateAuthority: collectionAuthority,
         }),
+        tokenRecord: metaplex
+          .nfts()
+          .pdas()
+          .tokenRecord({
+            mint: tokenMintKeypair.publicKey,
+            token: getAssociatedTokenAddressSync(
+              tokenMintKeypair.publicKey,
+              holder.publicKey,
+              true
+            ),
+          }),
         metadataProgram: metaplex.programs().getTokenMetadata().address,
       })
       .preInstructions([

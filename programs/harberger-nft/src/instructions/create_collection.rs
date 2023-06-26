@@ -21,7 +21,6 @@ pub fn create_collection(
     let config = &mut ctx.accounts.config;
 
     config.collection_mint = ctx.accounts.collection_mint.key();
-    config.admin_mint = ctx.accounts.admin_mint.key();
     config.tax_mint = ctx.accounts.tax_mint.key();
     config.time_period = time_period;
     config.contest_window_size = contest_window_size;
@@ -35,27 +34,27 @@ pub fn create_collection(
     ];
     let signers_seeds = &[&authority_seeds[..]];
 
-    // Mint the admin token
-    token::mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            MintTo {
-                mint: ctx.accounts.admin_mint.to_account_info(),
-                to: ctx.accounts.admin_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
-            },
-            signers_seeds,
-        ),
-        1,
-    )?;
-
-    // Mint the collection mint
+    // Create the collection mint
     let asset_data = AssetData::new(
         TokenStandard::NonFungible,
         "name".to_string(),
         "HARBIE".to_string(),
         "uri".to_string(),
     );
+
+    // Mint the token to the admin
+    token::mint_to(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            MintTo {
+                mint: ctx.accounts.collection_mint.to_account_info(),
+                to: ctx.accounts.admin_collection_account.to_account_info(),
+                authority: ctx.accounts.collection_authority.to_account_info(),
+            },
+            signers_seeds,
+        ),
+        1,
+    )?;
 
     invoke_signed(
         &CreateBuilder::new()
@@ -107,24 +106,6 @@ pub struct CreateCollection<'info> {
     /// CHECK: Delegatable creation
     pub admin: UncheckedAccount<'info>,
 
-    /// The token representing the group authority
-    #[account(
-        init,
-        payer = payer,
-        mint::decimals = 0,
-        mint::authority = collection_authority,
-    )]
-    pub admin_mint: Box<Account<'info, Mint>>,
-
-    /// The account that receives the token
-    #[account(
-        init_if_needed,
-        payer = payer,
-        associated_token::mint = admin_mint,
-        associated_token::authority = admin,
-    )]
-    pub admin_account: Box<Account<'info, TokenAccount>>,
-
     /// CHECK: Seeded authority
     #[account(
         seeds = [
@@ -170,14 +151,14 @@ pub struct CreateCollection<'info> {
     #[account(mut)]
     pub collection_master_edition: UncheckedAccount<'info>,
 
-    /// The account storing the collection token
+    /// The account that receives the token
     #[account(
         init_if_needed,
         payer = payer,
         associated_token::mint = collection_mint,
-        associated_token::authority = collection_authority,
+        associated_token::authority = admin,
     )]
-    pub collection_account: Box<Account<'info, TokenAccount>>,
+    pub admin_collection_account: Box<Account<'info, TokenAccount>>,
 
     /// Common Solana programs
     pub token_program: Program<'info, Token>,

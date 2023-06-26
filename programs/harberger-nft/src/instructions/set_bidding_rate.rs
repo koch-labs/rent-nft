@@ -1,4 +1,5 @@
 use crate::constants::*;
+use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
 use crate::utils::max;
@@ -95,6 +96,20 @@ pub struct SetBiddingRate<'info> {
 
     /// CHECK: Only reading admin authority
     pub admin: UncheckedAccount<'info>,
+
+    /// The mint of the collection
+    #[account(mut)]
+    pub collection_mint: Box<Account<'info, Mint>>,
+
+    /// The account that holds the collection mint
+    #[account(
+        init_if_needed,
+        payer = payer,
+        associated_token::mint = collection_mint,
+        associated_token::authority = admin,
+        constraint = admin_collection_account.amount == 1 @ HarbergerError::NotAdmin,
+    )]
+    pub admin_collection_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: Seeded authority
     #[account(

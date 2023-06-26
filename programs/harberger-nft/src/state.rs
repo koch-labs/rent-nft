@@ -7,9 +7,6 @@ pub struct CollectionConfig {
     /// The mint of the tax token
     pub collection_mint: Pubkey,
 
-    /// Mint of the authority token
-    pub admin_mint: Pubkey,
-
     /// The mint of the tax token
     pub tax_mint: Pubkey,
 
@@ -26,7 +23,6 @@ pub struct CollectionConfig {
 impl CollectionConfig {
     pub const LEN: usize = 8 // Discriminator
         + 32 // Collection
-        + 32 // Admin
         + 32 // Tax
         + 4 // Period
         + 1 // Window
