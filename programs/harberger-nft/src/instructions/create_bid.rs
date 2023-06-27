@@ -16,6 +16,7 @@ pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
 
     bid_state.depositor = ctx.accounts.depositor.key();
     bid_state.token_state = token_state.key();
+    bid_state.bidding_period = token_state.last_period;
     bid_state
         .bids_window
         .resize(config.contest_window_size as usize, 0);

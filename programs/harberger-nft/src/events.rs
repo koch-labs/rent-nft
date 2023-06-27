@@ -67,3 +67,18 @@ pub struct ClaimedToken {
     /// The new owner claiming the token
     pub claimant: Pubkey,
 }
+
+#[event]
+pub struct NewBiddingRate {
+    /// The collection mint
+    #[index]
+    pub collection_mint: Pubkey,
+
+    /// The contested mint
+    #[index]
+    pub mint: Pubkey,
+
+    pub bid_state: Pubkey,
+
+    pub new_rate: u64,
+}

@@ -1,10 +1,9 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
+use anchor_spl::token::{Mint, Token, TokenAccount};
 use mpl_token_metadata::instruction::builders::{CreateBuilder, MintBuilder, VerifyBuilder};
 use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, MintArgs, VerificationArgs};
-use mpl_token_metadata::processor::AuthorizationData;
 use mpl_token_metadata::state::{AssetData, Collection, PrintSupply, TokenStandard};
 
 use crate::constants::*;

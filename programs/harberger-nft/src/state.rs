@@ -79,8 +79,11 @@ pub struct BidState {
     // Units per time period payable to
     pub bidding_rate: u64,
 
+    // Whether this account is actively bidding
+    pub actively_bidding: bool,
+
     /// Timestamp of the moment the user started actively bidding
-    pub bidding_period: Option<i64>,
+    pub bidding_period: i64,
 
     /// Bids paid recently
     pub bids_window: Vec<u64>,
@@ -94,7 +97,8 @@ impl BidState {
         + 8 // Update
         + 8 // Amount
         + 8 // Bidding rate
-        + 9 // Start bid
+        + 1 // Active
+        + 8 // Start bid
         + 4 + 8 * (window_size as usize); // Window
     }
 }

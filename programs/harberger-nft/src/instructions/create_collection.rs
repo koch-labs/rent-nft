@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke_signed;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
-use mpl_token_metadata::instruction::builders::CreateBuilder;
-use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder};
+use anchor_spl::token::{Mint, Token, TokenAccount};
+use mpl_token_metadata::instruction::builders::{CreateBuilder, MintBuilder};
+use mpl_token_metadata::instruction::{CreateArgs, InstructionBuilder, MintArgs};
 use mpl_token_metadata::state::{AssetData, PrintSupply, TokenStandard};
 
 use crate::constants::*;
@@ -42,20 +42,6 @@ pub fn create_collection(
         "uri".to_string(),
     );
 
-    // Mint the token to the admin
-    token::mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            MintTo {
-                mint: ctx.accounts.collection_mint.to_account_info(),
-                to: ctx.accounts.admin_collection_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
-            },
-            signers_seeds,
-        ),
-        1,
-    )?;
-
     invoke_signed(
         &CreateBuilder::new()
             .mint(ctx.accounts.collection_mint.key())
@@ -83,6 +69,36 @@ pub fn create_collection(
             ctx.accounts.collection_authority.to_account_info(),
             ctx.accounts.payer.to_account_info(),
             ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
+        ],
+        signers_seeds,
+    )?;
+
+    invoke_signed(
+        &MintBuilder::new()
+            .mint(ctx.accounts.collection_mint.key())
+            .metadata(ctx.accounts.collection_metadata.key())
+            .master_edition(ctx.accounts.collection_master_edition.key())
+            .token(ctx.accounts.admin_collection_account.key())
+            .authority(ctx.accounts.collection_authority.key())
+            .token_owner(ctx.accounts.admin.key())
+            .payer(ctx.accounts.payer.key())
+            .sysvar_instructions(ctx.accounts.system_program.key())
+            .build(MintArgs::V1 {
+                amount: 1,
+                authorization_data: None,
+            })
+            .unwrap()
+            .instruction(),
+        &[
+            ctx.accounts.collection_mint.to_account_info(),
+            ctx.accounts.collection_metadata.to_account_info(),
+            ctx.accounts.collection_master_edition.to_account_info(),
+            ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.admin_collection_account.to_account_info(),
+            ctx.accounts.admin.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
             ctx.accounts.rent.to_account_info(),
         ],

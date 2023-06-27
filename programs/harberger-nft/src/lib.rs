@@ -35,4 +35,8 @@ pub mod harberger_nft {
     pub fn update_deposit(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
         instructions::update_bid(ctx, amount)
     }
+
+    pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
+        instructions::set_bidding_rate(ctx, new_rate)
+    }
 }
