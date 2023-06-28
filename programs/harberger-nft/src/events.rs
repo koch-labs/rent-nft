@@ -69,6 +69,18 @@ pub struct ClaimedToken {
 }
 
 #[event]
+pub struct UpdatedTokenState {
+    /// The collection mint
+    pub collection_mint: Pubkey,
+
+    /// The contested mint
+    pub mint: Pubkey,
+
+    #[index]
+    pub token_state: Pubkey,
+}
+
+#[event]
 pub struct NewBiddingRate {
     /// The collection mint
     #[index]

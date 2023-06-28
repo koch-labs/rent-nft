@@ -423,7 +423,7 @@ describe(suiteName, () => {
 
     console.log(bidState);
 
-    sleep(timePeriod * 2);
+    await sleep(timePeriod * 2);
     await program.methods
       .setBiddingRate(new BN(0))
       .accounts({
@@ -468,6 +468,11 @@ describe(suiteName, () => {
       await connection.getTokenAccountBalance(
         getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
       )
+    );
+
+    expect(bidState.biddingRate.toString()).to.equal("0");
+    expect(bidState.biddingPeriod.toString()).to.equal(
+      tokenState.lastPeriod.toString()
     );
   });
 });

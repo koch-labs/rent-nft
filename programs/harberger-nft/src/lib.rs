@@ -13,6 +13,7 @@ declare_id!("9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu");
 
 #[program]
 pub mod harberger_nft {
+
     use super::*;
 
     pub fn create_collection(
@@ -34,6 +35,10 @@ pub mod harberger_nft {
 
     pub fn update_deposit(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
         instructions::update_bid(ctx, amount)
+    }
+
+    pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
+        instructions::update_token_state(ctx)
     }
 
     pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
