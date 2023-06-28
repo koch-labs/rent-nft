@@ -2,7 +2,7 @@ use crate::constants::*;
 use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
-use crate::utils::max;
+use crate::utils::min;
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{transfer, Mint, Token, TokenAccount, Transfer};
@@ -56,6 +56,59 @@ fn update_bid_state_for_finished_period(
     amount
 }
 
+fn update_bid_state_for_current_period(
+    bid_state: &mut Account<BidState>,
+    token_state: &mut Account<TokenState>,
+    config: &Account<CollectionConfig>,
+    new_rate: u64,
+) -> Result<u64> {
+    let current_time = min(
+        Clock::get()?.unix_timestamp,
+        token_state.last_period + config.time_period as i64,
+    );
+    let amount = min(
+        bid_state.amount,
+        owed_amount_for_duration(bid_state, config, bid_state.last_update, current_time),
+    );
+
+    if !bid_state.actively_bidding && new_rate != 0 {
+        token_state.bidders += 1;
+    } else if bid_state.actively_bidding && new_rate == 0 {
+        token_state.bidders -= 1;
+    }
+
+    bid_state.bidding_rate = new_rate;
+    bid_state.actively_bidding = new_rate != 0;
+    bid_state.amount -= amount;
+    bid_state.last_update = current_time;
+    bid_state.bids_window[0] += amount;
+    token_state.total_bids_window[0] += amount;
+
+    Ok(amount)
+}
+
+fn update_token_period(
+    token_state: &mut Account<TokenState>,
+    config: &Account<CollectionConfig>,
+) -> Result<()> {
+    let current_time = min(
+        Clock::get()?.unix_timestamp,
+        token_state.last_period + config.time_period as i64,
+    );
+    let missed_periods = min(
+        (current_time - token_state.last_period) / config.time_period as i64,
+        config.contest_window_size as i64,
+    );
+
+    for _ in missed_periods..0 {
+        token_state.last_period += config.time_period as i64;
+        token_state.total_bids_window.insert(0, 0);
+        token_state.total_bids_window.pop();
+    }
+
+    Ok(())
+}
+
 pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
     msg!("Setting bidding rate");
 
@@ -63,17 +116,19 @@ pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<(
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
+    update_token_period(token_state, config)?;
+
     // Bidding process already started, update bid
     // Lock-in past bid
+    // Debit the bid account later
+    let mut debt = 0;
     if bid_state.bidding_period != token_state.last_period {
-        let missed_period = max(
+        let missed_period = min(
             (token_state.last_period - bid_state.bidding_period) / config.time_period as i64,
             config.contest_window_size as i64,
         );
 
         // Compute the owed amount now
-        // Debit the bid account later
-        let mut debt = 0;
         // Exclude the current period
         for offset in (missed_period - 1)..0 {
             debt += update_bid_state_for_finished_period(
@@ -83,41 +138,29 @@ pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<(
                 offset as usize,
             );
         }
-
-        transfer(
-            CpiContext::new(
-                ctx.accounts.token_program.to_account_info(),
-                Transfer {
-                    from: ctx.accounts.bid_account.to_account_info(),
-                    to: ctx.accounts.admin_account.to_account_info(),
-                    authority: ctx.accounts.bidder.to_account_info(),
-                },
-            ),
-            debt,
-        )?;
-
-        msg!(
-            "Bid state time: {}; Token state tim: {}",
-            bid_state.bidding_period,
-            token_state.last_period
-        );
     }
 
-    let current_time = max(
-        Clock::get()?.unix_timestamp,
-        token_state.last_period + config.time_period as i64,
-    );
-    let amount = max(
-        bid_state.amount,
-        owed_amount_for_duration(bid_state, config, bid_state.last_update, current_time),
-    );
+    debt += update_bid_state_for_current_period(bid_state, token_state, config, new_rate)?;
 
-    bid_state.bidding_rate = new_rate;
-    bid_state.actively_bidding = new_rate != 0;
-    bid_state.amount -= amount;
-    bid_state.last_update = current_time;
-    bid_state.bids_window[0] += amount;
-    token_state.total_bids_window[0] += amount;
+    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_seeds = &[
+        &ctx.accounts.collection_mint.key().to_bytes(),
+        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        &[authority_bump],
+    ];
+    let signer_seeds = &[&authority_seeds[..]];
+    transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.bid_account.to_account_info(),
+                to: ctx.accounts.admin_account.to_account_info(),
+                authority: ctx.accounts.collection_authority.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        debt,
+    )?;
 
     emit!(NewBiddingRate {
         collection_mint: config.collection_mint.key(),
@@ -140,7 +183,6 @@ pub struct SetBiddingRate<'info> {
     pub admin: UncheckedAccount<'info>,
 
     /// The mint of the collection
-    #[account(mut)]
     pub collection_mint: Box<Account<'info, Mint>>,
 
     /// The account that holds the collection mint
@@ -220,7 +262,7 @@ pub struct SetBiddingRate<'info> {
         init_if_needed,
         payer = payer,
         associated_token::mint = tax_mint,
-        associated_token::authority = collection_authority
+        associated_token::authority = admin
     )]
     pub admin_account: Box<Account<'info, TokenAccount>>,
 

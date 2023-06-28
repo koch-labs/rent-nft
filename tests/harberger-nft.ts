@@ -23,7 +23,11 @@ import { BN } from "bn.js";
 import { HarbergerNft } from "../target/types/harberger_nft";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
-import { createTokenAuthorizationRules, generateSeededKeypair } from "./utils";
+import {
+  createTokenAuthorizationRules,
+  generateSeededKeypair,
+  sleep,
+} from "./utils";
 
 import { expect } from "chai";
 import { createPassRuleSet } from "../deps/metaplex-program-library/token-metadata/js/test/utils/programmable";
@@ -93,8 +97,10 @@ describe(suiteName, () => {
       `${suiteName}+collection`
     );
     const price = new anchor.BN(10);
-    const timePeriod = 10;
-    const contestWindowSize = 100;
+    const timePeriod = 2;
+    const contestWindowSize = 10;
+    const depositedAmount = new BN(100);
+    const biddingRate = new anchor.BN(10);
 
     const configKey = getConfigKey(collectionMintKeypair.publicKey);
     const collectionAuthority = getCollectionAuthorityKey(
@@ -295,7 +301,6 @@ describe(suiteName, () => {
     expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
     expect(bidState.amount.toString()).to.equal("0");
 
-    const depositedAmount = new BN(10);
     await program.methods
       .updateDeposit(depositedAmount.mul(new BN(2)))
       .accounts({
@@ -359,5 +364,110 @@ describe(suiteName, () => {
     expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
     expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
     expect(bidState.amount.toString()).to.equal(depositedAmount.toString());
+
+    let bidAccount = await connection.getTokenAccountBalance(
+      getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
+    );
+    expect(bidAccount.value.amount).to.equal(depositedAmount.toString());
+
+    // Start bidding
+    await program.methods
+      .setBiddingRate(biddingRate)
+      .accounts({
+        bidder: holder.publicKey,
+        admin: admin.publicKey,
+        collectionMint: collectionMintKeypair.publicKey,
+        adminCollectionAccount: getAssociatedTokenAddressSync(
+          collectionMintKeypair.publicKey,
+          admin.publicKey,
+          true
+        ),
+        config: configKey,
+        collectionAuthority,
+        taxMint,
+        tokenState: tokenStateKey,
+        bidState: bidStateKey,
+        bidderAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          holder.publicKey,
+          true
+        ),
+        bidAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          collectionAuthority,
+          true
+        ),
+        adminAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          admin.publicKey,
+          true
+        ),
+      })
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
+      ])
+      .signers([holder])
+      .rpc({ skipPreflight: true });
+
+    let newBidAccount = await connection.getTokenAccountBalance(
+      getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
+    );
+    expect(newBidAccount.value.amount).to.equal(bidAccount.value.amount);
+
+    tokenState = await program.account.tokenState.fetch(tokenStateKey);
+    bidState = await program.account.bidState.fetch(bidStateKey);
+    expect(bidState.biddingRate.toString()).to.equal(biddingRate.toString());
+    expect(bidState.biddingPeriod.toString()).to.equal(
+      tokenState.lastPeriod.toString()
+    );
+
+    console.log(bidState);
+
+    sleep(timePeriod * 2);
+    await program.methods
+      .setBiddingRate(new BN(0))
+      .accounts({
+        bidder: holder.publicKey,
+        admin: admin.publicKey,
+        collectionMint: collectionMintKeypair.publicKey,
+        adminCollectionAccount: getAssociatedTokenAddressSync(
+          collectionMintKeypair.publicKey,
+          admin.publicKey,
+          true
+        ),
+        config: configKey,
+        collectionAuthority,
+        taxMint,
+        tokenState: tokenStateKey,
+        bidState: bidStateKey,
+        bidderAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          holder.publicKey,
+          true
+        ),
+        bidAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          collectionAuthority,
+          true
+        ),
+        adminAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          admin.publicKey,
+          true
+        ),
+      })
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
+      ])
+      .signers([holder])
+      .rpc({ skipPreflight: true });
+
+    bidState = await program.account.bidState.fetch(bidStateKey);
+    console.log(bidState);
+    console.log(
+      await connection.getTokenAccountBalance(
+        getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
+      )
+    );
   });
 });

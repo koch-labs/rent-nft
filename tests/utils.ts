@@ -1,7 +1,21 @@
 import * as anchor from "@coral-xyz/anchor";
 
-import { Keypair, PublicKey, Transaction, Connection, SystemProgram } from "@solana/web3.js";
-import { PREFIX, PROGRAM_ID, createCreateOrUpdateInstruction } from "@metaplex-foundation/mpl-token-auth-rules";
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  Connection,
+  SystemProgram,
+} from "@solana/web3.js";
+import {
+  PREFIX,
+  PROGRAM_ID,
+  createCreateOrUpdateInstruction,
+} from "@metaplex-foundation/mpl-token-auth-rules";
+
+export async function sleep(seconds: number) {
+  new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+}
 
 export const generateSeededKeypair = (seed: string) => {
   return Keypair.fromSeed(
