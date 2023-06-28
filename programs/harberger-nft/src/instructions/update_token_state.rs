@@ -7,7 +7,7 @@ use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{Mint, Token};
 
 pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
-    msg!("Update token state");
+    msg!("Updating token state");
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
@@ -20,8 +20,9 @@ pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
         (current_time - token_state.last_period) / config.time_period as i64,
         config.contest_window_size as i64,
     );
+    msg!("{} periods to update", missed_periods);
 
-    for _ in missed_periods..0 {
+    for _ in 0..missed_periods {
         token_state.last_period += config.time_period as i64;
         token_state.total_bids_window.insert(0, 0);
         token_state.total_bids_window.pop();

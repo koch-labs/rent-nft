@@ -27,9 +27,9 @@ pub struct TokenCreated {
 }
 
 #[event]
-pub struct CreatedDepositAccount {
-    /// The depositor
-    pub depositor: Pubkey,
+pub struct CreatedBidState {
+    /// The bidder
+    pub bidder: Pubkey,
 
     /// The created mint
     #[index]
@@ -44,8 +44,8 @@ pub struct BidUpdated {
     /// The collection mint
     pub collection_mint: Pubkey,
 
-    /// The depositor
-    pub depositor: Pubkey,
+    /// The bidder
+    pub bidder: Pubkey,
 
     /// The created mint
     #[index]
@@ -78,6 +78,18 @@ pub struct UpdatedTokenState {
 
     #[index]
     pub token_state: Pubkey,
+}
+
+#[event]
+pub struct UpdatedBidState {
+    /// The collection mint
+    pub collection_mint: Pubkey,
+
+    /// The contested mint
+    pub mint: Pubkey,
+
+    #[index]
+    pub bid_state: Pubkey,
 }
 
 #[event]

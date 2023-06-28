@@ -7,34 +7,48 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::{transfer, Mint, Token, TokenAccount, Transfer};
 
-pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
-    msg!("Setting bidding rate");
+pub fn update_bid_state(ctx: Context<UpdateBidState>) -> Result<()> {
+    msg!("Updating bid state");
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
-    let current_time = min(
-        Clock::get()?.unix_timestamp,
-        token_state.last_period + config.time_period as i64,
+    // Bidding process already started, update bid
+    // Lock-in past bid
+    // Debit the bid account later
+    let mut debt = 0;
+    let missed_period = min(
+        (token_state.last_period - bid_state.bidding_period) / config.time_period as i64,
+        config.contest_window_size as i64,
     );
-    let period_time_elapsed = (current_time - bid_state.last_update) as u64;
-    let prorata_debt =
-        10000 * period_time_elapsed * bid_state.bidding_rate / config.time_period as u64 / 10000;
-    let amount = min(bid_state.amount, prorata_debt);
 
-    if !bid_state.actively_bidding && new_rate != 0 {
-        token_state.bidders += 1;
-    } else if bid_state.actively_bidding && new_rate == 0 {
-        token_state.bidders -= 1;
+    // Compute the owed amount now
+    // Exclude the current period
+    for offset in 0..missed_period {
+        let amount = if bid_state.actively_bidding {
+            let period_time_elapsed = (bid_state.last_update - bid_state.bidding_period) as u64;
+            let prorata_debt = 10000 * period_time_elapsed * bid_state.bidding_rate
+                / config.time_period as u64
+                / 10000;
+
+            min(prorata_debt, bid_state.amount)
+        } else {
+            0
+        };
+
+        // Add the debt to the latest user bids
+        bid_state.bids_window[0] += amount;
+        token_state.total_bids_window[(missed_period - offset - 1) as usize] += amount;
+        bid_state.amount -= amount;
+        // Shift bids to start a new period
+        bid_state.last_update = bid_state.bidding_period + config.time_period as i64;
+        bid_state.bidding_period = bid_state.last_update;
+        bid_state.bids_window.insert(0, 0);
+        bid_state.bids_window.pop();
+
+        debt += amount
     }
-
-    bid_state.bidding_rate = new_rate;
-    bid_state.actively_bidding = new_rate != 0;
-    bid_state.amount -= amount;
-    bid_state.last_update = current_time;
-    bid_state.bids_window[0] += amount;
-    token_state.total_bids_window[0] += amount;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
@@ -53,25 +67,22 @@ pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<(
             },
             signer_seeds,
         ),
-        amount,
+        debt,
     )?;
 
-    emit!(NewBiddingRate {
+    emit!(UpdatedBidState {
         collection_mint: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
         bid_state: ctx.accounts.bid_state.key(),
-        new_rate
     });
 
     Ok(())
 }
 
 #[derive(Accounts)]
-pub struct SetBiddingRate<'info> {
+pub struct UpdateBidState<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-
-    pub bidder: Signer<'info>,
 
     /// CHECK: Only reading admin authority
     pub admin: UncheckedAccount<'info>,
@@ -123,7 +134,7 @@ pub struct SetBiddingRate<'info> {
         bump,
         has_one = config,
         constraint = token_state.last_period <= Clock::get()?.unix_timestamp @ HarbergerError::InvalidTokenStatePeriod,
-        constraint = token_state.last_period + config.time_period as i64 > Clock::get()?.unix_timestamp @ HarbergerError::InvalidTokenStatePeriod,
+        constraint = token_state.last_period + config.time_period as i64 >= Clock::get()?.unix_timestamp @ HarbergerError::InvalidTokenStatePeriod,
     )]
     pub token_state: Box<Account<'info, TokenState>>,
 
@@ -132,10 +143,10 @@ pub struct SetBiddingRate<'info> {
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes(),
-            &bidder.key().to_bytes(),
+            &bid_state.bidder.to_bytes(),
         ],
         bump,
-        constraint = bid_state.bidding_period == token_state.last_period @ HarbergerError::InvalidBidStatePeriod,
+        constraint = bid_state.bidding_period != token_state.last_period @ HarbergerError::InvalidBidStatePeriod,
     )]
     pub bid_state: Box<Account<'info, BidState>>,
 

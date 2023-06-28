@@ -68,7 +68,7 @@ pub struct BidState {
     pub token_state: Pubkey,
 
     /// The owner of the deposit
-    pub depositor: Pubkey,
+    pub bidder: Pubkey,
 
     /// Timestamp of the last update
     pub last_update: i64,

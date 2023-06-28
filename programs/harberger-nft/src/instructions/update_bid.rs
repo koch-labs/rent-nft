@@ -64,7 +64,7 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
     emit!(BidUpdated {
         collection_mint: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
-        depositor: ctx.accounts.bidder.key(),
+        bidder: ctx.accounts.bidder.key(),
         amount
     });
 

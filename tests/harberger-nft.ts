@@ -285,7 +285,7 @@ describe(suiteName, () => {
     await program.methods
       .createBid()
       .accounts({
-        depositor: holder.publicKey,
+        bidder: holder.publicKey,
         config: configKey,
         collectionAuthority,
         tokenState: tokenStateKey,
@@ -298,7 +298,7 @@ describe(suiteName, () => {
 
     let bidState = await program.account.bidState.fetch(bidStateKey);
     expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
-    expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
+    expect(bidState.bidder.toString()).to.equal(holder.publicKey.toString());
     expect(bidState.amount.toString()).to.equal("0");
 
     await program.methods
@@ -329,7 +329,7 @@ describe(suiteName, () => {
 
     bidState = await program.account.bidState.fetch(bidStateKey);
     expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
-    expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
+    expect(bidState.bidder.toString()).to.equal(holder.publicKey.toString());
     expect(bidState.amount.toString()).to.equal(
       depositedAmount.mul(new BN(2)).toString()
     );
@@ -362,7 +362,7 @@ describe(suiteName, () => {
 
     bidState = await program.account.bidState.fetch(bidStateKey);
     expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
-    expect(bidState.depositor.toString()).to.equal(holder.publicKey.toString());
+    expect(bidState.bidder.toString()).to.equal(holder.publicKey.toString());
     expect(bidState.amount.toString()).to.equal(depositedAmount.toString());
 
     let bidAccount = await connection.getTokenAccountBalance(
@@ -370,7 +370,48 @@ describe(suiteName, () => {
     );
     expect(bidAccount.value.amount).to.equal(depositedAmount.toString());
 
+    console.log(await program.account.tokenState.fetch(tokenStateKey));
     // Start bidding
+    await program.methods
+      .updateTokenState()
+      .accounts({
+        collectionMint: collectionMintKeypair.publicKey,
+        config: configKey,
+        collectionAuthority,
+        tokenState: tokenStateKey,
+      })
+      .rpc({ skipPreflight: true });
+
+    console.log(await program.account.tokenState.fetch(tokenStateKey));
+    console.log(await program.account.bidState.fetch(bidStateKey));
+
+    await program.methods
+      .updateBidState()
+      .accounts({
+        admin: admin.publicKey,
+        collectionMint: collectionMintKeypair.publicKey,
+        adminCollectionAccount: getAssociatedTokenAddressSync(
+          collectionMintKeypair.publicKey,
+          admin.publicKey,
+          true
+        ),
+        config: configKey,
+        collectionAuthority,
+        taxMint,
+        tokenState: tokenStateKey,
+        bidState: bidStateKey,
+        bidAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          collectionAuthority,
+          true
+        ),
+        adminAccount: getAssociatedTokenAddressSync(
+          taxMint,
+          admin.publicKey,
+          true
+        ),
+      })
+      .rpc({ skipPreflight: true });
     await program.methods
       .setBiddingRate(biddingRate)
       .accounts({
@@ -387,11 +428,6 @@ describe(suiteName, () => {
         taxMint,
         tokenState: tokenStateKey,
         bidState: bidStateKey,
-        bidderAccount: getAssociatedTokenAddressSync(
-          taxMint,
-          holder.publicKey,
-          true
-        ),
         bidAccount: getAssociatedTokenAddressSync(
           taxMint,
           collectionAuthority,
@@ -403,9 +439,6 @@ describe(suiteName, () => {
           true
         ),
       })
-      .preInstructions([
-        ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
-      ])
       .signers([holder])
       .rpc({ skipPreflight: true });
 
@@ -440,11 +473,6 @@ describe(suiteName, () => {
         taxMint,
         tokenState: tokenStateKey,
         bidState: bidStateKey,
-        bidderAccount: getAssociatedTokenAddressSync(
-          taxMint,
-          holder.publicKey,
-          true
-        ),
         bidAccount: getAssociatedTokenAddressSync(
           taxMint,
           collectionAuthority,

@@ -14,15 +14,16 @@ pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
-    bid_state.depositor = ctx.accounts.depositor.key();
+    bid_state.bidder = ctx.accounts.bidder.key();
     bid_state.token_state = token_state.key();
     bid_state.bidding_period = token_state.last_period;
+    bid_state.last_update = Clock::get()?.unix_timestamp;
     bid_state
         .bids_window
         .resize(config.contest_window_size as usize, 0);
 
-    emit!(CreatedDepositAccount {
-        depositor: ctx.accounts.depositor.key(),
+    emit!(CreatedBidState {
+        bidder: ctx.accounts.bidder.key(),
         mint: token_state.token_mint.key(),
         collection_mint: config.collection_mint.key()
     });
@@ -36,7 +37,7 @@ pub struct CreateBid<'info> {
     pub payer: Signer<'info>,
 
     /// CHECK: Delegatable creation
-    pub depositor: UncheckedAccount<'info>,
+    pub bidder: UncheckedAccount<'info>,
 
     /// CHECK: Seeded authority
     #[account(
@@ -76,7 +77,7 @@ pub struct CreateBid<'info> {
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes(),
-            &depositor.key().to_bytes(),
+            &bidder.key().to_bytes(),
         ],
         bump,
     )]
