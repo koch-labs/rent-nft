@@ -12,10 +12,7 @@ pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
 
-    let current_time = min(
-        Clock::get()?.unix_timestamp,
-        token_state.last_period + config.time_period as i64,
-    );
+    let current_time = Clock::get()?.unix_timestamp;
     let missed_periods = min(
         (current_time - token_state.last_period) / config.time_period as i64,
         config.contest_window_size as i64,
