@@ -59,3 +59,4 @@ wallet = "./id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+submodules = "git submodule update --init --recursive && cd deps/cardinal-staking && anchor build && cd ../metaplex-program-library/ && anchor build && cd ../shadow-nft-standard/ && anchor build && cd ../../"
