@@ -4,3 +4,6 @@
 [submodule "deps/cardinal-staking"]
 	path = deps/cardinal-staking
 	url = https://github.com/coral-xyz/cardinal-staking
+[submodule "deps/shadow-nft-standard"]
+	path = deps/shadow-nft-standard
+	url = https://github.com/GenesysGo/shadow-nft-standard
