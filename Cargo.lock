@@ -747,17 +747,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "harberger-nft"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "mpl-token-auth-rules",
- "mpl-token-metadata",
- "solana-program",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1409,6 +1398,17 @@ name = "regex-syntax"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
+
+[[package]]
+name = "rent-nft"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "mpl-token-auth-rules",
+ "mpl-token-metadata",
+ "solana-program",
+]
 
 [[package]]
 name = "rmp"

@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-harberger_nft = "9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu"
+harberger_nft = "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
 
 [[test.genesis]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -10,7 +10,7 @@ program = "./deps/metaplex-program-library/token-metadata/target/deploy/mpl_toke
 
 [[test.genesis]]
 address = "9fQse1hBRfzWweeUod6WEsR4jZf7hVucetEheCaWooY5"
-program = "./deps/shadow-nf-standard/target/deploy/shadow-nft-standard.so"
+program = "./deps/shadow-nft-standard/target/deploy/shadow_nft_standard.so"
 
 #
 # If this ever changes, make sure to change the

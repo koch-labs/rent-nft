@@ -20,7 +20,7 @@ import {
 } from "../sdk/src";
 
 import { BN } from "bn.js";
-import { HarbergerNft } from "../target/types/harberger_nft";
+import { RentNft } from "../target/types/rent_nft";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
 import {
@@ -36,7 +36,7 @@ import {
   serializeRuleSetRevision,
 } from "@metaplex-foundation/mpl-token-auth-rules";
 
-const suiteName = "harberger-nft";
+const suiteName = "rent-nft";
 describe(suiteName, () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.local();
@@ -44,7 +44,7 @@ describe(suiteName, () => {
   const connection = provider.connection;
   const metaplex = new Metaplex(connection);
 
-  const program = anchor.workspace.HarbergerNft as Program<HarbergerNft>;
+  const program = anchor.workspace.RentNft as Program<RentNft>;
   let users: Keypair[];
   let taxMint: PublicKey;
 

@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 
-export const HARBERGER_PROGRAM_ID = new PublicKey(
-  "9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu"
+export const RENT_NFT_PROGRAM_ID = new PublicKey(
+  "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
 );
 export const DEPOSITS_SEED = "deposits";
 export const TREASURY_SEED = "treasury";

@@ -1,12 +1,12 @@
 [package]
-name = "harberger-nft"
+name = "rent-nft"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "harberger_nft"
+name = "rent_nft"
 
 [features]
 no-entrypoint = []

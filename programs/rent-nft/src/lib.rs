@@ -9,10 +9,10 @@ use anchor_lang::prelude::*;
 
 use instructions::*;
 
-declare_id!("9DBWBHwWi2UaDXL6Y6t5rhtHaYyQ5xyiroRReEvZsJDu");
+declare_id!("FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8");
 
 #[program]
-pub mod harberger_nft {
+pub mod rent_nft {
 
     use super::*;
 
