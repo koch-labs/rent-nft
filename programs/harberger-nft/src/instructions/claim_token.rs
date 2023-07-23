@@ -1,4 +1,5 @@
 use crate::constants::*;
+use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
@@ -15,7 +16,7 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
-    let bid_state = &mut ctx.accounts.bid_state;
+    let bid_state = &mut ctx.accounts.claimant_bid_state;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
@@ -24,8 +25,6 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
         &[authority_bump],
     ];
     let signers_seeds = &[&authority_seeds[..]];
-
-    let authorization_data = AuthorizationData::new_empty();
 
     invoke_signed(
         &TransferBuilder::new()
@@ -39,7 +38,7 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
             .sysvar_instructions(ctx.accounts.system_program.key())
             .build(TransferArgs::V1 {
                 amount: 1,
-                authorization_data: Some(authorization_data),
+                authorization_data: Some(AuthorizationData::new_empty()),
             })
             .unwrap()
             .instruction(),
@@ -105,6 +104,9 @@ pub struct ClaimToken<'info> {
         ],
         bump,
         has_one = config,
+        has_one = token_mint,
+        constraint = token_state.last_period <= Clock::get()?.unix_timestamp @ HarbergerError::InvalidTokenStatePeriod,
+        constraint = token_state.last_period + config.time_period as i64 >= Clock::get()?.unix_timestamp @ HarbergerError::InvalidTokenStatePeriod,
     )]
     pub token_state: Box<Account<'info, TokenState>>,
 
@@ -139,15 +141,18 @@ pub struct ClaimToken<'info> {
         ],
         bump,
     )]
-    pub bid_state: Box<Account<'info, BidState>>,
+    pub claimant_bid_state: Box<Account<'info, BidState>>,
 
     #[account(
-        init_if_needed,
-        payer = payer,
-        associated_token::mint = tax_mint,
-        associated_token::authority = collection_authority
+        mut,
+        seeds = [
+            &config.collection_mint.to_bytes(),
+            &token_state.token_mint.key().to_bytes(),
+            &owner_bid_state.key().to_bytes(),
+        ],
+        bump,
     )]
-    pub bid_account: Box<Account<'info, TokenAccount>>,
+    pub owner_bid_state: Box<Account<'info, BidState>>,
 
     /// Common Solana programs
     pub token_program: Program<'info, Token>,
