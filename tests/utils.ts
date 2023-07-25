@@ -8,10 +8,15 @@ import {
   SystemProgram,
 } from "@solana/web3.js";
 import {
-  PREFIX,
-  PROGRAM_ID,
-  createCreateOrUpdateInstruction,
-} from "@metaplex-foundation/mpl-token-auth-rules";
+  getCollectionAuthorityKey,
+  getCollectionKey,
+  getConfigKey,
+  getCreatorGroupKey,
+} from "../sdk/src";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 
 export async function sleep(seconds: number) {
   new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -23,39 +28,57 @@ export const generateSeededKeypair = (seed: string) => {
   );
 };
 
-export const findRuleSetPDA = (payer: PublicKey, name: string) => {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from(PREFIX), payer.toBuffer(), Buffer.from(name)],
-    PROGRAM_ID
+export interface TestValues {
+  admin: Keypair;
+  adminTaxAccount: PublicKey;
+  taxMintKeypair: Keypair;
+  creators: PublicKey[];
+  creatorGroupName: string;
+  creatorGroupKey: PublicKey;
+  collectionName: string;
+  collectionSymbol: string;
+  collectionPeriod: number;
+  collectionKey: PublicKey;
+  collectionAuthority: PublicKey;
+  configKey: PublicKey;
+  depositedAmount: anchor.BN;
+  biddingRate: anchor.BN;
+}
+
+export const createValues = (): TestValues => {
+  const admin = Keypair.generate();
+  const taxMintKeypair = Keypair.generate();
+  const adminTaxAccount = getAssociatedTokenAddressSync(
+    taxMintKeypair.publicKey,
+    admin.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID
   );
-};
-
-export const createTokenAuthorizationRules = async (
-  connection: Connection,
-  payer: Keypair,
-  name: string,
-  data: Uint8Array
-) => {
-  const ruleSetAddress = await findRuleSetPDA(payer.publicKey, name);
-
-  let createIX = createCreateOrUpdateInstruction(
-    {
-      payer: payer.publicKey,
-      ruleSetPda: ruleSetAddress[0],
-      systemProgram: SystemProgram.programId,
-    },
-    {
-      createOrUpdateArgs: { __kind: "V1", serializedRuleSet: data },
-    },
-    PROGRAM_ID
-  );
-
-  const tx = new Transaction().add(createIX);
-
-  const { blockhash } = await connection.getLatestBlockhash();
-  tx.recentBlockhash = blockhash;
-  tx.feePayer = payer.publicKey;
-  const sig = await connection.sendTransaction(tx, [payer]);
-  await connection.confirmTransaction(sig, "finalized");
-  return ruleSetAddress[0];
+  const creatorGroupName = "Harbies";
+  const creators = [admin].map((e) => e.publicKey);
+  const creatorGroupKey = getCreatorGroupKey(creators);
+  const collectionName = "Harbies";
+  const collectionSymbol = "HRB";
+  const collectionKey = getCollectionKey(creatorGroupKey, collectionName);
+  const collectionAuthority = getCollectionAuthorityKey(collectionKey);
+  const collectionPeriod = 2;
+  const depositedAmount = new anchor.BN(100);
+  const biddingRate = new anchor.BN(10);
+  const configKey = getConfigKey(collectionKey);
+  return {
+    admin,
+    adminTaxAccount,
+    taxMintKeypair,
+    creators,
+    creatorGroupName,
+    creatorGroupKey,
+    collectionName,
+    collectionSymbol,
+    collectionKey,
+    collectionPeriod,
+    collectionAuthority,
+    configKey,
+    depositedAmount,
+    biddingRate,
+  };
 };

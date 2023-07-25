@@ -4,29 +4,21 @@ use anchor_lang::prelude::*;
 /// It's used to save space in each token account.
 #[account]
 pub struct CollectionConfig {
-    /// The mint of the tax token
-    pub collection_mint: Pubkey,
+    /// The shadow collection
+    pub collection: Pubkey,
 
     /// The mint of the tax token
     pub tax_mint: Pubkey,
 
     /// Seconds in a time period
     pub time_period: u32,
-
-    /// Seconds in a time period
-    pub contest_window_size: u8,
-
-    /// The accumulated shares at the last update
-    pub price_per_time_unit: u64,
 }
 
 impl CollectionConfig {
     pub const LEN: usize = 8 // Discriminator
         + 32 // Collection
         + 32 // Tax
-        + 4 // Period
-        + 1 // Window
-        + 8; // Price
+        + 4; // Period
 }
 
 #[account]

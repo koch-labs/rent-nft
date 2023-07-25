@@ -18,34 +18,34 @@ pub mod rent_nft {
 
     pub fn create_collection(
         ctx: Context<CreateCollection>,
-        price_per_time_unit: u64,
+        name: String,
+        symbol: String,
         time_period: u32,
-        contest_window_size: u8,
     ) -> Result<()> {
-        instructions::create_collection(ctx, price_per_time_unit, time_period, contest_window_size)
+        instructions::create_collection(ctx, name, symbol, time_period)
     }
 
-    pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
-        instructions::create_token(ctx)
-    }
+    // pub fn create_token(ctx: Context<CreateToken>) -> Result<()> {
+    //     instructions::create_token(ctx)
+    // }
 
-    pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
-        instructions::create_bid(ctx)
-    }
+    // pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
+    //     instructions::create_bid(ctx)
+    // }
 
-    pub fn update_deposit(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
-        instructions::update_bid(ctx, amount)
-    }
+    // pub fn update_deposit(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
+    //     instructions::update_bid(ctx, amount)
+    // }
 
-    pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
-        instructions::update_token_state(ctx)
-    }
+    // pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
+    //     instructions::update_token_state(ctx)
+    // }
 
-    pub fn update_bid_state(ctx: Context<UpdateBidState>) -> Result<()> {
-        instructions::update_bid_state(ctx)
-    }
+    // pub fn update_bid_state(ctx: Context<UpdateBidState>) -> Result<()> {
+    //     instructions::update_bid_state(ctx)
+    // }
 
-    pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
-        instructions::set_bidding_rate(ctx, new_rate)
-    }
+    // pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
+    //     instructions::set_bidding_rate(ctx, new_rate)
+    // }
 }

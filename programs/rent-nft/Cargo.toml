@@ -1,3 +1,5 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
 name = "rent-nft"
 version = "0.1.0"
@@ -16,8 +18,12 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = { version = "0.26.0", features = ["init-if-needed"] }
-anchor-spl = { version = "0.26.0" }
-mpl-token-metadata = { version = "1.12.0", features = ["no-entrypoint"] }
-mpl-token-auth-rules = "1.4.1"
-solana-program = "=1.14.17"
+anchor-lang = { workspace = true, features = ["init-if-needed"] }
+anchor-spl = { version = "0.27.0", default-features = false, features = [
+  "token",
+  "associated_token",
+] }
+solana-program = { workspace = true }
+shadow-nft-standard = { git = "https://github.com/GenesysGo/shadow-nft-standard", features = [
+  "cpi",
+] }

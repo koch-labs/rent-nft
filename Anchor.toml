@@ -2,53 +2,19 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-harberger_nft = "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
-
-[[test.genesis]]
-address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-program = "./deps/metaplex-program-library/token-metadata/target/deploy/mpl_token_metadata.so"
+rent_nft = "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
 
 [[test.genesis]]
 address = "9fQse1hBRfzWweeUod6WEsR4jZf7hVucetEheCaWooY5"
 program = "./deps/shadow-nft-standard/target/deploy/shadow_nft_standard.so"
 
-#
-# If this ever changes, make sure to change the
-#
-# - tests
-# - program binary (declare id)
-# - toml below
-# - stake_programmable.rs inside the stake program.
-#
-# [[test.genesis]]
-# address = "H2yQahQ7eQH8HXXPtJSJn8MURRFEWVesTd8PsracXp1S"
-# program = "./deps/cardinal-staking/target/deploy/cardinal_reward_distributor.so"
+[[test.validator.clone]]
+address = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" # token-2022
 
-#
-# If this ever changes, make sure to change the
-#
-# - tests
-# - program binary (declare id)
-# - toml below
-#
-# [[test.genesis]]
-# address = "2gvBmibwtBnbkLExmgsijKy6hGXJneou8X6hkyWQvYnF"
-# program = "./deps/cardinal-staking/target/deploy/cardinal_stake_pool.so"
-
-[test.validator]
-url = "https://api.mainnet-beta.solana.com"
 # [test.validator]
-# url = "https://swr.xnfts.dev/rpc-proxy"
-
-# [[test.validator.clone]]
-# address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-
-# [[test.validator.account]]
-# address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-# filename = "./deps/metaplex.json"
-# [[test.validator.account]]
-# address = "PwDiXFxQsGra4sFFTT8r1QWRMd4vfumiWC1jfWNfdYT"
-# filename = "./deps/metaplex_executable.json"
+# url = "https://api.mainnet-beta.solana.com"
+[test.validator]
+url = "https://swr.xnfts.dev/rpc-proxy"
 
 [registry]
 url = "https://api.apr.dev"
@@ -59,4 +25,4 @@ wallet = "./id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
-submodules = "git submodule update --init --recursive && cd deps/cardinal-staking && anchor build && cd ../metaplex-program-library/ && anchor build && cd ../shadow-nft-standard/ && anchor build && cd ../../"
+submodules = "git submodule update --init --recursive && deps/shadow-nft-standard/ && anchor build && cd ../../"
