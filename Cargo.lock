@@ -1334,6 +1334,8 @@ dependencies = [
  "anchor-spl",
  "shadow-nft-standard",
  "solana-program",
+ "spl-associated-token-account",
+ "spl-token-2022",
 ]
 
 [[package]]

@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{Mint, Token};
 use shadow_nft_standard;
 use shadow_nft_standard::common::creator_group::CreatorGroup;
+use shadow_nft_standard::common::token_2022::{Mint, Token2022 as Token};
 use shadow_nft_standard::instructions::create_collection::CreateCollectionArgs;
 
 use crate::constants::*;
@@ -37,7 +37,7 @@ pub fn create_collection(
             shadow_nft_standard::cpi::accounts::CreateCollection {
                 collection: ctx.accounts.collection.to_account_info(),
                 creator_group: ctx.accounts.creator_group.to_account_info(),
-                payer_creator: ctx.accounts.payer.to_account_info(),
+                payer_creator: ctx.accounts.admin.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
             },
             signer_seeds,
@@ -71,7 +71,8 @@ pub struct CreateCollection<'info> {
     pub payer: Signer<'info>,
 
     /// CHECK: Delegatable creation
-    pub admin: UncheckedAccount<'info>,
+    #[account(mut)]
+    pub admin: Signer<'info>,
 
     /// CHECK: Seeded authority
     #[account(

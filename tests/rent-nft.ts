@@ -23,8 +23,7 @@ import {
 } from "../sdk/src";
 
 import { BN } from "bn.js";
-import { ShadowNftStandard } from "../deps/shadow-nft-standard/target/types/shadow_nft_standard";
-import shadowIdl from "../deps/shadow-nft-standard/target/idl/shadow_nft_standard.json";
+import { IDL as standardIdl, ShadowNftStandard } from "./standard-idl";
 import { RentNft } from "../target/types/rent_nft";
 import { Program } from "@coral-xyz/anchor";
 import { TestValues, createValues, generateSeededKeypair } from "./utils";
@@ -40,7 +39,7 @@ describe(suiteName, () => {
 
   const program = anchor.workspace.RentNft as Program<RentNft>;
   const programShadowNft = new Program<ShadowNftStandard>(
-    shadowIdl as any,
+    standardIdl as any,
     SHADOW_NFT_PROGRAM_ID,
     provider
   );
@@ -113,10 +112,14 @@ describe(suiteName, () => {
       .accounts({
         config: values.configKey,
         admin: values.admin.publicKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        creatorGroup: values.creatorGroupKey,
         collectionAuthority: values.collectionAuthority,
         collection: values.collectionKey,
         metadataProgram: SHADOW_NFT_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .signers([values.admin])
       .rpc({ skipPreflight: true });
 
     let collectionConfig = await program.account.collectionConfig.fetch(

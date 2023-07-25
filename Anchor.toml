@@ -4,12 +4,24 @@ skip-lint = false
 [programs.localnet]
 rent_nft = "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
 
-[[test.genesis]]
+# Shadow NFT Standard Loader
+[[test.validator.account]]
 address = "9fQse1hBRfzWweeUod6WEsR4jZf7hVucetEheCaWooY5"
-program = "./deps/shadow-nft-standard/target/deploy/shadow_nft_standard.so"
+filename = "deps/shadow_nft_standard_loader.json"
 
-[[test.validator.clone]]
-address = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" # token-2022
+# Shadow NFT Standard Data Account
+[[test.validator.account]]
+address = "E3AuyxUidXpTeYh98i8PQs2eoKibjgU184gb6tEELxWH"
+filename = "deps/shadow_nft_standard_data.json"
+
+# Token2022 Loader
+[[test.validator.account]]
+address = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+filename = "deps/token2022_loader.json"
+
+[[test.validator.account]]
+address = "DoU57AYuPFu2QU514RktNPG22QhApEjnKxnBcu4BHDTY"
+filename = "deps/token2022_data.json"
 
 # [test.validator]
 # url = "https://api.mainnet-beta.solana.com"
