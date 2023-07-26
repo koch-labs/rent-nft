@@ -35,11 +35,11 @@ export const getConfigKey = (collectionMint: PublicKey) => {
   )[0];
 };
 export const getTokenStateKey = (
-  collectionMint: PublicKey,
+  collection: PublicKey,
   tokenMint: PublicKey
 ) => {
   return PublicKey.findProgramAddressSync(
-    [collectionMint.toBuffer(), tokenMint.toBuffer()],
+    [collection.toBuffer(), tokenMint.toBuffer()],
     RENT_NFT_PROGRAM_ID
   )[0];
 };

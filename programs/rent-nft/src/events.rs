@@ -2,12 +2,12 @@ use anchor_lang::prelude::*;
 
 #[event]
 pub struct CollectionCreated {
-    /// The config
+    /// The collection
     #[index]
-    pub config: Pubkey,
-
-    /// The collection mint
     pub collection: Pubkey,
+
+    /// The config
+    pub config: Pubkey,
 
     /// The tax mint
     pub tax_mint: Pubkey,
@@ -22,27 +22,28 @@ pub struct TokenCreated {
     #[index]
     pub mint: Pubkey,
 
-    /// The collection mint
-    pub collection_mint: Pubkey,
+    /// The collection
+    pub collection: Pubkey,
 }
 
 #[event]
 pub struct CreatedBidState {
     /// The bidder
+    #[index]
     pub bidder: Pubkey,
 
     /// The created mint
     #[index]
     pub mint: Pubkey,
 
-    /// The collection mint
-    pub collection_mint: Pubkey,
+    /// The collection
+    pub collection: Pubkey,
 }
 
 #[event]
 pub struct BidUpdated {
-    /// The collection mint
-    pub collection_mint: Pubkey,
+    /// The collection
+    pub collection: Pubkey,
 
     /// The bidder
     pub bidder: Pubkey,
@@ -56,9 +57,9 @@ pub struct BidUpdated {
 
 #[event]
 pub struct ClaimedToken {
-    /// The collection mint
+    /// The collection
     #[index]
-    pub collection_mint: Pubkey,
+    pub collection: Pubkey,
 
     /// The created mint
     #[index]
@@ -70,8 +71,8 @@ pub struct ClaimedToken {
 
 #[event]
 pub struct UpdatedTokenState {
-    /// The collection mint
-    pub collection_mint: Pubkey,
+    /// The collection
+    pub collection: Pubkey,
 
     /// The contested mint
     pub mint: Pubkey,
@@ -82,8 +83,8 @@ pub struct UpdatedTokenState {
 
 #[event]
 pub struct UpdatedBidState {
-    /// The collection mint
-    pub collection_mint: Pubkey,
+    /// The collection
+    pub collection: Pubkey,
 
     /// The contested mint
     pub mint: Pubkey,
@@ -94,9 +95,9 @@ pub struct UpdatedBidState {
 
 #[event]
 pub struct NewBiddingRate {
-    /// The collection mint
+    /// The collection
     #[index]
-    pub collection_mint: Pubkey,
+    pub collection: Pubkey,
 
     /// The contested mint
     #[index]

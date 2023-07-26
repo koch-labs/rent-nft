@@ -12,11 +12,14 @@ import {
   getCollectionKey,
   getConfigKey,
   getCreatorGroupKey,
+  getMetadataKey,
+  getTokenStateKey,
 } from "../sdk/src";
 import {
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
+import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 
 export async function sleep(seconds: number) {
   new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -31,6 +34,8 @@ export const generateSeededKeypair = (seed: string) => {
 export interface TestValues {
   admin: Keypair;
   adminTaxAccount: PublicKey;
+  holder: Keypair;
+  holderTaxAccount: PublicKey;
   taxMintKeypair: Keypair;
   creators: PublicKey[];
   creatorGroupName: string;
@@ -41,16 +46,28 @@ export interface TestValues {
   collectionKey: PublicKey;
   collectionAuthority: PublicKey;
   configKey: PublicKey;
+  tokenMintKeypair: Keypair;
+  tokenMintAccount: PublicKey;
+  adminTokenMintAccount: PublicKey;
+  tokenMetadata: PublicKey;
+  tokenStateKey: PublicKey;
   depositedAmount: anchor.BN;
   biddingRate: anchor.BN;
 }
 
 export const createValues = (): TestValues => {
   const admin = Keypair.generate();
+  const holder = Keypair.generate();
   const taxMintKeypair = Keypair.generate();
   const adminTaxAccount = getAssociatedTokenAddressSync(
     taxMintKeypair.publicKey,
     admin.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID
+  );
+  const holderTaxAccount = getAssociatedTokenAddressSync(
+    taxMintKeypair.publicKey,
+    holder.publicKey,
     true,
     TOKEN_2022_PROGRAM_ID
   );
@@ -62,12 +79,34 @@ export const createValues = (): TestValues => {
   const collectionKey = getCollectionKey(creatorGroupKey, collectionName);
   const collectionAuthority = getCollectionAuthorityKey(collectionKey);
   const collectionPeriod = 2;
+  const configKey = getConfigKey(collectionKey);
+  const tokenMintKeypair = Keypair.generate();
+  const tokenMintAccount = getAssociatedTokenAddressSync(
+    tokenMintKeypair.publicKey,
+    holder.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID,
+    ASSOCIATED_PROGRAM_ID
+  );
+  const adminTokenMintAccount = getAssociatedTokenAddressSync(
+    tokenMintKeypair.publicKey,
+    admin.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID,
+    ASSOCIATED_PROGRAM_ID
+  );
+  const tokenMetadata = getMetadataKey(tokenMintKeypair.publicKey);
+  const tokenStateKey = getTokenStateKey(
+    collectionKey,
+    tokenMintKeypair.publicKey
+  );
   const depositedAmount = new anchor.BN(100);
   const biddingRate = new anchor.BN(10);
-  const configKey = getConfigKey(collectionKey);
   return {
     admin,
+    holder,
     adminTaxAccount,
+    holderTaxAccount,
     taxMintKeypair,
     creators,
     creatorGroupName,
@@ -78,6 +117,11 @@ export const createValues = (): TestValues => {
     collectionPeriod,
     collectionAuthority,
     configKey,
+    tokenMintKeypair,
+    tokenMintAccount,
+    adminTokenMintAccount,
+    tokenMetadata,
+    tokenStateKey,
     depositedAmount,
     biddingRate,
   };

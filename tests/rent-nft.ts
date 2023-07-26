@@ -1,32 +1,21 @@
 import * as anchor from "@coral-xyz/anchor";
 
+import { LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 import {
-  ComputeBudgetProgram,
-  Keypair,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-} from "@solana/web3.js";
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
   createAssociatedTokenAccountIdempotent,
+  createInitializeMint2Instruction,
   createMint,
-  getAssociatedTokenAddressSync,
-  getOrCreateAssociatedTokenAccount,
+  getMinimumBalanceForRentExemptMint,
+  MINT_SIZE,
   mintToChecked,
 } from "@solana/spl-token";
-import {
-  SHADOW_NFT_PROGRAM_ID,
-  getCollectionAuthorityKey,
-  getCollectionKey,
-  getConfigKey,
-} from "../sdk/src";
+import { SHADOW_NFT_PROGRAM_ID } from "../sdk/src";
 
-import { BN } from "bn.js";
 import { IDL as standardIdl, ShadowNftStandard } from "./standard-idl";
 import { RentNft } from "../target/types/rent_nft";
 import { Program } from "@coral-xyz/anchor";
-import { TestValues, createValues, generateSeededKeypair } from "./utils";
+import { TestValues, createValues } from "./utils";
 
 import { expect } from "chai";
 
@@ -49,7 +38,7 @@ describe(suiteName, () => {
     values = createValues();
 
     await Promise.all(
-      [values.admin].map(async (kp, i) => {
+      [values.admin, values.holder].map(async (kp, i) => {
         await connection.confirmTransaction(
           await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
         );
@@ -75,12 +64,20 @@ describe(suiteName, () => {
       undefined,
       TOKEN_2022_PROGRAM_ID
     );
+    await createAssociatedTokenAccountIdempotent(
+      connection,
+      values.admin,
+      values.taxMintKeypair.publicKey,
+      values.holder.publicKey,
+      undefined,
+      TOKEN_2022_PROGRAM_ID
+    );
 
     await mintToChecked(
       connection,
       values.admin,
       values.taxMintKeypair.publicKey,
-      values.adminTaxAccount,
+      values.holderTaxAccount,
       values.admin,
       10 ** 10,
       6,
@@ -138,82 +135,86 @@ describe(suiteName, () => {
     //   tokenMintKeypair.publicKey
     // );
 
-    // // Mint a token
-    // await program.methods
-    //   .createToken()
-    //   .accounts({
-    //     config: configKey,
-    //     receiver: holder.publicKey,
-    //     admin: admin.publicKey,
-    //     adminCollectionAccount: getAssociatedTokenAddressSync(
-    //       collectionMintKeypair.publicKey,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //     collectionAuthority,
-    //     collectionMint: collectionMintKeypair.publicKey,
-    //     collectionMetadata: metaplex
-    //       .nfts()
-    //       .pdas()
-    //       .metadata({ mint: collectionMintKeypair.publicKey }),
-    //     collectionMasterEdition: metaplex
-    //       .nfts()
-    //       .pdas()
-    //       .masterEdition({ mint: collectionMintKeypair.publicKey }),
-    //     tokenState: tokenStateKey,
-    //     tokenMint: tokenMintKeypair.publicKey,
-    //     tokenMetadata: metaplex
-    //       .nfts()
-    //       .pdas()
-    //       .metadata({ mint: tokenMintKeypair.publicKey }),
-    //     tokenMasterEdition: metaplex
-    //       .nfts()
-    //       .pdas()
-    //       .masterEdition({ mint: tokenMintKeypair.publicKey }),
-    //     tokenAccount: getAssociatedTokenAddressSync(
-    //       tokenMintKeypair.publicKey,
-    //       holder.publicKey,
-    //       true
-    //     ),
-    //     delegateRecord: metaplex.nfts().pdas().metadataDelegateRecord({
-    //       mint: tokenMintKeypair.publicKey,
-    //       type: "ProgrammableConfigV1",
-    //       delegate: collectionAuthority,
-    //       updateAuthority: collectionAuthority,
-    //     }),
-    //     tokenRecord: metaplex
-    //       .nfts()
-    //       .pdas()
-    //       .tokenRecord({
-    //         mint: tokenMintKeypair.publicKey,
-    //         token: getAssociatedTokenAddressSync(
-    //           tokenMintKeypair.publicKey,
-    //           holder.publicKey,
-    //           true
-    //         ),
-    //       }),
-    //     metadataProgram: metaplex.programs().getTokenMetadata().address,
-    //   })
-    //   .preInstructions([
-    //     ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
-    //   ])
-    //   .signers([admin, tokenMintKeypair])
-    //   .rpc({ skipPreflight: true });
+    const mintArgs = {
+      updateAuthority: values.admin.publicKey,
+      name: "TOKKKKKKEN",
+      uri: "https://shdw-drive.genesysgo.net/AScUn18hGQ9HDA5KHRUUWNzVkeho2izUnWh1F3GKJJLD/smb.png",
+      mutable: true,
+      collectionKey: values.collectionKey,
+    };
 
-    // let tokenMetadata = await metaplex
-    //   .nfts()
-    //   .findByMint({ mintAddress: tokenMintKeypair.publicKey });
-    // expect(tokenMetadata.collection.address.toString()).to.equal(
-    //   collectionMintKeypair.publicKey.toString()
-    // );
-    // expect(tokenMetadata.collection.verified).to.equal(true);
+    console.log({
+      config: values.configKey,
+      receiver: values.holder.publicKey,
+      admin: values.admin.publicKey,
+      creatorGroup: values.creatorGroupKey,
+      collectionAuthority: values.collectionAuthority,
+      collection: values.collectionKey,
+      tokenMint: values.tokenMintKeypair.publicKey,
+      tokenState: values.tokenStateKey,
+      tokenMetadata: values.tokenMetadata,
+      tokenAccount: values.tokenMintAccount,
+      metadataProgram: SHADOW_NFT_PROGRAM_ID,
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
+    });
 
-    // let tokenState = await program.account.tokenState.fetch(tokenStateKey);
-    // expect(tokenState.config.toString()).to.equal(configKey.toString());
-    // expect(tokenState.tokenMint.toString()).to.equal(
-    //   tokenMintKeypair.publicKey.toString()
-    // );
-    // expect(tokenState.deposited.toString()).to.equal("0");
+    const createIx = SystemProgram.createAccount({
+      fromPubkey: values.admin.publicKey!,
+      newAccountPubkey: values.tokenMintKeypair.publicKey,
+      space: MINT_SIZE,
+      lamports: await getMinimumBalanceForRentExemptMint(connection),
+      programId: TOKEN_2022_PROGRAM_ID,
+    });
+
+    // init mint account
+    const initMintIx = createInitializeMint2Instruction(
+      values.tokenMintKeypair.publicKey, // mint pubkey
+      0, // decimals
+      values.tokenMetadata, // mint authority
+      null, // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
+      TOKEN_2022_PROGRAM_ID
+    );
+
+    // Mint a token
+    await program.methods
+      .createToken(mintArgs)
+      .accounts({
+        config: values.configKey,
+        receiver: values.holder.publicKey,
+        admin: values.admin.publicKey,
+        creatorGroup: values.creatorGroupKey,
+        collectionAuthority: values.collectionAuthority,
+        collection: values.collectionKey,
+        tokenMint: values.tokenMintKeypair.publicKey,
+        tokenState: values.tokenStateKey,
+        tokenMetadata: values.tokenMetadata,
+        tokenAccount: values.tokenMintAccount,
+        adminTokenAccount: values.adminTokenMintAccount,
+        metadataProgram: SHADOW_NFT_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.admin, values.tokenMintKeypair])
+      .preInstructions([createIx, initMintIx])
+      .rpc({ skipPreflight: true });
+
+    let tokenMetadata = await programShadowNft.account.metadata.fetch(
+      values.tokenMetadata
+    );
+    expect(tokenMetadata.collectionKey.toString()).to.equal(
+      values.collectionKey.toString()
+    );
+    expect(tokenMetadata.mint.toString()).to.equal(
+      values.tokenMintKeypair.publicKey.toString()
+    );
+
+    let tokenState = await program.account.tokenState.fetch(
+      values.tokenStateKey
+    );
+    expect(tokenState.config.toString()).to.equal(values.configKey.toString());
+    expect(tokenState.tokenMint.toString()).to.equal(
+      values.tokenMintKeypair.publicKey.toString()
+    );
+    expect(tokenState.deposited.toString()).to.equal("0");
 
     // const bidStateKey = getBidStateKey(
     //   collectionMintKeypair.publicKey,

@@ -12,13 +12,17 @@ pub struct CollectionConfig {
 
     /// Seconds in a time period
     pub time_period: u32,
+
+    /// The number of period won to start claiming a token
+    pub contest_window_size: u8,
 }
 
 impl CollectionConfig {
     pub const LEN: usize = 8 // Discriminator
         + 32 // Collection
         + 32 // Tax
-        + 4; // Period
+        + 4 // Period
+        + 1; // Window size
 }
 
 #[account]

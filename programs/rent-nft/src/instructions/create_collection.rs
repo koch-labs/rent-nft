@@ -1,9 +1,13 @@
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use shadow_nft_standard;
-use shadow_nft_standard::common::creator_group::CreatorGroup;
-use shadow_nft_standard::common::token_2022::{Mint, Token2022 as Token};
-use shadow_nft_standard::instructions::create_collection::CreateCollectionArgs;
+use shadow_nft_standard::{
+    common::{
+        creator_group::CreatorGroup,
+        token_2022::{Mint, Token2022 as Token},
+    },
+    instructions::create_collection::CreateCollectionArgs,
+};
 
 use crate::constants::*;
 use crate::events::*;
