@@ -25,7 +25,7 @@ pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
     emit!(CreatedBidState {
         bidder: ctx.accounts.bidder.key(),
         mint: token_state.token_mint.key(),
-        collection_mint: config.collection_mint.key()
+        collection: config.collection.key()
     });
 
     Ok(())
@@ -43,7 +43,7 @@ pub struct CreateBid<'info> {
     #[account(
         mut,
         seeds = [
-            &config.collection_mint.to_bytes(),
+            &config.collection.to_bytes(),
             COLLECTION_AUTHORITY_SEED.as_bytes(),
         ],
         bump,
@@ -53,7 +53,7 @@ pub struct CreateBid<'info> {
     /// The config
     #[account(
         seeds = [
-            &config.collection_mint.to_bytes(),
+            &config.collection.to_bytes(),
         ],
         bump,
     )]
@@ -62,7 +62,7 @@ pub struct CreateBid<'info> {
     /// The state for the token assessement
     #[account(
         seeds = [
-            &config.collection_mint.to_bytes(),
+            &config.collection.to_bytes(),
             &token_state.token_mint.key().to_bytes()
         ],
         bump,
@@ -75,7 +75,7 @@ pub struct CreateBid<'info> {
         payer = payer,
         space = BidState::len(config.contest_window_size),
         seeds = [
-            &config.collection_mint.to_bytes(),
+            &config.collection.to_bytes(),
             &token_state.token_mint.key().to_bytes(),
             &bidder.key().to_bytes(),
         ],

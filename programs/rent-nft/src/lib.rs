@@ -28,9 +28,9 @@ pub mod rent_nft {
         instructions::create_token(ctx, args)
     }
 
-    // pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
-    //     instructions::create_bid(ctx)
-    // }
+    pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {
+        instructions::create_bid(ctx)
+    }
 
     // pub fn update_deposit(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
     //     instructions::update_bid(ctx, amount)

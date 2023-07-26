@@ -129,12 +129,6 @@ describe(suiteName, () => {
       values.taxMintKeypair.publicKey.toString()
     );
 
-    // const tokenMintKeypair = generateSeededKeypair(`${suiteName}+token-1`);
-    // const tokenStateKey = getTokenStateKey(
-    //   collectionMintKeypair.publicKey,
-    //   tokenMintKeypair.publicKey
-    // );
-
     const mintArgs = {
       updateAuthority: values.admin.publicKey,
       name: "TOKKKKKKEN",
@@ -142,21 +136,6 @@ describe(suiteName, () => {
       mutable: true,
       collectionKey: values.collectionKey,
     };
-
-    console.log({
-      config: values.configKey,
-      receiver: values.holder.publicKey,
-      admin: values.admin.publicKey,
-      creatorGroup: values.creatorGroupKey,
-      collectionAuthority: values.collectionAuthority,
-      collection: values.collectionKey,
-      tokenMint: values.tokenMintKeypair.publicKey,
-      tokenState: values.tokenStateKey,
-      tokenMetadata: values.tokenMetadata,
-      tokenAccount: values.tokenMintAccount,
-      metadataProgram: SHADOW_NFT_PROGRAM_ID,
-      tokenProgram: TOKEN_2022_PROGRAM_ID,
-    });
 
     const createIx = SystemProgram.createAccount({
       fromPubkey: values.admin.publicKey!,
@@ -216,29 +195,25 @@ describe(suiteName, () => {
     );
     expect(tokenState.deposited.toString()).to.equal("0");
 
-    // const bidStateKey = getBidStateKey(
-    //   collectionMintKeypair.publicKey,
-    //   tokenMintKeypair.publicKey,
-    //   holder.publicKey
-    // );
-    // await program.methods
-    //   .createBid()
-    //   .accounts({
-    //     bidder: holder.publicKey,
-    //     config: configKey,
-    //     collectionAuthority,
-    //     tokenState: tokenStateKey,
-    //     bidState: bidStateKey,
-    //   })
-    //   .preInstructions([
-    //     ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
-    //   ])
-    //   .rpc({ skipPreflight: true });
+    await program.methods
+      .createBid()
+      .accounts({
+        bidder: values.holder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.bidStateKey,
+      })
+      .rpc({ skipPreflight: true });
 
-    // let bidState = await program.account.bidState.fetch(bidStateKey);
-    // expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
-    // expect(bidState.bidder.toString()).to.equal(holder.publicKey.toString());
-    // expect(bidState.amount.toString()).to.equal("0");
+    let bidState = await program.account.bidState.fetch(values.bidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.holder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal("0");
 
     // await program.methods
     //   .updateDeposit(depositedAmount.mul(new BN(2)))

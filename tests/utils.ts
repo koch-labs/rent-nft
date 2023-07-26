@@ -8,6 +8,7 @@ import {
   SystemProgram,
 } from "@solana/web3.js";
 import {
+  getBidStateKey,
   getCollectionAuthorityKey,
   getCollectionKey,
   getConfigKey,
@@ -51,6 +52,7 @@ export interface TestValues {
   adminTokenMintAccount: PublicKey;
   tokenMetadata: PublicKey;
   tokenStateKey: PublicKey;
+  bidStateKey: PublicKey;
   depositedAmount: anchor.BN;
   biddingRate: anchor.BN;
 }
@@ -100,6 +102,11 @@ export const createValues = (): TestValues => {
     collectionKey,
     tokenMintKeypair.publicKey
   );
+  const bidStateKey = getBidStateKey(
+    collectionKey,
+    tokenMintKeypair.publicKey,
+    holder.publicKey
+  );
   const depositedAmount = new anchor.BN(100);
   const biddingRate = new anchor.BN(10);
   return {
@@ -122,6 +129,7 @@ export const createValues = (): TestValues => {
     adminTokenMintAccount,
     tokenMetadata,
     tokenStateKey,
+    bidStateKey,
     depositedAmount,
     biddingRate,
   };
