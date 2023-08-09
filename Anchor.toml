@@ -3,6 +3,7 @@ seeds = false
 skip-lint = false
 [programs.localnet]
 rent_nft = "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
+nft_standard = "9msweUGitRR1ELUe4XZi6xhecPCko54kSqSnfWH7LLiZ"
 
 # Shadow NFT Standard Loader
 [[test.validator.account]]
