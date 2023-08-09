@@ -37,6 +37,8 @@ export interface TestValues {
   adminTaxAccount: PublicKey;
   holder: Keypair;
   holderTaxAccount: PublicKey;
+  bidder: Keypair;
+  bidderTaxAccount: PublicKey;
   taxMintKeypair: Keypair;
   creators: PublicKey[];
   creatorGroupName: string;
@@ -52,7 +54,10 @@ export interface TestValues {
   adminTokenMintAccount: PublicKey;
   tokenMetadata: PublicKey;
   tokenStateKey: PublicKey;
-  bidStateKey: PublicKey;
+  holderBidStateKey: PublicKey;
+  bidderBidStateKey: PublicKey;
+  bidAccount: PublicKey;
+  bidderAccount: PublicKey;
   depositedAmount: anchor.BN;
   biddingRate: anchor.BN;
 }
@@ -60,6 +65,7 @@ export interface TestValues {
 export const createValues = (): TestValues => {
   const admin = Keypair.generate();
   const holder = Keypair.generate();
+  const bidder = Keypair.generate();
   const taxMintKeypair = Keypair.generate();
   const adminTaxAccount = getAssociatedTokenAddressSync(
     taxMintKeypair.publicKey,
@@ -70,6 +76,12 @@ export const createValues = (): TestValues => {
   const holderTaxAccount = getAssociatedTokenAddressSync(
     taxMintKeypair.publicKey,
     holder.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID
+  );
+  const bidderTaxAccount = getAssociatedTokenAddressSync(
+    taxMintKeypair.publicKey,
+    bidder.publicKey,
     true,
     TOKEN_2022_PROGRAM_ID
   );
@@ -102,18 +114,35 @@ export const createValues = (): TestValues => {
     collectionKey,
     tokenMintKeypair.publicKey
   );
-  const bidStateKey = getBidStateKey(
+  const holderBidStateKey = getBidStateKey(
     collectionKey,
     tokenMintKeypair.publicKey,
     holder.publicKey
+  );
+  const bidderBidStateKey = getBidStateKey(
+    collectionKey,
+    tokenMintKeypair.publicKey,
+    bidder.publicKey
+  );
+  const bidderAccount = getAssociatedTokenAddressSync(
+    taxMintKeypair.publicKey,
+    holder.publicKey,
+    true
+  );
+  const bidAccount = getAssociatedTokenAddressSync(
+    taxMintKeypair.publicKey,
+    collectionAuthority,
+    true
   );
   const depositedAmount = new anchor.BN(100);
   const biddingRate = new anchor.BN(10);
   return {
     admin,
     holder,
+    bidder,
     adminTaxAccount,
     holderTaxAccount,
+    bidderTaxAccount,
     taxMintKeypair,
     creators,
     creatorGroupName,
@@ -129,7 +158,10 @@ export const createValues = (): TestValues => {
     adminTokenMintAccount,
     tokenMetadata,
     tokenStateKey,
-    bidStateKey,
+    holderBidStateKey,
+    bidderBidStateKey,
+    bidAccount,
+    bidderAccount,
     depositedAmount,
     biddingRate,
   };

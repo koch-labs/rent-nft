@@ -38,7 +38,7 @@ describe(suiteName, () => {
     values = createValues();
 
     await Promise.all(
-      [values.admin, values.holder].map(async (kp, i) => {
+      [values.admin, values.holder, values.bidder].map(async (kp, i) => {
         await connection.confirmTransaction(
           await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
         );
@@ -72,12 +72,32 @@ describe(suiteName, () => {
       undefined,
       TOKEN_2022_PROGRAM_ID
     );
+    await createAssociatedTokenAccountIdempotent(
+      connection,
+      values.admin,
+      values.taxMintKeypair.publicKey,
+      values.bidder.publicKey,
+      undefined,
+      TOKEN_2022_PROGRAM_ID
+    );
 
     await mintToChecked(
       connection,
       values.admin,
       values.taxMintKeypair.publicKey,
       values.holderTaxAccount,
+      values.admin,
+      10 ** 10,
+      6,
+      undefined,
+      undefined,
+      TOKEN_2022_PROGRAM_ID
+    );
+    await mintToChecked(
+      connection,
+      values.admin,
+      values.taxMintKeypair.publicKey,
+      values.bidderTaxAccount,
       values.admin,
       10 ** 10,
       6,
@@ -198,91 +218,92 @@ describe(suiteName, () => {
     await program.methods
       .createBid()
       .accounts({
-        bidder: values.holder.publicKey,
+        bidder: values.bidder.publicKey,
         config: values.configKey,
         collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
-        bidState: values.bidStateKey,
+        bidState: values.bidderBidStateKey,
       })
       .rpc({ skipPreflight: true });
 
-    let bidState = await program.account.bidState.fetch(values.bidStateKey);
+    let bidState = await program.account.bidState.fetch(
+      values.bidderBidStateKey
+    );
     expect(bidState.tokenState.toString()).to.equal(
       values.tokenStateKey.toString()
     );
     expect(bidState.bidder.toString()).to.equal(
-      values.holder.publicKey.toString()
+      values.bidder.publicKey.toString()
     );
     expect(bidState.amount.toString()).to.equal("0");
 
-    // await program.methods
-    //   .updateDeposit(depositedAmount.mul(new BN(2)))
-    //   .accounts({
-    //     bidder: holder.publicKey,
-    //     config: configKey,
-    //     collectionAuthority,
-    //     tokenState: tokenStateKey,
-    //     bidState: bidStateKey,
-    //     taxMint,
-    //     bidderAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       holder.publicKey,
-    //       true
-    //     ),
-    //     bidAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       collectionAuthority,
-    //       true
-    //     ),
-    //   })
-    //   .preInstructions([
-    //     ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
-    //   ])
-    //   .signers([holder])
-    //   .rpc({ skipPreflight: true });
+    console.log({
+      bidder: values.bidder.publicKey,
+      config: values.configKey,
+      collectionAuthority: values.collectionAuthority,
+      tokenState: values.tokenStateKey,
+      bidState: values.bidderBidStateKey,
+      taxMint: values.taxMintKeypair.publicKey,
+      bidderAccount: values.bidderAccount,
+      bidAccount: values.bidAccount,
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
+    });
+    await program.methods
+      .updateDeposit(values.depositedAmount.mul(new anchor.BN(2)))
+      .accounts({
+        bidder: values.bidder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.bidderBidStateKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        bidderAccount: values.bidderAccount,
+        bidAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.bidder])
+      .rpc({ skipPreflight: true });
 
-    // bidState = await program.account.bidState.fetch(bidStateKey);
-    // expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
-    // expect(bidState.bidder.toString()).to.equal(holder.publicKey.toString());
-    // expect(bidState.amount.toString()).to.equal(
-    //   depositedAmount.mul(new BN(2)).toString()
-    // );
+    bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.bidder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal(
+      values.depositedAmount.mul(new anchor.BN(2)).toString()
+    );
 
-    // await program.methods
-    //   .updateDeposit(depositedAmount.neg())
-    //   .accounts({
-    //     bidder: holder.publicKey,
-    //     config: configKey,
-    //     collectionAuthority,
-    //     tokenState: tokenStateKey,
-    //     bidState: bidStateKey,
-    //     taxMint,
-    //     bidderAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       holder.publicKey,
-    //       true
-    //     ),
-    //     bidAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       collectionAuthority,
-    //       true
-    //     ),
-    //   })
-    //   .preInstructions([
-    //     ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
-    //   ])
-    //   .signers([holder])
-    //   .rpc({ skipPreflight: true });
+    await program.methods
+      .updateDeposit(values.depositedAmount.neg())
+      .accounts({
+        bidder: values.bidder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.bidderBidStateKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        bidderAccount: values.bidderAccount,
+        bidAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.bidder])
+      .rpc({ skipPreflight: true });
 
-    // bidState = await program.account.bidState.fetch(bidStateKey);
-    // expect(bidState.tokenState.toString()).to.equal(tokenStateKey.toString());
-    // expect(bidState.bidder.toString()).to.equal(holder.publicKey.toString());
-    // expect(bidState.amount.toString()).to.equal(depositedAmount.toString());
+    bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.bidder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal(
+      values.depositedAmount.toString()
+    );
 
-    // let bidAccount = await connection.getTokenAccountBalance(
-    //   getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
-    // );
-    // expect(bidAccount.value.amount).to.equal(depositedAmount.toString());
+    let bidAccount = await connection.getTokenAccountBalance(values.bidAccount);
+    expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
 
     // console.log(await program.account.tokenState.fetch(tokenStateKey));
     // // Start bidding

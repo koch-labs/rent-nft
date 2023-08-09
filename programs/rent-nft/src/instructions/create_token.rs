@@ -4,13 +4,11 @@ use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use shadow_nft_standard::{
     common::{
-        collection::Collection,
-        creator_group::CreatorGroup,
-        token_2022::{Mint, Token2022 as Token, TokenAccount},
-        Url,
+        collection::Collection, creator_group::CreatorGroup, token_2022::Token2022 as Token, Url,
     },
     instructions::create::CreateMetaArgs,
 };
+use solana_program::program::invoke_signed;
 
 use crate::constants::*;
 use crate::errors::*;
@@ -70,6 +68,7 @@ pub fn create_token(ctx: Context<CreateToken>, args: CreateTokenArgs) -> Result<
         },
     )?;
 
+    // Minting the token to the collection admin
     shadow_nft_standard::cpi::mint_nft(
         CpiContext::new_with_signer(
             ctx.accounts.metadata_program.to_account_info(),
@@ -86,6 +85,27 @@ pub fn create_token(ctx: Context<CreateToken>, args: CreateTokenArgs) -> Result<
             signer_seeds,
         ),
         0,
+    )?;
+
+    invoke_signed(
+        &spl_token_2022::instruction::transfer_checked(
+            ctx.accounts.token_program.key,
+            ctx.accounts.admin_token_account.key,
+            ctx.accounts.token_mint.key,
+            ctx.accounts.token_account.key,
+            ctx.accounts.admin.key,
+            &[ctx.accounts.admin.key],
+            1,
+            0,
+        )?,
+        &[
+            ctx.accounts.admin_token_account.to_account_info(),
+            ctx.accounts.token_mint.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.admin.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+        ],
+        signer_seeds,
     )?;
 
     emit!(TokenCreated {
