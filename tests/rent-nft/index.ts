@@ -10,12 +10,12 @@ import {
   MINT_SIZE,
   mintToChecked,
 } from "@solana/spl-token";
-import { SHADOW_NFT_PROGRAM_ID } from "../sdk/src";
+import { SHADOW_NFT_PROGRAM_ID } from "../../sdk/src";
 
-import { IDL as standardIdl, ShadowNftStandard } from "./standard-idl";
-import { RentNft } from "../target/types/rent_nft";
+import { IDL as standardIdl, ShadowNftStandard } from "../standard-idl";
+import { RentNft } from "../../target/types/rent_nft";
 import { Program } from "@coral-xyz/anchor";
-import { TestValues, createValues } from "./utils";
+import { TestValues, createValues } from "../utils";
 
 import { expect } from "chai";
 
