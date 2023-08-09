@@ -2,33 +2,109 @@
 
 ## NFT Standard
 
-We propose a new implementation for NFT Metadata.
+### Objectives
 
-We observe that Metaplex's dominant token metadata implementation has the following characteristics:
+#### Minimizing accounts size
 
-- Expensive to mint because of the size and number of accounts needed.
-- Overly complex programmable NFTs when Token2022 can do most of the heavy lifting for us already
-- Frequent need to do 1tx/NFT to update informations like authorities.
-- Only supports metadata stored on external storage.
+One of the big down side of Metaplex Standard is that it tries to cover a scope that is too large, making you pay on each mint for informations you will never use.
+Reducing mandatory account size to the minimum will make minting much cheaper and will still be compatible with account compression.
 
-We propose an alternative with these characteristics instead:
+#### Maximizing account reusability
 
-- Minimal metadata accounts.
-  - As the most basic account, getting rid of superfluous data is important. The functions that we need are 1) easily composable minting 2) checking if the token is part of a set, 3) efficiently updating its metadata and 2). This translates by minimized account dependency for creation operations and unambiguous inclusion information from a single source of truth that is simple to modify
-- Token ownership using Token2022.
-  - Token2022 can handle many cases of programmable ownership using its delegation feature. Tokens can be easily created and configured using other tools and they can be composed using reusable authority accounts.
-- Reusable accounts
-  - By creating reusable authorities and having metadata point to them, we only need to modify the authority, not every token that had this authority. Because authorities are composable and rely on token ownership, we can easily configure complex collections without the need to create custom programs.
-- A simple interface for a wide range of storage
-  - Onchain metadata have a interesting properties that cannot be used with Metaplex
-  - Reusing other tokens metadata let's tokens reflect changes made at a single point.
+Having to create complex scripts that will require access to the update authority private keys is bad: non technicals will have to pay a dev, devs will do repetitive work, it also makes some use cases harder to realize.
+Giving the opportunity to modify many tokens in a single tx thanks to reflected changes favorizes account reusability.
+
+#### Simple Programmability
+
+Using user created Token2022 tokens for representing NFTs enables many new ownership models, especially with delegation.
+
+#### Flexible set inclusions
+
+One of the most important feature of NFT is to prove you're part of something and that your participation is uniquely identified. For example, owning a MadLad not only proves you're part of the MadLad owners community, you have a very specific MadLad that no one else has.
+
+In this standard, all tokens are potential sets that can recursively contain other sets.
+Modifying a set will require a new kind of authority, the _Inclusion Authority_.
+However, anyone will be able to prove that a token is part of a superset.
+
+This allows creating sets of collections, where each collection grants a specific right, on top of the common rights granted by all collections.
 
 ### Accounts
 
-#### **AuthorityNode**
+#### **Metadata**
+
+Uniquely identified by the mint of the token it represents.
+
+It maintains a version number that is incremented for every set operation of this token (When this token includes other tokens in its set, not when other tokens include it).
+
+Data:
+
+- **index**. Mint of the token
+- Current authorities set
+- Set Version Counter.
+- Set Size
+- Pointer to the actual metadata.
 
 #### **AuthoritiesSet**
 
-#### **Metadata**
+Uniquely identified by a random ID.
+
+Data:
+
+- **index**. ID
+- Public key of the inclusion authority
+- Public key of the update authority
+
+#### **SetInclusion**
+
+Uniquely identified by the parent metadata and the child metadata.
+Can only be created by the Inclusion Authority.
+Does not need to store the version because they don't become stale since they're created by the Inclusion Authority.
+
+Data:
+
+- **index**. Public key of the parent set metadata
+- **index**. Public key of the child metadata
+
+#### **SupersetInclusion**
+
+Uniquely identified by the parent metadata and the child metadata.
+They need to maintain the counter because these accounts can be created by anyone, generally the token holder.
+
+Data:
+
+- **index**. Public key of the parent set metadata
+- **index**. Public key of the child metadata
+- Last seen Set Version Counter
+
+### Instructions
+
+#### CreateAuthoritiesSet
+
+#### UpdateAuthoritiesSet
+
+Only the update authority of an authorities set can update it
+
+#### CreateMetadata
+
+#### UpdateMetadata
+
+Only the update authority of the metadata authorities set can update it
+
+#### BurnMetadata
+
+Only the update authority of the metadata authorities set can burn it.
+Requires the burning metadata set size to 0.
+
+#### IncludeMetadata
+
+Only the inclusion authority of the parent metadata's authorities set can include
+
+#### ExcludeMetadata
+
+Only the inclusion authority of the parent metadata's authorities set can exclude
+
+#### CreateSupersetInclusion
+
+#### CloseSupersetInclusion
 
 ## Rent NFT
