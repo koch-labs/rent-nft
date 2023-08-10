@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { utils } from "@coral-xyz/anchor";
 import {
   AUTHORITIES_SEED,
+  METADATA_SEED,
   COLLECTION_AUTHORITY_SEED,
   DEPOSITS_SEED,
   NFT_STANDARD_PROGRAM_ID,
@@ -16,6 +17,12 @@ import { PublicKey } from "@solana/web3.js";
 export const getAuthoritiesGroupKey = (id: PublicKey) => {
   return PublicKey.findProgramAddressSync(
     [Buffer.from(AUTHORITIES_SEED), id.toBuffer()],
+    NFT_STANDARD_PROGRAM_ID
+  )[0];
+};
+export const getMetadataKey = (mint: PublicKey) => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from(METADATA_SEED), mint.toBuffer()],
     NFT_STANDARD_PROGRAM_ID
   )[0];
 };
@@ -84,12 +91,6 @@ export const getCollectionKey = (
 ) => {
   return PublicKey.findProgramAddressSync(
     [creatorGroup.toBuffer(), Buffer.from(collectionName)],
-    SHADOW_NFT_PROGRAM_ID
-  )[0];
-};
-export const getMetadataKey = (assetMint: PublicKey) => {
-  return PublicKey.findProgramAddressSync(
-    [assetMint.toBuffer()],
     SHADOW_NFT_PROGRAM_ID
   )[0];
 };

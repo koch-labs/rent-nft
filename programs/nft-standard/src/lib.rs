@@ -4,6 +4,7 @@ pub mod instructions;
 pub mod state;
 
 use instructions::*;
+use state::*;
 
 use anchor_lang::prelude::*;
 
@@ -42,5 +43,9 @@ pub mod nft_standard {
             update_authority,
             inclusion_authority,
         )
+    }
+
+    pub fn create_metadata(ctx: Context<CreateMetadata>, data: MetadataData) -> Result<()> {
+        instructions::create_metadata(ctx, data)
     }
 }

@@ -10,6 +10,7 @@ export const RENT_NFT_PROGRAM_ID = new PublicKey(
   "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
 );
 export const AUTHORITIES_SEED = "authorities";
+export const METADATA_SEED = "metadata";
 export const DEPOSITS_SEED = "deposits";
 export const TREASURY_SEED = "treasury";
 export const COLLECTION_AUTHORITY_SEED = "collection";
