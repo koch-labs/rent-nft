@@ -4,7 +4,6 @@ pub mod instructions;
 pub mod state;
 
 use instructions::*;
-use state::*;
 
 use anchor_lang::prelude::*;
 
@@ -31,10 +30,17 @@ pub mod nft_standard {
         )
     }
 
-    // pub fn set_authorities_group(
-    //     ctx: Context<CreateAuthorityNode>,
-    //     node_type: AuthorityNodeType,
-    // ) -> Result<()> {
-    //     instructions::create_authority_node(ctx, node_type)
-    // }
+    pub fn update_authorities_group(
+        ctx: Context<UpdateAuthoritiesGroup>,
+        transfer_authority: Pubkey,
+        update_authority: Pubkey,
+        inclusion_authority: Pubkey,
+    ) -> Result<()> {
+        instructions::update_authorities_group(
+            ctx,
+            transfer_authority,
+            update_authority,
+            inclusion_authority,
+        )
+    }
 }
