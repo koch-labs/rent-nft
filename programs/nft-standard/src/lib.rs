@@ -12,21 +12,29 @@ declare_id!("9msweUGitRR1ELUe4XZi6xhecPCko54kSqSnfWH7LLiZ");
 
 #[program]
 pub mod nft_standard {
-    use crate::state::AuthorityNodeType;
 
     use super::*;
 
-    pub fn create_authority_node(
-        ctx: Context<CreateAuthorityNode>,
-        node_type: AuthorityNodeType,
+    pub fn create_authorities_group(
+        ctx: Context<CreateAuthoritiesGroup>,
+        id: Pubkey,
+        transfer_authority: Pubkey,
+        update_authority: Pubkey,
+        inclusion_authority: Pubkey,
     ) -> Result<()> {
-        instructions::create_authority_node(ctx, node_type)
+        instructions::create_authorities_group(
+            ctx,
+            id,
+            transfer_authority,
+            update_authority,
+            inclusion_authority,
+        )
     }
 
-    pub fn set_authority_node(
-        ctx: Context<CreateAuthorityNode>,
-        node_type: AuthorityNodeType,
-    ) -> Result<()> {
-        instructions::create_authority_node(ctx, node_type)
-    }
+    // pub fn set_authorities_group(
+    //     ctx: Context<CreateAuthorityNode>,
+    //     node_type: AuthorityNodeType,
+    // ) -> Result<()> {
+    //     instructions::create_authority_node(ctx, node_type)
+    // }
 }

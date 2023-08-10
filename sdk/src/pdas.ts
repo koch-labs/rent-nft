@@ -1,8 +1,10 @@
 import crypto from "crypto";
 import { utils } from "@coral-xyz/anchor";
 import {
+  AUTHORITIES_SEED,
   COLLECTION_AUTHORITY_SEED,
   DEPOSITS_SEED,
+  NFT_STANDARD_PROGRAM_ID,
   RENT_NFT_PROGRAM_ID,
   SHADOW_NFT_PROGRAM_ID,
   TREASURY_SEED,
@@ -10,6 +12,15 @@ import {
 
 import { PublicKey } from "@solana/web3.js";
 
+// Metadata Standard PDAs
+export const getAuthoritiesGroupKey = (id: PublicKey) => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from(AUTHORITIES_SEED), id.toBuffer()],
+    NFT_STANDARD_PROGRAM_ID
+  )[0];
+};
+
+// Rent NFT PDAs
 export const getDepositsKey = (id: PublicKey) => {
   return PublicKey.findProgramAddressSync(
     [id.toBuffer(), Buffer.from(DEPOSITS_SEED)],

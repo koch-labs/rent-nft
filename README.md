@@ -39,7 +39,7 @@ It maintains a version number that is incremented for every set operation of thi
 Data:
 
 - **index**. Mint of the token
-- Current authorities set
+- Current authorities group
 - Set Version Counter.
 - Set Size
 - Pointer to the actual metadata.
@@ -78,30 +78,30 @@ Data:
 
 ### Instructions
 
-#### CreateAuthoritiesSet
+#### CreateAuthoritiesGroup
 
-#### UpdateAuthoritiesSet
+#### UpdateAuthoritiesGroup
 
-Only the update authority of an authorities set can update it
+Only the update authority of an authorities group can update it
 
 #### CreateMetadata
 
 #### UpdateMetadata
 
-Only the update authority of the metadata authorities set can update it
+Only the update authority of the metadata authorities group can update it
 
 #### BurnMetadata
 
-Only the update authority of the metadata authorities set can burn it.
+Only the update authority of the metadata authorities group can burn it.
 Requires the burning metadata set size to 0.
 
 #### IncludeMetadata
 
-Only the inclusion authority of the parent metadata's authorities set can include
+Only the inclusion authority of the parent metadata's authorities group can include
 
 #### ExcludeMetadata
 
-Only the inclusion authority of the parent metadata's authorities set can exclude
+Only the inclusion authority of the parent metadata's authorities group can exclude
 
 #### CreateSupersetInclusion
 
