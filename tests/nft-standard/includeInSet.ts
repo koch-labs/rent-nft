@@ -95,33 +95,26 @@ describe(suiteName, () => {
       .signers([values.inclusionAuthority])
       .rpc({ skipPreflight: true });
 
-    const metadata = await program.account.metadata.fetch(
-      values.metadata2022Key
+    const inclusion = await program.account.inclusion.fetch(
+      values.inclusionKey
     );
+    expect(inclusion).not.to.be.undefined;
+  });
 
-    expect(metadata.mint.toString()).to.equal(
-      values.mintKeypair2022.publicKey.toString()
-    );
-    expect(metadata.setVersionCounter).to.equal(0);
-    expect(metadata.authoritiesGroup.toString()).to.equal(
-      values.authoritiesGroupKey.toString()
-    );
-    expect(metadata.data.toString()).to.equal(values.metadataData.toString());
-
-    const tokenAccount = await getOrCreateAssociatedTokenAccount(
-      connection,
-      values.admin,
-      values.mintKeypair2022.publicKey,
-      values.holder.publicKey,
-      true,
-      undefined,
-      undefined,
-      TOKEN_2022_PROGRAM_ID
-    );
-
-    expect(tokenAccount.amount.toString()).to.equal("1");
-    expect(tokenAccount.mint.toString()).to.equal(
-      values.mintKeypair2022.publicKey.toString()
+  it("requires inclusion authority", async () => {
+    await expectRevert(
+      program.methods
+        .includeInSet()
+        .accounts({
+          inclusionAuthority: values.holder.publicKey,
+          parentAuthoritiesGroup: values.authoritiesGroupKey,
+          childAuthoritiesGroup: values.authoritiesGroupKey,
+          parentMetadata: values.parentMetadata2022Key,
+          childMetadata: values.metadata2022Key,
+          inclusion: values.inclusionKey,
+        })
+        .signers([values.holder])
+        .rpc({ skipPreflight: true })
     );
   });
 });
