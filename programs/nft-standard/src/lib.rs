@@ -48,4 +48,8 @@ pub mod nft_standard {
     pub fn create_metadata(ctx: Context<CreateMetadata>, data: MetadataData) -> Result<()> {
         instructions::create_metadata(ctx, data)
     }
+
+    pub fn include_in_set(ctx: Context<IncludeInSet>) -> Result<()> {
+        instructions::include_in_set(ctx)
+    }
 }

@@ -3,6 +3,7 @@ import { utils } from "@coral-xyz/anchor";
 import {
   AUTHORITIES_SEED,
   METADATA_SEED,
+  INCLUSION_SEED,
   COLLECTION_AUTHORITY_SEED,
   DEPOSITS_SEED,
   NFT_STANDARD_PROGRAM_ID,
@@ -23,6 +24,16 @@ export const getAuthoritiesGroupKey = (id: PublicKey) => {
 export const getMetadataKey = (mint: PublicKey) => {
   return PublicKey.findProgramAddressSync(
     [Buffer.from(METADATA_SEED), mint.toBuffer()],
+    NFT_STANDARD_PROGRAM_ID
+  )[0];
+};
+export const getInclusionKey = (parentMint: PublicKey, mint: PublicKey) => {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(INCLUSION_SEED),
+      getMetadataKey(parentMint).toBuffer(),
+      getMetadataKey(mint).toBuffer(),
+    ],
     NFT_STANDARD_PROGRAM_ID
   )[0];
 };

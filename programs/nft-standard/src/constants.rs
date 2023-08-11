@@ -8,3 +8,6 @@ pub const AUTHORITIES_SEED: &str = "authorities";
 
 #[constant]
 pub const METADATA_SEED: &str = "metadata";
+
+#[constant]
+pub const INCLUSION_SEED: &str = "inclusion";

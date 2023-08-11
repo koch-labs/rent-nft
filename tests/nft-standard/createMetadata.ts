@@ -78,7 +78,7 @@ describe(suiteName, () => {
         values.mintKeypair2022.publicKey.toString()
       );
       expect(metadata.setVersionCounter).to.equal(0);
-      expect(metadata.authoritiesSet.toString()).to.equal(
+      expect(metadata.authoritiesGroup.toString()).to.equal(
         values.authoritiesGroupKey.toString()
       );
       expect(metadata.data.toString()).to.equal(values.metadataData.toString());
@@ -122,7 +122,7 @@ describe(suiteName, () => {
         values.mintKeypair.publicKey.toString()
       );
       expect(metadata.setVersionCounter).to.equal(0);
-      expect(metadata.authoritiesSet.toString()).to.equal(
+      expect(metadata.authoritiesGroup.toString()).to.equal(
         values.authoritiesGroupKey.toString()
       );
       expect(metadata.data.toString()).to.equal(values.metadataData.toString());

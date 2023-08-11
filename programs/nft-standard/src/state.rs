@@ -52,7 +52,7 @@ impl MetadataData {
 pub struct Metadata {
     pub mint: Pubkey,
 
-    pub authorities_set: Pubkey,
+    pub authorities_group: Pubkey,
 
     pub set_version_counter: u32,
 
@@ -65,4 +65,11 @@ impl Metadata {
         + 32 // Authorities
         + 4 // SVC
         + MetadataData::LEN; // Metadata
+}
+
+#[account]
+pub struct Inclusion {}
+
+impl Inclusion {
+    pub const LEN: usize = 8; // Discriminator
 }

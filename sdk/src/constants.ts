@@ -11,6 +11,7 @@ export const RENT_NFT_PROGRAM_ID = new PublicKey(
 );
 export const AUTHORITIES_SEED = "authorities";
 export const METADATA_SEED = "metadata";
+export const INCLUSION_SEED = "inclusion";
 export const DEPOSITS_SEED = "deposits";
 export const TREASURY_SEED = "treasury";
 export const COLLECTION_AUTHORITY_SEED = "collection";

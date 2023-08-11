@@ -15,7 +15,7 @@ use crate::{
 pub fn create_metadata(ctx: Context<CreateMetadata>, data: MetadataData) -> Result<()> {
     let metadata = &mut ctx.accounts.metadata;
     metadata.mint = ctx.accounts.mint.key();
-    metadata.authorities_set = ctx.accounts.authorities_group.key();
+    metadata.authorities_group = ctx.accounts.authorities_group.key();
     metadata.data = data;
 
     // Mint one token
