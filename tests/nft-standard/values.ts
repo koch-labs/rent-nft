@@ -24,9 +24,11 @@ export interface TestValues {
   authoritiesGroupId: PublicKey;
   authoritiesGroupKey: PublicKey;
   mintKeypair: Keypair;
+  mintKeypair2022: Keypair;
   metadataUri: string;
   metadataData: MetadataData;
   metadataKey: PublicKey;
+  metadata2022Key: PublicKey;
   holder: Keypair;
   holderMintAccount: PublicKey;
   holderMintAccount2022: PublicKey;
@@ -49,9 +51,11 @@ export const createValues = (): TestValues => {
   const authoritiesGroupId = Keypair.generate().publicKey;
   const authoritiesGroupKey = getAuthoritiesGroupKey(authoritiesGroupId);
   const mintKeypair = Keypair.generate();
+  const mintKeypair2022 = Keypair.generate();
   const metadataUri = "some uri";
   const metadataData = createExternalMetadataData("some uri");
   const metadataKey = getMetadataKey(mintKeypair.publicKey);
+  const metadata2022Key = getMetadataKey(mintKeypair2022.publicKey);
   const holder = Keypair.generate();
   const holderMintAccount = getAssociatedTokenAddressSync(
     mintKeypair.publicKey,
@@ -60,7 +64,7 @@ export const createValues = (): TestValues => {
     TOKEN_PROGRAM_ID
   );
   const holderMintAccount2022 = getAssociatedTokenAddressSync(
-    mintKeypair.publicKey,
+    mintKeypair2022.publicKey,
     holder.publicKey,
     true,
     TOKEN_2022_PROGRAM_ID
@@ -83,9 +87,11 @@ export const createValues = (): TestValues => {
     authoritiesGroupId,
     authoritiesGroupKey,
     mintKeypair,
+    mintKeypair2022,
     metadataUri,
     metadataData,
     metadataKey,
+    metadata2022Key,
     holder,
     holderMintAccount,
     holderMintAccount2022,

@@ -6,7 +6,14 @@ import { TestValues, createValues } from "./values";
 import { NftStandard } from "../../target/types/nft_standard";
 import { expect } from "chai";
 import { expectRevert } from "../utils";
-import { TOKEN_2022_PROGRAM_ID, createMint } from "@solana/spl-token";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountIdempotent,
+  createMint,
+  getAccount,
+  getOrCreateAssociatedTokenAccount,
+} from "@solana/spl-token";
 
 const suiteName = "Nft Standard: Create metadata";
 describe(suiteName, () => {
@@ -48,29 +55,93 @@ describe(suiteName, () => {
       .rpc({ skipPreflight: true });
   });
 
-  it("Creates using Token2022", async () => {
-    await program.methods
-      .createMetadata(values.metadataData)
-      .accounts({
-        creator: values.holder.publicKey,
-        authoritiesGroup: values.authoritiesGroupKey,
-        // tokenAccount: values.holderMintAccount2022,
-        mint: values.mintKeypair.publicKey,
-        metadata: values.metadataKey,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-      })
-      .signers([values.holder, values.mintKeypair])
-      .rpc({ skipPreflight: true });
+  describe("Using Token2022", () => {
+    it("Creates", async () => {
+      await program.methods
+        .createMetadata(values.metadataData)
+        .accounts({
+          creator: values.holder.publicKey,
+          authoritiesGroup: values.authoritiesGroupKey,
+          tokenAccount: values.holderMintAccount2022,
+          mint: values.mintKeypair2022.publicKey,
+          metadata: values.metadata2022Key,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+        })
+        .signers([values.holder, values.mintKeypair2022])
+        .rpc({ skipPreflight: true });
 
-    const metadata = await program.account.metadata.fetch(values.metadataKey);
+      const metadata = await program.account.metadata.fetch(
+        values.metadata2022Key
+      );
 
-    expect(metadata.mint.toString()).to.equal(
-      values.mintKeypair.publicKey.toString()
-    );
-    expect(metadata.setVersionCounter).to.equal(0);
-    expect(metadata.authoritiesSet.toString()).to.equal(
-      values.authoritiesGroupKey.toString()
-    );
-    expect(metadata.data.toString()).to.equal(values.metadataData.toString());
+      expect(metadata.mint.toString()).to.equal(
+        values.mintKeypair2022.publicKey.toString()
+      );
+      expect(metadata.setVersionCounter).to.equal(0);
+      expect(metadata.authoritiesSet.toString()).to.equal(
+        values.authoritiesGroupKey.toString()
+      );
+      expect(metadata.data.toString()).to.equal(values.metadataData.toString());
+
+      const tokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        values.admin,
+        values.mintKeypair2022.publicKey,
+        values.holder.publicKey,
+        true,
+        undefined,
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
+
+      expect(tokenAccount.amount.toString()).to.equal("1");
+      expect(tokenAccount.mint.toString()).to.equal(
+        values.mintKeypair2022.publicKey.toString()
+      );
+    });
+  });
+
+  describe("Using standard SPL", () => {
+    it("Creates", async () => {
+      await program.methods
+        .createMetadata(values.metadataData)
+        .accounts({
+          creator: values.holder.publicKey,
+          authoritiesGroup: values.authoritiesGroupKey,
+          tokenAccount: values.holderMintAccount,
+          mint: values.mintKeypair.publicKey,
+          metadata: values.metadataKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        })
+        .signers([values.holder, values.mintKeypair])
+        .rpc({ skipPreflight: true });
+
+      const metadata = await program.account.metadata.fetch(values.metadataKey);
+
+      expect(metadata.mint.toString()).to.equal(
+        values.mintKeypair.publicKey.toString()
+      );
+      expect(metadata.setVersionCounter).to.equal(0);
+      expect(metadata.authoritiesSet.toString()).to.equal(
+        values.authoritiesGroupKey.toString()
+      );
+      expect(metadata.data.toString()).to.equal(values.metadataData.toString());
+
+      const tokenAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        values.admin,
+        values.mintKeypair.publicKey,
+        values.holder.publicKey,
+        true,
+        undefined,
+        undefined,
+        TOKEN_PROGRAM_ID
+      );
+
+      expect(tokenAccount.amount.toString()).to.equal("1");
+      expect(tokenAccount.mint.toString()).to.equal(
+        values.mintKeypair.publicKey.toString()
+      );
+    });
   });
 });
