@@ -52,4 +52,8 @@ pub mod nft_standard {
     pub fn include_in_set(ctx: Context<IncludeInSet>) -> Result<()> {
         instructions::include_in_set(ctx)
     }
+
+    pub fn exclude_from_set(ctx: Context<ExcludeFromSet>) -> Result<()> {
+        instructions::exclude_from_set(ctx)
+    }
 }

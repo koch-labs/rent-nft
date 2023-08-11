@@ -5,12 +5,12 @@ use crate::{
     state::{AuthoritiesGroup, Inclusion, Metadata},
 };
 
-pub fn include_in_set(_: Context<IncludeInSet>) -> Result<()> {
+pub fn exclude_from_set(_: Context<ExcludeFromSet>) -> Result<()> {
     Ok(())
 }
 
 #[derive(Accounts)]
-pub struct IncludeInSet<'info> {
+pub struct ExcludeFromSet<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -48,9 +48,8 @@ pub struct IncludeInSet<'info> {
     pub child_metadata: Account<'info, Metadata>,
 
     #[account(
-        init,
-        payer = payer,
-        space = Inclusion::LEN,
+        mut,
+        close = payer,
         seeds = [
             INCLUSION_SEED.as_ref(),
             parent_metadata.key().as_ref(),

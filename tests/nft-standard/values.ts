@@ -24,6 +24,8 @@ export interface TestValues {
   inclusionAuthority: Keypair;
   authoritiesGroupId: PublicKey;
   authoritiesGroupKey: PublicKey;
+  parentAuthoritiesGroupId: PublicKey;
+  parentAuthoritiesGroupKey: PublicKey;
   mintKeypair: Keypair;
   mintKeypair2022: Keypair;
   parentMintKeypair2022: Keypair;
@@ -46,6 +48,10 @@ export const createValues = (): TestValues => {
   const inclusionAuthority = Keypair.generate();
   const authoritiesGroupId = Keypair.generate().publicKey;
   const authoritiesGroupKey = getAuthoritiesGroupKey(authoritiesGroupId);
+  const parentAuthoritiesGroupId = Keypair.generate().publicKey;
+  const parentAuthoritiesGroupKey = getAuthoritiesGroupKey(
+    parentAuthoritiesGroupId
+  );
   const mintKeypair = Keypair.generate();
   const mintKeypair2022 = Keypair.generate();
   const parentMintKeypair2022 = Keypair.generate();
@@ -84,6 +90,8 @@ export const createValues = (): TestValues => {
     inclusionAuthority,
     authoritiesGroupId,
     authoritiesGroupKey,
+    parentAuthoritiesGroupId,
+    parentAuthoritiesGroupKey,
     mintKeypair,
     mintKeypair2022,
     parentMintKeypair2022,

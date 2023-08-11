@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { expectRevert } from "../utils";
 import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 
-const suiteName = "Nft Standard: Include in set";
+const suiteName = "Nft Standard: Exclude from set";
 describe(suiteName, () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.local();
@@ -84,9 +84,7 @@ describe(suiteName, () => {
       })
       .signers([values.holder, values.parentMintKeypair2022])
       .rpc({ skipPreflight: true });
-  });
 
-  it("includes", async () => {
     await program.methods
       .includeInSet()
       .accounts({
@@ -98,25 +96,36 @@ describe(suiteName, () => {
       })
       .signers([values.inclusionAuthority])
       .rpc({ skipPreflight: true });
+  });
 
-    const inclusion = await program.account.inclusion.fetch(
-      values.inclusionKey
-    );
-    expect(inclusion).not.to.be.undefined;
+  it("excludes", async () => {
+    await program.methods
+      .excludeFromSet()
+      .accounts({
+        inclusionAuthority: values.inclusionAuthority.publicKey,
+        authoritiesGroup: values.parentAuthoritiesGroupKey,
+        parentMetadata: values.parentMetadata2022Key,
+        childMetadata: values.metadata2022Key,
+        inclusion: values.inclusionKey,
+      })
+      .signers([values.inclusionAuthority])
+      .rpc({ skipPreflight: true });
+
+    await expectRevert(program.account.inclusion.fetch(values.inclusionKey));
   });
 
   it("requires inclusion authority", async () => {
     await expectRevert(
       program.methods
-        .includeInSet()
+        .excludeFromSet()
         .accounts({
-          inclusionAuthority: values.holder.publicKey,
+          inclusionAuthority: values.inclusionAuthority.publicKey,
           authoritiesGroup: values.parentAuthoritiesGroupKey,
           parentMetadata: values.parentMetadata2022Key,
           childMetadata: values.metadata2022Key,
           inclusion: values.inclusionKey,
         })
-        .signers([values.holder])
+        .signers([values.inclusionAuthority])
         .rpc({ skipPreflight: true })
     );
   });
