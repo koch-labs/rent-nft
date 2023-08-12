@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::constants::MAX_URI_LENGTH;
+use crate::constants::{MAX_URI_LENGTH, METADATA_SEED};
 
 #[account]
 pub struct AuthoritiesGroup {
@@ -67,9 +67,34 @@ impl Metadata {
         + MetadataData::LEN; // Metadata
 }
 
+pub fn validate_inclusion(
+    parent: &Account<Metadata>,
+    child: &Account<Metadata>,
+    inclusion: &AccountInfo,
+    bump: u8,
+) -> bool {
+    let (_key, _bump) = Pubkey::find_program_address(
+        &[
+            METADATA_SEED.as_ref(),
+            parent.key().as_ref(),
+            child.key().as_ref(),
+        ],
+        &crate::ID,
+    );
+
+    inclusion.key() == _key && bump == _bump
+}
+
 #[account]
 pub struct Inclusion {}
 
 impl Inclusion {
+    pub const LEN: usize = 8; // Discriminator
+}
+
+#[account]
+pub struct SupersetInclusion {}
+
+impl SupersetInclusion {
     pub const LEN: usize = 8; // Discriminator
 }

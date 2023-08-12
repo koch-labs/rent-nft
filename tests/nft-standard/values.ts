@@ -1,9 +1,7 @@
 import { Keypair, PublicKey } from "@solana/web3.js";
 import {
   getAuthoritiesGroupKey,
-  getCollectionAuthorityKey,
-  getCollectionKey,
-  getCreatorGroupKey,
+  getSupersetInclusionKey,
   getInclusionKey,
   getMetadataKey,
 } from "../../sdk/src";
@@ -16,6 +14,7 @@ import {
   MetadataData,
   createExternalMetadataData,
 } from "../../sdk/src/metadataData";
+import { getPathBumpsFromMints } from "../../sdk/src/superset";
 
 export interface TestValues {
   admin: Keypair;
@@ -39,6 +38,8 @@ export interface TestValues {
   holderMintAccount2022: PublicKey;
   holderParentMintAccount2022: PublicKey;
   inclusionKey: PublicKey;
+  supersetInclusionKey: PublicKey;
+  pathBumps: Buffer;
 }
 
 export const createValues = (): TestValues => {
@@ -83,6 +84,14 @@ export const createValues = (): TestValues => {
     parentMintKeypair2022.publicKey,
     mintKeypair2022.publicKey
   );
+  const supersetInclusionKey = getSupersetInclusionKey(
+    parentMintKeypair2022.publicKey,
+    mintKeypair2022.publicKey
+  );
+  const pathBumps = getPathBumpsFromMints([
+    parentMintKeypair2022.publicKey,
+    mintKeypair2022.publicKey,
+  ]);
   return {
     admin,
     transferAuthority,
@@ -105,5 +114,7 @@ export const createValues = (): TestValues => {
     holderMintAccount2022,
     holderParentMintAccount2022,
     inclusionKey,
+    supersetInclusionKey,
+    pathBumps,
   };
 };

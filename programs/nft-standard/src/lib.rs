@@ -56,4 +56,10 @@ pub mod nft_standard {
     pub fn exclude_from_set(ctx: Context<ExcludeFromSet>) -> Result<()> {
         instructions::exclude_from_set(ctx)
     }
+
+    /// Verification path is passed as remaining accounts in the form `[Metadata, Inclusion, Metadata, Inclusion, ...]`
+    /// Only pass bumps of inclusions
+    pub fn include_in_superset(ctx: Context<IncludeInSuperset>, bumps: Vec<u8>) -> Result<()> {
+        instructions::include_in_superset(ctx, &bumps)
+    }
 }

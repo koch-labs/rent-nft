@@ -11,3 +11,6 @@ pub const METADATA_SEED: &str = "metadata";
 
 #[constant]
 pub const INCLUSION_SEED: &str = "inclusion";
+
+#[constant]
+pub const SUPERSET_SEED: &str = "superset";
