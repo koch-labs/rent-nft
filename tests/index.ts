@@ -10,11 +10,14 @@ import {
   ExtensionType,
   createInitializeMintInstruction,
   createInitializePermanentDelegateInstruction,
+  getAssociatedTokenAddressSync,
+  TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { Program } from "@coral-xyz/anchor";
 import {
   NFT_STANDARD_PROGRAM_ID,
   fetchMetadata,
+  getInclusionKey,
 } from "@koch-labs/nft-standard";
 
 import { RentNft } from "../target/types/rent_nft";
@@ -113,19 +116,6 @@ describe(suiteName, () => {
       )
     );
 
-    console.log({
-      config: values.configKey,
-      admin: values.admin.publicKey,
-      taxMint: values.taxMintKeypair.publicKey,
-      adminAccount: values.adminCollectionMintAccount,
-      authoritiesGroup: values.authoritiesGroupKey,
-      collectionAuthority: values.collectionAuthority,
-      collectionMint: values.collectionMintKeypair.publicKey,
-      collectionMetadata: values.collectionMetadata,
-      metadataProgram: NFT_STANDARD_PROGRAM_ID,
-      tokenProgram: TOKEN_2022_PROGRAM_ID,
-    });
-
     // Mint collection
     await program.methods
       .createCollection(
@@ -141,8 +131,9 @@ describe(suiteName, () => {
         collectionAuthority: values.collectionAuthority,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
-        adminAccount: values.adminCollectionMintAccount,
+        adminCollectionMintAccount: values.adminCollectionMintAccount,
         metadataProgram: NFT_STANDARD_PROGRAM_ID,
+        taxTokenProgram: TOKEN_2022_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([values.admin, values.collectionMintKeypair])
@@ -160,58 +151,59 @@ describe(suiteName, () => {
 
     let collectionMetadata = await fetchMetadata(
       provider,
-      values.collectionMetadata
+      values.collectionMintKeypair.publicKey
     );
     expect(collectionMetadata.mint.toString()).to.equal(
       values.collectionMintKeypair.publicKey.toString()
     );
 
-    // const mintArgs = {
-    //   updateAuthority: values.admin.publicKey,
-    //   name: "TOKKKKKKEN",
-    //   uri: "https://shdw-drive.genesysgo.net/AScUn18hGQ9HDA5KHRUUWNzVkeho2izUnWh1F3GKJJLD/smb.png",
-    //   mutable: true,
-    //   collectionKey: values.collectionKey,
-    // };
+    console.log({
+      config: values.configKey,
+      receiver: values.holder.publicKey,
+      admin: values.admin.publicKey,
+      authoritiesGroup: values.authoritiesGroupKey,
+      collectionAuthority: values.collectionAuthority,
+      collectionMint: values.collectionMintKeypair.publicKey,
+      collectionMetadata: values.collectionMetadata,
+      tokenMint: values.tokenMintKeypair.publicKey,
+      tokenState: values.tokenStateKey,
+      tokenMetadata: values.tokenMetadata,
+      inclusion: getInclusionKey(
+        values.collectionMintKeypair.publicKey,
+        values.tokenMintKeypair.publicKey
+      ),
+      tokenAccount: values.tokenMintAccount,
+      adminCollectionMintAccount: values.adminCollectionMintAccount,
+      metadataProgram: NFT_STANDARD_PROGRAM_ID,
+      tokenProgram: TOKEN_2022_PROGRAM_ID,
+    });
 
-    // const createIx = SystemProgram.createAccount({
-    //   fromPubkey: values.admin.publicKey!,
-    //   newAccountPubkey: values.tokenMintKeypair.publicKey,
-    //   space: MINT_SIZE,
-    //   lamports: await getMinimumBalanceForRentExemptMint(connection),
-    //   programId: TOKEN_2022_PROGRAM_ID,
-    // });
-
-    // // init mint account
-    // const initMintIx = createInitializeMint2Instruction(
-    //   values.tokenMintKeypair.publicKey, // mint pubkey
-    //   0, // decimals
-    //   values.tokenMetadata, // mint authority
-    //   null, // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
-    //   TOKEN_2022_PROGRAM_ID
-    // );
-
-    // // Mint a token
-    // await program.methods
-    //   .createToken(mintArgs)
-    //   .accounts({
-    //     config: values.configKey,
-    //     receiver: values.holder.publicKey,
-    //     admin: values.admin.publicKey,
-    //     creatorGroup: values.creatorGroupKey,
-    //     collectionAuthority: values.collectionAuthority,
-    //     collection: values.collectionKey,
-    //     tokenMint: values.tokenMintKeypair.publicKey,
-    //     tokenState: values.tokenStateKey,
-    //     tokenMetadata: values.tokenMetadata,
-    //     tokenAccount: values.tokenMintAccount,
-    //     adminTokenAccount: values.adminTokenMintAccount,
-    //     metadataProgram: SHADOW_NFT_PROGRAM_ID,
-    //     tokenProgram: TOKEN_2022_PROGRAM_ID,
-    //   })
-    //   .signers([values.admin, values.tokenMintKeypair])
-    //   .preInstructions([createIx, initMintIx])
-    //   .rpc({ skipPreflight: true });
+    const uri = "ijsiodfjsodifjo";
+    // Mint a token
+    await program.methods
+      .createToken(uri)
+      .accounts({
+        config: values.configKey,
+        receiver: values.holder.publicKey,
+        admin: values.admin.publicKey,
+        authoritiesGroup: values.authoritiesGroupKey,
+        collectionAuthority: values.collectionAuthority,
+        collectionMint: values.collectionMintKeypair.publicKey,
+        collectionMetadata: values.collectionMetadata,
+        tokenMint: values.tokenMintKeypair.publicKey,
+        tokenState: values.tokenStateKey,
+        tokenMetadata: values.tokenMetadata,
+        inclusion: getInclusionKey(
+          values.collectionMintKeypair.publicKey,
+          values.tokenMintKeypair.publicKey
+        ),
+        tokenAccount: values.tokenMintAccount,
+        adminCollectionMintAccount: values.adminCollectionMintAccount,
+        metadataProgram: NFT_STANDARD_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.admin, values.tokenMintKeypair])
+      .rpc({ skipPreflight: true });
 
     // let tokenMetadata = await programShadowNft.account.metadata.fetch(
     //   values.tokenMetadata

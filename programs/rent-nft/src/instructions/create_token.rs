@@ -1,30 +1,27 @@
-use std::str::FromStr;
-
-use anchor_lang::prelude::*;
-use anchor_spl::associated_token::AssociatedToken;
-use shadow_nft_standard::{
-    common::{
-        collection::Collection, creator_group::CreatorGroup, token_2022::Token2022 as Token, Url,
+use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
+use anchor_spl::{
+    associated_token::{
+        create_idempotent, get_associated_token_address_with_program_id, AssociatedToken, Create,
     },
-    instructions::create::CreateMetaArgs,
+    token_interface::{
+        initialize_mint, mint_to, spl_token_2022::instruction::initialize_permanent_delegate,
+        InitializeMint, Mint, MintTo, TokenAccount, TokenInterface,
+    },
 };
-use solana_program::program::invoke_signed;
+use nft_standard::{
+    cpi::{
+        accounts::{CreateMetadata, IncludeInSet},
+        create_external_metadata, include_in_set,
+    },
+    program::NftStandard,
+    state::{AuthoritiesGroup, Metadata},
+};
 
 use crate::constants::*;
-use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateTokenArgs {
-    pub update_authority: Pubkey,
-    pub name: String,
-    pub uri: String,
-    pub mutable: bool,
-    pub collection_key: Pubkey,
-}
-
-pub fn create_token(ctx: Context<CreateToken>, args: CreateTokenArgs) -> Result<()> {
+pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
     msg!("Creating a token");
 
     let config = &mut ctx.accounts.config;
@@ -39,79 +36,99 @@ pub fn create_token(ctx: Context<CreateToken>, args: CreateTokenArgs) -> Result<
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
-        &ctx.accounts.collection.key().to_bytes(),
+        &ctx.accounts.collection_mint.key().to_bytes(),
         COLLECTION_AUTHORITY_SEED.as_bytes(),
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
 
-    shadow_nft_standard::cpi::create_metadata_account(
-        CpiContext::new_with_signer(
-            ctx.accounts.metadata_program.to_account_info(),
-            shadow_nft_standard::cpi::accounts::CreateMetadataAccount {
-                metadata: ctx.accounts.token_metadata.to_account_info(),
-                creator_group: ctx.accounts.creator_group.to_account_info(),
-                asset_mint: ctx.accounts.token_mint.to_account_info(),
-                collection: ctx.accounts.collection.to_account_info(),
-                payer_creator: ctx.accounts.admin.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        CreateMetaArgs {
-            update_authority: args.update_authority,
-            name: args.name,
-            uri: Url::from_str(args.uri.as_str()).unwrap(),
-            mutable: args.mutable,
-            collection_key: args.collection_key,
-        },
-    )?;
-
-    // Minting the token to the collection admin
-    shadow_nft_standard::cpi::mint_nft(
-        CpiContext::new_with_signer(
-            ctx.accounts.metadata_program.to_account_info(),
-            shadow_nft_standard::cpi::accounts::MintNFT {
-                metadata: ctx.accounts.token_metadata.to_account_info(),
-                asset_mint: ctx.accounts.token_mint.to_account_info(),
-                minter: ctx.accounts.admin.to_account_info(),
-                minter_ata: ctx.accounts.admin_token_account.to_account_info(),
-                collection: ctx.accounts.collection.to_account_info(),
-                associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        0,
-    )?;
-
     invoke_signed(
-        &spl_token_2022::instruction::transfer_checked(
+        &initialize_permanent_delegate(
             ctx.accounts.token_program.key,
-            ctx.accounts.admin_token_account.key,
-            ctx.accounts.token_mint.key,
-            ctx.accounts.token_account.key,
-            ctx.accounts.admin.key,
-            &[ctx.accounts.admin.key],
-            1,
-            0,
+            &ctx.accounts.token_mint.key(),
+            &ctx.accounts.collection_authority.key(),
         )?,
         &[
-            ctx.accounts.admin_token_account.to_account_info(),
-            ctx.accounts.token_mint.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.admin.to_account_info(),
             ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.collection_authority.to_account_info(),
+            ctx.accounts.token_mint.to_account_info(),
         ],
         signer_seeds,
     )?;
 
+    initialize_mint(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            InitializeMint {
+                mint: ctx.accounts.token_mint.to_account_info(),
+                rent: ctx.accounts.rent.to_account_info(),
+            },
+        ),
+        0,
+        ctx.accounts.collection_authority.key,
+        Some(ctx.accounts.collection_authority.key),
+    )?;
+
+    create_idempotent(CpiContext::new(
+        ctx.accounts.associated_token_program.to_account_info(),
+        Create {
+            payer: ctx.accounts.payer.to_account_info(),
+            associated_token: ctx.accounts.token_account.to_account_info(),
+            authority: ctx.accounts.receiver.to_account_info(),
+            mint: ctx.accounts.token_mint.to_account_info(),
+            system_program: ctx.accounts.system_program.to_account_info(),
+            token_program: ctx.accounts.token_program.to_account_info(),
+        },
+    ))?;
+
+    mint_to(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            MintTo {
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.collection_authority.to_account_info(),
+                mint: ctx.accounts.token_mint.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        1,
+    )?;
+
+    create_external_metadata(
+        CpiContext::new_with_signer(
+            ctx.accounts.metadata_program.to_account_info(),
+            CreateMetadata {
+                payer: ctx.accounts.payer.to_account_info(),
+                authorities_group: ctx.accounts.authorities_group.to_account_info(),
+                mint: ctx.accounts.token_mint.to_account_info(),
+                metadata: ctx.accounts.token_metadata.to_account_info(),
+                token_program: ctx.accounts.token_program.to_account_info(),
+                associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
+                system_program: ctx.accounts.system_program.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        uri,
+    )?;
+
+    include_in_set(CpiContext::new_with_signer(
+        ctx.accounts.metadata_program.to_account_info(),
+        IncludeInSet {
+            payer: ctx.accounts.payer.to_account_info(),
+            inclusion_authority: ctx.accounts.collection_authority.to_account_info(),
+            authorities_group: ctx.accounts.authorities_group.to_account_info(),
+            parent_metadata: ctx.accounts.collection_metadata.to_account_info(),
+            child_metadata: ctx.accounts.token_metadata.to_account_info(),
+            inclusion: ctx.accounts.inclusion.to_account_info(),
+            system_program: ctx.accounts.system_program.to_account_info(),
+        },
+        signer_seeds,
+    ))?;
+
     emit!(TokenCreated {
         config: config.key(),
         mint: ctx.accounts.token_mint.key(),
-        collection: ctx.accounts.collection.key()
+        collection: ctx.accounts.collection_mint.key()
     });
 
     Ok(())
@@ -126,17 +143,12 @@ pub struct CreateToken<'info> {
     pub admin: Signer<'info>,
 
     /// CHECK: Delegatable creation
-    #[account(mut)]
     pub receiver: UncheckedAccount<'info>,
-
-    /// The creator group
-    pub creator_group: Account<'info, CreatorGroup>,
 
     /// CHECK: Seeded authority
     #[account(
-        mut,
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
             COLLECTION_AUTHORITY_SEED.as_bytes(),
         ],
         bump,
@@ -146,53 +158,58 @@ pub struct CreateToken<'info> {
     /// The config
     #[account(
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
         ],
         bump,
-        has_one = collection,
+        has_one = collection_mint,
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
 
-    /// The Shadow collection
+    pub collection_mint: Box<InterfaceAccount<'info, Mint>>,
+
+    #[account(
+        address = get_associated_token_address_with_program_id(
+            admin.key,
+            &collection_mint.key(),
+            &token_program.key(),
+        ),
+        constraint = admin_collection_mint_account.amount == 1,
+    )]
+    pub admin_collection_mint_account: InterfaceAccount<'info, TokenAccount>,
+
     #[account(
         mut,
-        constraint = collection.creator_group_key == creator_group.key() @ RentNftError::BadCreatorGroup
+        has_one = authorities_group
     )]
-    pub collection: Box<Account<'info, Collection>>,
+    pub collection_metadata: Box<Account<'info, Metadata>>,
+
+    pub authorities_group: Account<'info, AuthoritiesGroup>,
 
     /// The mint of the new token
-    /// CHECK: Will be initialized by Shadow
-    #[account(mut)]
-    pub token_mint: UncheckedAccount<'info>,
+    /// CHECK: Will be initialized by Standard
+    #[account(
+        init,
+        owner = token_program.key(),
+        payer = payer,
+        space = 202, // Token2022 mint with permanent delegation extension
+        mint::token_program = token_program,
+    )]
+    pub token_mint: AccountInfo<'info>,
 
     /// Metadata of the token
-    /// CHECK: Verified by Shadow
+    /// CHECK: Verified by Standard
     #[account(mut)]
     pub token_metadata: UncheckedAccount<'info>,
 
-    /// The account storing the collection token
-    /// CHECK: Will be initialized by Shadow
-    #[account(
-        mut,
-        address = anchor_spl::associated_token::get_associated_token_address_with_program_id(
-            receiver.key,
-            &token_mint.key(),
-            &token_program.key(),
-        )
-    )]
-    pub token_account: UncheckedAccount<'info>,
+    /// Proof of inclusion
+    /// CHECK: Verified by Standard
+    #[account(mut)]
+    pub inclusion: UncheckedAccount<'info>,
 
-    /// The account storing the collection token
-    /// CHECK: Will be initialized by Shadow
-    #[account(
-        mut,
-        address = anchor_spl::associated_token::get_associated_token_address_with_program_id(
-            admin.key,
-            &token_mint.key(),
-            &token_program.key(),
-        )
-    )]
-    pub admin_token_account: UncheckedAccount<'info>,
+    /// The account storing the new token
+    /// CHECK: Will be initialized by Standard
+    #[account(mut)]
+    pub token_account: UncheckedAccount<'info>,
 
     /// The wrapper
     #[account(
@@ -200,7 +217,7 @@ pub struct CreateToken<'info> {
         payer = payer,
         space = TokenState::len(config.contest_window_size),
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
             &token_mint.key().to_bytes()
         ],
         bump,
@@ -208,11 +225,10 @@ pub struct CreateToken<'info> {
     pub token_state: Box<Account<'info, TokenState>>,
 
     /// Common Solana programs
-    pub token_program: Program<'info, Token>,
+    pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
-    /// CHECK: Shadow standard
-    #[account(address = shadow_nft_standard::ID)]
-    pub metadata_program: UncheckedAccount<'info>,
+    #[account(address = nft_standard::ID)]
+    pub metadata_program: Program<'info, NftStandard>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }
