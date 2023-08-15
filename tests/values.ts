@@ -10,17 +10,18 @@ import {
 import {
   getBidStateKey,
   getCollectionAuthorityKey,
-  getCollectionKey,
   getConfigKey,
-  getCreatorGroupKey,
-  getMetadataKey,
   getTokenStateKey,
-} from "../../sdk/src";
+} from "../sdk/src";
 import {
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
+import {
+  getAuthoritiesGroupKey,
+  getMetadataKey,
+} from "@koch-labs/nft-standard";
 
 export interface TestValues {
   admin: Keypair;
@@ -30,17 +31,17 @@ export interface TestValues {
   bidder: Keypair;
   bidderTaxAccount: PublicKey;
   taxMintKeypair: Keypair;
-  creators: PublicKey[];
-  creatorGroupName: string;
-  creatorGroupKey: PublicKey;
-  collectionName: string;
-  collectionSymbol: string;
+  authoritiesGroupId: PublicKey;
+  authoritiesGroupKey: PublicKey;
   collectionPeriod: number;
-  collectionKey: PublicKey;
+  collectionData: string;
+  collectionMetadata: PublicKey;
+  collectionMintKeypair: Keypair;
   collectionAuthority: PublicKey;
   configKey: PublicKey;
   tokenMintKeypair: Keypair;
   tokenMintAccount: PublicKey;
+  adminCollectionMintAccount: PublicKey;
   adminTokenMintAccount: PublicKey;
   tokenMetadata: PublicKey;
   tokenStateKey: PublicKey;
@@ -75,19 +76,27 @@ export const createValues = (): TestValues => {
     true,
     TOKEN_2022_PROGRAM_ID
   );
-  const creatorGroupName = "Harbies";
-  const creators = [admin].map((e) => e.publicKey);
-  const creatorGroupKey = getCreatorGroupKey(creators);
-  const collectionName = "Harbies";
-  const collectionSymbol = "HRB";
-  const collectionKey = getCollectionKey(creatorGroupKey, collectionName);
-  const collectionAuthority = getCollectionAuthorityKey(collectionKey);
+  const authoritiesGroupId = Keypair.generate().publicKey;
+  const authoritiesGroupKey = getAuthoritiesGroupKey(authoritiesGroupId);
+  const collectionMintKeypair = Keypair.generate();
+  const collectionMetadata = getMetadataKey(collectionMintKeypair.publicKey);
+  const collectionData = "okokokkok";
+  const collectionAuthority = getCollectionAuthorityKey(
+    collectionMintKeypair.publicKey
+  );
   const collectionPeriod = 2;
-  const configKey = getConfigKey(collectionKey);
+  const configKey = getConfigKey(collectionMintKeypair.publicKey);
   const tokenMintKeypair = Keypair.generate();
   const tokenMintAccount = getAssociatedTokenAddressSync(
     tokenMintKeypair.publicKey,
     holder.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID,
+    ASSOCIATED_PROGRAM_ID
+  );
+  const adminCollectionMintAccount = getAssociatedTokenAddressSync(
+    collectionMintKeypair.publicKey,
+    admin.publicKey,
     true,
     TOKEN_2022_PROGRAM_ID,
     ASSOCIATED_PROGRAM_ID
@@ -101,16 +110,16 @@ export const createValues = (): TestValues => {
   );
   const tokenMetadata = getMetadataKey(tokenMintKeypair.publicKey);
   const tokenStateKey = getTokenStateKey(
-    collectionKey,
+    collectionMintKeypair.publicKey,
     tokenMintKeypair.publicKey
   );
   const holderBidStateKey = getBidStateKey(
-    collectionKey,
+    collectionMintKeypair.publicKey,
     tokenMintKeypair.publicKey,
     holder.publicKey
   );
   const bidderBidStateKey = getBidStateKey(
-    collectionKey,
+    collectionMintKeypair.publicKey,
     tokenMintKeypair.publicKey,
     bidder.publicKey
   );
@@ -134,17 +143,17 @@ export const createValues = (): TestValues => {
     holderTaxAccount,
     bidderTaxAccount,
     taxMintKeypair,
-    creators,
-    creatorGroupName,
-    creatorGroupKey,
-    collectionName,
-    collectionSymbol,
-    collectionKey,
+    authoritiesGroupId,
+    authoritiesGroupKey,
+    collectionData,
+    collectionMetadata,
+    collectionMintKeypair,
     collectionPeriod,
     collectionAuthority,
     configKey,
     tokenMintKeypair,
     tokenMintAccount,
+    adminCollectionMintAccount,
     adminTokenMintAccount,
     tokenMetadata,
     tokenStateKey,

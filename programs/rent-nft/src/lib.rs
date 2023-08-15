@@ -1,13 +1,13 @@
-// mod constants;
-// mod errors;
-// mod events;
-// mod instructions;
-// mod state;
-// mod utils;
+mod constants;
+mod errors;
+mod events;
+mod instructions;
+mod state;
+mod utils;
 
 use anchor_lang::prelude::*;
 
-// use instructions::*;
+use instructions::*;
 
 declare_id!("FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8");
 
@@ -15,14 +15,14 @@ declare_id!("FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8");
 pub mod rent_nft {
     use super::*;
 
-    // pub fn create_collection(
-    //     ctx: Context<CreateCollection>,
-    //     name: String,
-    //     symbol: String,
-    //     time_period: u32,
-    // ) -> Result<()> {
-    //     instructions::create_collection(ctx, name, symbol, time_period)
-    // }
+    pub fn create_collection(
+        ctx: Context<CreateCollection>,
+        id: Pubkey,
+        uri: String,
+        time_period: u32,
+    ) -> Result<()> {
+        instructions::create_collection(ctx, id, uri, time_period)
+    }
 
     // pub fn create_token(ctx: Context<CreateToken>, args: CreateTokenArgs) -> Result<()> {
     //     instructions::create_token(ctx, args)

@@ -3,17 +3,6 @@ seeds = false
 skip-lint = false
 [programs.localnet]
 rent_nft = "FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8"
-nft_standard = "9msweUGitRR1ELUe4XZi6xhecPCko54kSqSnfWH7LLiZ"
-
-# Shadow NFT Standard Loader
-[[test.validator.account]]
-address = "9fQse1hBRfzWweeUod6WEsR4jZf7hVucetEheCaWooY5"
-filename = "deps/shadow_nft_standard_loader.json"
-
-# Shadow NFT Standard Data Account
-[[test.validator.account]]
-address = "E3AuyxUidXpTeYh98i8PQs2eoKibjgU184gb6tEELxWH"
-filename = "deps/shadow_nft_standard_data.json"
 
 # Token2022 Loader
 [[test.validator.account]]
@@ -23,6 +12,10 @@ filename = "deps/token2022_loader.json"
 [[test.validator.account]]
 address = "DoU57AYuPFu2QU514RktNPG22QhApEjnKxnBcu4BHDTY"
 filename = "deps/token2022_data.json"
+
+[[test.genesis]]
+address = "9msweUGitRR1ELUe4XZi6xhecPCko54kSqSnfWH7LLiZ"
+program = "deps/nft_standard.so"
 
 # [test.validator]
 # url = "https://api.mainnet-beta.solana.com"
@@ -38,6 +31,3 @@ wallet = "./id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
-test-standard = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/nft-standard/*.ts"
-test-rent = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/rent-nft/*.ts"
-submodules = "git submodule update --init --recursive && deps/shadow-nft-standard/ && anchor build && cd ../../"

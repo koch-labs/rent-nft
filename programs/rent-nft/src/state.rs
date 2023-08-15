@@ -4,8 +4,8 @@ use anchor_lang::prelude::*;
 /// It's used to save space in each token account.
 #[account]
 pub struct CollectionConfig {
-    /// The shadow collection
-    pub collection: Pubkey,
+    /// The collection mint
+    pub collection_mint: Pubkey,
 
     /// The mint of the tax token
     pub tax_mint: Pubkey,

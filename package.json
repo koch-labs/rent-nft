@@ -4,7 +4,8 @@
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
     },
     "dependencies": {
-        "@coral-xyz/anchor": "0.26.0"
+        "@coral-xyz/anchor": "0.28.0",
+        "@koch-labs/nft-standard": "0.0.6"
     },
     "devDependencies": {
         "@solana/spl-token": "^0.3.8",
