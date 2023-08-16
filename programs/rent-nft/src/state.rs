@@ -17,6 +17,8 @@ pub struct CollectionConfig {
     pub tax_rate: u32,
 
     pub minimum_sell_price: u64,
+
+    pub collected_tax: u64,
 }
 
 impl CollectionConfig {
@@ -36,6 +38,8 @@ pub struct TokenState {
     /// The mint of the token
     pub token_mint: Pubkey,
 
+    pub owner_bid_state: Option<Pubkey>,
+
     /// The sum of all deposits
     pub deposited: u64,
 
@@ -46,6 +50,7 @@ impl TokenState {
     pub const LEN: usize = 8 // Discriminator
             + 32 // Config
             + 32 // Mint
+            + 33 // Owner
             + 8 // Deposits
             + 8; // Price
 }

@@ -56,7 +56,7 @@ pub struct BidUpdated {
 }
 
 #[event]
-pub struct ClaimedToken {
+pub struct BoughtToken {
     /// The collection
     #[index]
     pub collection: Pubkey,
@@ -66,7 +66,7 @@ pub struct ClaimedToken {
     pub mint: Pubkey,
 
     /// The new owner claiming the token
-    pub claimant: Pubkey,
+    pub buyer: Pubkey,
 }
 
 #[event]

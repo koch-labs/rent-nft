@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 
-import { LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import {
   TOKEN_2022_PROGRAM_ID,
   createAssociatedTokenAccountIdempotent,
@@ -172,7 +172,7 @@ describe(suiteName, () => {
           values.collectionMintKeypair.publicKey,
           values.tokenMintKeypair.publicKey
         ),
-        tokenAccount: values.tokenMintAccount,
+        tokenAccount: values.holderTokenMintAccount,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
         metadataProgram: NFT_STANDARD_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
@@ -275,17 +275,23 @@ describe(suiteName, () => {
     let bidAccount = await connection.getTokenAccountBalance(values.bidAccount);
     expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
 
-    // console.log(await program.account.tokenState.fetch(tokenStateKey));
-    // // Start bidding
-    // await program.methods
-    //   .updateTokenState()
-    //   .accounts({
-    //     collectionMint: collectionMintKeypair.publicKey,
-    //     config: configKey,
-    //     collectionAuthority,
-    //     tokenState: tokenStateKey,
-    //   })
-    //   .rpc({ skipPreflight: true });
+    // Buy the token for the first time
+    await program.methods
+      .buyToken(values.newTokenPrice)
+      .accounts({
+        owner: values.holder.publicKey,
+        buyer: values.bidder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        tokenMint: values.tokenMintKeypair.publicKey,
+        ownerTokenAccount: values.holderTaxAccount,
+        buyerTokenAccount: values.bidderTokenMintAccount,
+        buyerBidState: values.bidderBidStateKey,
+        ownerBidState: values.holderBidStateKey,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .rpc({ skipPreflight: true });
 
     // console.log(await program.account.tokenState.fetch(tokenStateKey));
     // console.log(await program.account.bidState.fetch(bidStateKey));

@@ -1,4 +1,4 @@
-// mod claim_token;
+mod buy_token;
 mod create_bid;
 mod create_collection;
 mod create_token;
@@ -7,7 +7,7 @@ mod update_bid;
 // mod update_bid_state;
 // mod update_token_state;
 
-// pub use claim_token::*;
+pub use buy_token::*;
 pub use create_bid::*;
 pub use create_collection::*;
 pub use create_token::*;

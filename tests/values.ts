@@ -42,7 +42,8 @@ export interface TestValues {
   collectionAuthority: PublicKey;
   configKey: PublicKey;
   tokenMintKeypair: Keypair;
-  tokenMintAccount: PublicKey;
+  holderTokenMintAccount: PublicKey;
+  bidderTokenMintAccount: PublicKey;
   adminCollectionMintAccount: PublicKey;
   adminTokenMintAccount: PublicKey;
   tokenMetadata: PublicKey;
@@ -51,7 +52,7 @@ export interface TestValues {
   bidderBidStateKey: PublicKey;
   bidAccount: PublicKey;
   depositedAmount: anchor.BN;
-  biddingRate: anchor.BN;
+  newTokenPrice: anchor.BN;
 }
 
 export const createValues = (): TestValues => {
@@ -85,31 +86,34 @@ export const createValues = (): TestValues => {
   const collectionAuthority = getCollectionAuthorityKey(
     collectionMintKeypair.publicKey
   );
-  const collectionRate = 10000;
+  const collectionRate = 10000 * 365 * 8640; // 1/10 of price per second
   const collectionPeriod = 2;
   const collectionMinimumPrice = new anchor.BN(100);
   const configKey = getConfigKey(collectionMintKeypair.publicKey);
   const tokenMintKeypair = Keypair.generate();
-  const tokenMintAccount = getAssociatedTokenAddressSync(
+  const holderTokenMintAccount = getAssociatedTokenAddressSync(
     tokenMintKeypair.publicKey,
     holder.publicKey,
     true,
-    TOKEN_2022_PROGRAM_ID,
-    ASSOCIATED_PROGRAM_ID
+    TOKEN_2022_PROGRAM_ID
+  );
+  const bidderTokenMintAccount = getAssociatedTokenAddressSync(
+    tokenMintKeypair.publicKey,
+    bidder.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID
   );
   const adminCollectionMintAccount = getAssociatedTokenAddressSync(
     collectionMintKeypair.publicKey,
     admin.publicKey,
     true,
-    TOKEN_2022_PROGRAM_ID,
-    ASSOCIATED_PROGRAM_ID
+    TOKEN_2022_PROGRAM_ID
   );
   const adminTokenMintAccount = getAssociatedTokenAddressSync(
     tokenMintKeypair.publicKey,
     admin.publicKey,
     true,
-    TOKEN_2022_PROGRAM_ID,
-    ASSOCIATED_PROGRAM_ID
+    TOKEN_2022_PROGRAM_ID
   );
   const tokenMetadata = getMetadataKey(tokenMintKeypair.publicKey);
   const tokenStateKey = getTokenStateKey(
@@ -132,8 +136,8 @@ export const createValues = (): TestValues => {
     true,
     TOKEN_2022_PROGRAM_ID
   );
-  const depositedAmount = new anchor.BN(100);
-  const biddingRate = new anchor.BN(10);
+  const depositedAmount = new anchor.BN(10000);
+  const newTokenPrice = new anchor.BN(200);
   return {
     admin,
     holder,
@@ -153,7 +157,8 @@ export const createValues = (): TestValues => {
     collectionAuthority,
     configKey,
     tokenMintKeypair,
-    tokenMintAccount,
+    holderTokenMintAccount,
+    bidderTokenMintAccount,
     adminCollectionMintAccount,
     adminTokenMintAccount,
     tokenMetadata,
@@ -162,6 +167,6 @@ export const createValues = (): TestValues => {
     bidderBidStateKey,
     bidAccount,
     depositedAmount,
-    biddingRate,
+    newTokenPrice,
   };
 };

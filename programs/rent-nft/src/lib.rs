@@ -1,8 +1,8 @@
-mod constants;
-mod errors;
-mod events;
-mod instructions;
-mod state;
+pub mod constants;
+pub mod errors;
+pub mod events;
+pub mod instructions;
+pub mod state;
 
 use anchor_lang::prelude::*;
 
@@ -37,9 +37,9 @@ pub mod rent_nft {
         instructions::update_bid(ctx, amount)
     }
 
-    // pub fn update_token_state(ctx: Context<UpdateTokenState>) -> Result<()> {
-    //     instructions::update_token_state(ctx)
-    // }
+    pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {
+        instructions::buy_token(ctx, new_sell_price)
+    }
 
     // pub fn update_bid_state(ctx: Context<UpdateBidState>) -> Result<()> {
     //     instructions::update_bid_state(ctx)
