@@ -109,19 +109,13 @@ describe(suiteName, () => {
   });
 
   it("Mint collection", async () => {
-    console.log(
-      getMintLen([ExtensionType.PermanentDelegate]),
-      await connection.getMinimumBalanceForRentExemption(
-        getMintLen([ExtensionType.PermanentDelegate])
-      )
-    );
-
     // Mint collection
     await program.methods
       .createCollection(
         values.authoritiesGroupId,
         values.collectionData,
-        values.collectionPeriod
+        values.collectionPeriod,
+        values.collectionRate
       )
       .accounts({
         config: values.configKey,
@@ -157,27 +151,6 @@ describe(suiteName, () => {
       values.collectionMintKeypair.publicKey.toString()
     );
 
-    console.log({
-      config: values.configKey,
-      receiver: values.holder.publicKey,
-      admin: values.admin.publicKey,
-      authoritiesGroup: values.authoritiesGroupKey,
-      collectionAuthority: values.collectionAuthority,
-      collectionMint: values.collectionMintKeypair.publicKey,
-      collectionMetadata: values.collectionMetadata,
-      tokenMint: values.tokenMintKeypair.publicKey,
-      tokenState: values.tokenStateKey,
-      tokenMetadata: values.tokenMetadata,
-      inclusion: getInclusionKey(
-        values.collectionMintKeypair.publicKey,
-        values.tokenMintKeypair.publicKey
-      ),
-      tokenAccount: values.tokenMintAccount,
-      adminCollectionMintAccount: values.adminCollectionMintAccount,
-      metadataProgram: NFT_STANDARD_PROGRAM_ID,
-      tokenProgram: TOKEN_2022_PROGRAM_ID,
-    });
-
     const uri = "ijsiodfjsodifjo";
     // Mint a token
     await program.methods
@@ -205,58 +178,44 @@ describe(suiteName, () => {
       .signers([values.admin, values.tokenMintKeypair])
       .rpc({ skipPreflight: true });
 
-    // let tokenMetadata = await programShadowNft.account.metadata.fetch(
-    //   values.tokenMetadata
-    // );
-    // expect(tokenMetadata.collectionKey.toString()).to.equal(
-    //   values.collectionKey.toString()
-    // );
-    // expect(tokenMetadata.mint.toString()).to.equal(
-    //   values.tokenMintKeypair.publicKey.toString()
-    // );
+    let tokenMetadata = await fetchMetadata(
+      provider,
+      values.tokenMintKeypair.publicKey
+    );
+    expect(tokenMetadata.mint.toString()).to.equal(
+      values.tokenMintKeypair.publicKey.toString()
+    );
+    let tokenState = await program.account.tokenState.fetch(
+      values.tokenStateKey
+    );
+    expect(tokenState.config.toString()).to.equal(values.configKey.toString());
+    expect(tokenState.tokenMint.toString()).to.equal(
+      values.tokenMintKeypair.publicKey.toString()
+    );
+    expect(tokenState.deposited.toString()).to.equal("0");
 
-    // let tokenState = await program.account.tokenState.fetch(
-    //   values.tokenStateKey
-    // );
-    // expect(tokenState.config.toString()).to.equal(values.configKey.toString());
-    // expect(tokenState.tokenMint.toString()).to.equal(
-    //   values.tokenMintKeypair.publicKey.toString()
-    // );
-    // expect(tokenState.deposited.toString()).to.equal("0");
+    await program.methods
+      .createBid()
+      .accounts({
+        bidder: values.bidder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.bidderBidStateKey,
+      })
+      .rpc({ skipPreflight: true });
 
-    // await program.methods
-    //   .createBid()
-    //   .accounts({
-    //     bidder: values.bidder.publicKey,
-    //     config: values.configKey,
-    //     collectionAuthority: values.collectionAuthority,
-    //     tokenState: values.tokenStateKey,
-    //     bidState: values.bidderBidStateKey,
-    //   })
-    //   .rpc({ skipPreflight: true });
+    let bidState = await program.account.bidState.fetch(
+      values.bidderBidStateKey
+    );
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.bidder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal("0");
 
-    // let bidState = await program.account.bidState.fetch(
-    //   values.bidderBidStateKey
-    // );
-    // expect(bidState.tokenState.toString()).to.equal(
-    //   values.tokenStateKey.toString()
-    // );
-    // expect(bidState.bidder.toString()).to.equal(
-    //   values.bidder.publicKey.toString()
-    // );
-    // expect(bidState.amount.toString()).to.equal("0");
-
-    // console.log({
-    //   bidder: values.bidder.publicKey,
-    //   config: values.configKey,
-    //   collectionAuthority: values.collectionAuthority,
-    //   tokenState: values.tokenStateKey,
-    //   bidState: values.bidderBidStateKey,
-    //   taxMint: values.taxMintKeypair.publicKey,
-    //   bidderAccount: values.bidderAccount,
-    //   bidAccount: values.bidAccount,
-    //   tokenProgram: TOKEN_2022_PROGRAM_ID,
-    // });
     // await program.methods
     //   .updateDeposit(values.depositedAmount.mul(new anchor.BN(2)))
     //   .accounts({

@@ -29,10 +29,6 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
 
     token_state.config = config.key();
     token_state.token_mint = ctx.accounts.token_mint.key();
-    token_state.last_period = Clock::get()?.unix_timestamp;
-    token_state
-        .total_bids_window
-        .resize(config.contest_window_size as usize, 0);
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
@@ -215,7 +211,7 @@ pub struct CreateToken<'info> {
     #[account(
         init,
         payer = payer,
-        space = TokenState::len(config.contest_window_size),
+        space = TokenState::LEN,
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_mint.key().to_bytes()

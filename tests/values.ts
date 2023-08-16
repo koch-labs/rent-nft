@@ -34,6 +34,7 @@ export interface TestValues {
   authoritiesGroupId: PublicKey;
   authoritiesGroupKey: PublicKey;
   collectionPeriod: number;
+  collectionRate: number;
   collectionData: string;
   collectionMetadata: PublicKey;
   collectionMintKeypair: Keypair;
@@ -84,6 +85,7 @@ export const createValues = (): TestValues => {
   const collectionAuthority = getCollectionAuthorityKey(
     collectionMintKeypair.publicKey
   );
+  const collectionRate = 10000;
   const collectionPeriod = 2;
   const configKey = getConfigKey(collectionMintKeypair.publicKey);
   const tokenMintKeypair = Keypair.generate();
@@ -149,6 +151,7 @@ export const createValues = (): TestValues => {
     collectionMetadata,
     collectionMintKeypair,
     collectionPeriod,
+    collectionRate,
     collectionAuthority,
     configKey,
     tokenMintKeypair,

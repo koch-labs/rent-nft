@@ -15,6 +15,7 @@ pub fn create_collection(
     id: Pubkey,
     uri: String,
     time_period: u32,
+    tax_rate: u32,
 ) -> Result<()> {
     msg!("Creating a collection");
     let config = &mut ctx.accounts.config;
@@ -22,6 +23,7 @@ pub fn create_collection(
     config.collection_mint = ctx.accounts.collection_mint.key();
     config.tax_mint = ctx.accounts.tax_mint.key();
     config.time_period = time_period;
+    config.tax_rate = tax_rate;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
