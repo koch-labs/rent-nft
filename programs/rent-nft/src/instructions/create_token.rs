@@ -29,6 +29,7 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
 
     token_state.config = config.key();
     token_state.token_mint = ctx.accounts.token_mint.key();
+    token_state.current_selling_price = config.minimum_sell_price;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[

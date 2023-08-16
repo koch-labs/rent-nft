@@ -35,6 +35,7 @@ export interface TestValues {
   authoritiesGroupKey: PublicKey;
   collectionPeriod: number;
   collectionRate: number;
+  collectionMinimumPrice: anchor.BN;
   collectionData: string;
   collectionMetadata: PublicKey;
   collectionMintKeypair: Keypair;
@@ -87,6 +88,7 @@ export const createValues = (): TestValues => {
   );
   const collectionRate = 10000;
   const collectionPeriod = 2;
+  const collectionMinimumPrice = new anchor.BN(100);
   const configKey = getConfigKey(collectionMintKeypair.publicKey);
   const tokenMintKeypair = Keypair.generate();
   const tokenMintAccount = getAssociatedTokenAddressSync(
@@ -152,6 +154,7 @@ export const createValues = (): TestValues => {
     collectionMintKeypair,
     collectionPeriod,
     collectionRate,
+    collectionMinimumPrice,
     collectionAuthority,
     configKey,
     tokenMintKeypair,

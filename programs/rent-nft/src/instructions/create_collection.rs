@@ -16,6 +16,7 @@ pub fn create_collection(
     uri: String,
     time_period: u32,
     tax_rate: u32,
+    min_price: u64,
 ) -> Result<()> {
     msg!("Creating a collection");
     let config = &mut ctx.accounts.config;
@@ -24,6 +25,7 @@ pub fn create_collection(
     config.tax_mint = ctx.accounts.tax_mint.key();
     config.time_period = time_period;
     config.tax_rate = tax_rate;
+    config.minimum_sell_price = min_price;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[

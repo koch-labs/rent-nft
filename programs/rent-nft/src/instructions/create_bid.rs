@@ -1,6 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::Token;
 
 use crate::constants::*;
 use crate::events::*;
@@ -79,8 +77,6 @@ pub struct CreateBid<'info> {
     pub bid_state: Box<Account<'info, BidState>>,
 
     /// Common Solana programs
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

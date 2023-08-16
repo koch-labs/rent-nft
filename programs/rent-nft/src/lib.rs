@@ -3,7 +3,6 @@ mod errors;
 mod events;
 mod instructions;
 mod state;
-mod utils;
 
 use anchor_lang::prelude::*;
 
@@ -21,8 +20,9 @@ pub mod rent_nft {
         uri: String,
         time_period: u32,
         tax_rate: u32,
+        min_price: u64,
     ) -> Result<()> {
-        instructions::create_collection(ctx, id, uri, time_period, tax_rate)
+        instructions::create_collection(ctx, id, uri, time_period, tax_rate, min_price)
     }
 
     pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {

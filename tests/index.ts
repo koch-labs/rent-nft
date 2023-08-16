@@ -115,7 +115,8 @@ describe(suiteName, () => {
         values.authoritiesGroupId,
         values.collectionData,
         values.collectionPeriod,
-        values.collectionRate
+        values.collectionRate,
+        values.collectionMinimumPrice
       )
       .accounts({
         config: values.configKey,

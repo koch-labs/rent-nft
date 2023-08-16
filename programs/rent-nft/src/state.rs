@@ -15,6 +15,8 @@ pub struct CollectionConfig {
 
     /// Basis points per year of tax on the selling price
     pub tax_rate: u32,
+
+    pub minimum_sell_price: u64,
 }
 
 impl CollectionConfig {
@@ -22,7 +24,8 @@ impl CollectionConfig {
         + 32 // Collection
         + 32 // Tax
         + 4 // Period
-        + 4; // Rate
+        + 4 // Rate
+        + 8; // Min price
 }
 
 #[account]
@@ -35,13 +38,16 @@ pub struct TokenState {
 
     /// The sum of all deposits
     pub deposited: u64,
+
+    pub current_selling_price: u64,
 }
 
 impl TokenState {
     pub const LEN: usize = 8 // Discriminator
             + 32 // Config
             + 32 // Mint
-            + 8; // Sum
+            + 8 // Deposits
+            + 8; // Price
 }
 
 #[account]
