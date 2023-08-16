@@ -127,6 +127,7 @@ describe(suiteName, () => {
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
+        bidsAccount: values.bidAccount,
         metadataProgram: NFT_STANDARD_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
@@ -217,62 +218,62 @@ describe(suiteName, () => {
     );
     expect(bidState.amount.toString()).to.equal("0");
 
-    // await program.methods
-    //   .updateDeposit(values.depositedAmount.mul(new anchor.BN(2)))
-    //   .accounts({
-    //     bidder: values.bidder.publicKey,
-    //     config: values.configKey,
-    //     collectionAuthority: values.collectionAuthority,
-    //     tokenState: values.tokenStateKey,
-    //     bidState: values.bidderBidStateKey,
-    //     taxMint: values.taxMintKeypair.publicKey,
-    //     bidderAccount: values.bidderAccount,
-    //     bidAccount: values.bidAccount,
-    //     tokenProgram: TOKEN_2022_PROGRAM_ID,
-    //   })
-    //   .signers([values.bidder])
-    //   .rpc({ skipPreflight: true });
+    await program.methods
+      .updateBid(values.depositedAmount.mul(new anchor.BN(2)))
+      .accounts({
+        bidder: values.bidder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.bidderBidStateKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        bidderAccount: values.bidderTaxAccount,
+        bidsAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.bidder])
+      .rpc({ skipPreflight: true });
 
-    // bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
-    // expect(bidState.tokenState.toString()).to.equal(
-    //   values.tokenStateKey.toString()
-    // );
-    // expect(bidState.bidder.toString()).to.equal(
-    //   values.bidder.publicKey.toString()
-    // );
-    // expect(bidState.amount.toString()).to.equal(
-    //   values.depositedAmount.mul(new anchor.BN(2)).toString()
-    // );
+    bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.bidder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal(
+      values.depositedAmount.mul(new anchor.BN(2)).toString()
+    );
 
-    // await program.methods
-    //   .updateDeposit(values.depositedAmount.neg())
-    //   .accounts({
-    //     bidder: values.bidder.publicKey,
-    //     config: values.configKey,
-    //     collectionAuthority: values.collectionAuthority,
-    //     tokenState: values.tokenStateKey,
-    //     bidState: values.bidderBidStateKey,
-    //     taxMint: values.taxMintKeypair.publicKey,
-    //     bidderAccount: values.bidderAccount,
-    //     bidAccount: values.bidAccount,
-    //     tokenProgram: TOKEN_2022_PROGRAM_ID,
-    //   })
-    //   .signers([values.bidder])
-    //   .rpc({ skipPreflight: true });
+    await program.methods
+      .updateBid(values.depositedAmount.neg())
+      .accounts({
+        bidder: values.bidder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.bidderBidStateKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        bidderAccount: values.bidderTaxAccount,
+        bidsAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.bidder])
+      .rpc({ skipPreflight: true });
 
-    // bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
-    // expect(bidState.tokenState.toString()).to.equal(
-    //   values.tokenStateKey.toString()
-    // );
-    // expect(bidState.bidder.toString()).to.equal(
-    //   values.bidder.publicKey.toString()
-    // );
-    // expect(bidState.amount.toString()).to.equal(
-    //   values.depositedAmount.toString()
-    // );
+    bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.bidder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal(
+      values.depositedAmount.toString()
+    );
 
-    // let bidAccount = await connection.getTokenAccountBalance(values.bidAccount);
-    // expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
+    let bidAccount = await connection.getTokenAccountBalance(values.bidAccount);
+    expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
 
     // console.log(await program.account.tokenState.fetch(tokenStateKey));
     // // Start bidding

@@ -2,11 +2,13 @@ use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
-use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token;
-use anchor_spl::token::TransferChecked;
-use anchor_spl::token::{transfer, Transfer};
-use shadow_nft_standard::common::token_2022::{Mint, Token2022 as Token, TokenAccount};
+use anchor_spl::token_interface::Mint;
+use anchor_spl::token_interface::TokenAccount;
+use anchor_spl::token_interface::TokenInterface;
+use anchor_spl::{
+    associated_token::get_associated_token_address_with_program_id,
+    token_interface::{transfer_checked, TransferChecked},
+};
 
 pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
     msg!("Updating bid account");
@@ -21,16 +23,18 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
         token_state.deposited += amount;
         bid_state.amount += amount;
 
-        transfer(
+        transfer_checked(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
-                Transfer {
+                TransferChecked {
+                    mint: ctx.accounts.tax_mint.to_account_info(),
                     from: ctx.accounts.bidder_account.to_account_info(),
-                    to: ctx.accounts.bid_account.to_account_info(),
+                    to: ctx.accounts.bids_account.to_account_info(),
                     authority: ctx.accounts.bidder.to_account_info(),
                 },
             ),
             amount,
+            ctx.accounts.tax_mint.decimals,
         )?;
     } else {
         let amount = if (-amount) as u64 > bid_state.amount {
@@ -44,18 +48,18 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
 
         let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
         let authority_seeds = &[
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
             COLLECTION_AUTHORITY_SEED.as_bytes(),
             &[authority_bump],
         ];
         let signer_seeds = &[&authority_seeds[..]];
 
-        token::transfer_checked(
+        transfer_checked(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
                 TransferChecked {
                     mint: ctx.accounts.tax_mint.to_account_info(),
-                    from: ctx.accounts.bid_account.to_account_info(),
+                    from: ctx.accounts.bids_account.to_account_info(),
                     to: ctx.accounts.bidder_account.to_account_info(),
                     authority: ctx.accounts.collection_authority.to_account_info(),
                 },
@@ -67,7 +71,7 @@ pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
     }
 
     emit!(BidUpdated {
-        collection: config.collection.key(),
+        collection: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
         bidder: ctx.accounts.bidder.key(),
         amount
@@ -87,7 +91,7 @@ pub struct UpdateBid<'info> {
     #[account(
         mut,
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
             COLLECTION_AUTHORITY_SEED.as_bytes(),
         ],
         bump,
@@ -97,7 +101,7 @@ pub struct UpdateBid<'info> {
     /// The config
     #[account(
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
         ],
         bump,
         has_one = tax_mint,
@@ -105,13 +109,16 @@ pub struct UpdateBid<'info> {
     pub config: Box<Account<'info, CollectionConfig>>,
 
     /// The token used to pay taxes
-    pub tax_mint: Box<Account<'info, Mint>>,
+    #[account(
+        mint::token_program = token_program
+    )]
+    pub tax_mint: Box<InterfaceAccount<'info, Mint>>,
 
     /// The state for the token assessement
     #[account(
         mut,
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes()
         ],
         bump,
@@ -122,7 +129,7 @@ pub struct UpdateBid<'info> {
     #[account(
         mut,
         seeds = [
-            &config.collection.to_bytes(),
+            &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes(),
             &bidder.key().to_bytes(),
         ],
@@ -132,27 +139,26 @@ pub struct UpdateBid<'info> {
 
     #[account(
         mut,
-        address = anchor_spl::associated_token::get_associated_token_address_with_program_id(
+        address = get_associated_token_address_with_program_id(
             bidder.key,
             &tax_mint.key(),
             &token_program.key(),
-        )
+        ),
     )]
-    pub bidder_account: Box<Account<'info, TokenAccount>>,
+    pub bidder_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
-        address = anchor_spl::associated_token::get_associated_token_address_with_program_id(
+        address = get_associated_token_address_with_program_id(
             collection_authority.key,
             &tax_mint.key(),
             &token_program.key(),
-        )
+        ),
     )]
-    pub bid_account: Box<Account<'info, TokenAccount>>,
+    pub bids_account: InterfaceAccount<'info, TokenAccount>,
 
     /// Common Solana programs
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

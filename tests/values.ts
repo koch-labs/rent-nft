@@ -50,7 +50,6 @@ export interface TestValues {
   holderBidStateKey: PublicKey;
   bidderBidStateKey: PublicKey;
   bidAccount: PublicKey;
-  bidderAccount: PublicKey;
   depositedAmount: anchor.BN;
   biddingRate: anchor.BN;
 }
@@ -127,15 +126,11 @@ export const createValues = (): TestValues => {
     tokenMintKeypair.publicKey,
     bidder.publicKey
   );
-  const bidderAccount = getAssociatedTokenAddressSync(
-    taxMintKeypair.publicKey,
-    holder.publicKey,
-    true
-  );
   const bidAccount = getAssociatedTokenAddressSync(
     taxMintKeypair.publicKey,
     collectionAuthority,
-    true
+    true,
+    TOKEN_2022_PROGRAM_ID
   );
   const depositedAmount = new anchor.BN(100);
   const biddingRate = new anchor.BN(10);
@@ -166,7 +161,6 @@ export const createValues = (): TestValues => {
     holderBidStateKey,
     bidderBidStateKey,
     bidAccount,
-    bidderAccount,
     depositedAmount,
     biddingRate,
   };

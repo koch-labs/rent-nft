@@ -3,6 +3,10 @@ use crate::events::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::associated_token::Create;
+use anchor_spl::associated_token::{
+    create_idempotent, get_associated_token_address_with_program_id,
+};
 use anchor_spl::token_interface::{mint_to, Mint, MintTo, TokenAccount, TokenInterface};
 use nft_standard::cpi::{
     accounts::{CreateAuthoritiesGroup, CreateMetadata},
@@ -34,6 +38,19 @@ pub fn create_collection(
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
+
+    // Create collection's tax account
+    create_idempotent(CpiContext::new(
+        ctx.accounts.associated_token_program.to_account_info(),
+        Create {
+            payer: ctx.accounts.payer.to_account_info(),
+            associated_token: ctx.accounts.bids_account.to_account_info(),
+            authority: ctx.accounts.collection_authority.to_account_info(),
+            mint: ctx.accounts.tax_mint.to_account_info(),
+            system_program: ctx.accounts.system_program.to_account_info(),
+            token_program: ctx.accounts.tax_token_program.to_account_info(),
+        },
+    ))?;
 
     mint_to(
         CpiContext::new_with_signer(
@@ -146,6 +163,17 @@ pub struct CreateCollection<'info> {
         associated_token::token_program = token_program,
     )]
     pub admin_collection_mint_account: InterfaceAccount<'info, TokenAccount>,
+
+    /// CHECK: Tax ATA
+    #[account(
+        mut,
+        address = get_associated_token_address_with_program_id(
+            collection_authority.key,
+            &tax_mint.key(),
+            &tax_token_program.key(),
+        ),
+    )]
+    pub bids_account: UncheckedAccount<'info>,
 
     /// Common Solana programs
     pub tax_token_program: Interface<'info, TokenInterface>,
