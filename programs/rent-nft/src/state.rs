@@ -14,7 +14,7 @@ pub struct CollectionConfig {
     pub time_period: u32,
 
     /// Basis points per year of tax on the selling price
-    pub tax_rate: u32,
+    pub tax_rate: u64,
 
     pub minimum_sell_price: u64,
 
@@ -26,8 +26,9 @@ impl CollectionConfig {
         + 32 // Collection
         + 32 // Tax
         + 4 // Period
-        + 4 // Rate
-        + 8; // Min price
+        + 8 // Rate
+        + 8 // Min price
+        + 8; // Collected
 }
 
 #[account]

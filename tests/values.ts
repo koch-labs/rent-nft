@@ -34,7 +34,7 @@ export interface TestValues {
   authoritiesGroupId: PublicKey;
   authoritiesGroupKey: PublicKey;
   collectionPeriod: number;
-  collectionRate: number;
+  collectionRate: anchor.BN;
   collectionMinimumPrice: anchor.BN;
   collectionData: string;
   collectionMetadata: PublicKey;
@@ -44,8 +44,8 @@ export interface TestValues {
   tokenMintKeypair: Keypair;
   holderTokenMintAccount: PublicKey;
   bidderTokenMintAccount: PublicKey;
-  adminCollectionMintAccount: PublicKey;
   adminTokenMintAccount: PublicKey;
+  adminCollectionMintAccount: PublicKey;
   tokenMetadata: PublicKey;
   tokenStateKey: PublicKey;
   holderBidStateKey: PublicKey;
@@ -86,7 +86,7 @@ export const createValues = (): TestValues => {
   const collectionAuthority = getCollectionAuthorityKey(
     collectionMintKeypair.publicKey
   );
-  const collectionRate = 10000 * 365 * 8640; // 1/10 of price per second
+  const collectionRate = new anchor.BN(10000 * 365 * 8640); // 1/10 of price per second
   const collectionPeriod = 2;
   const collectionMinimumPrice = new anchor.BN(100);
   const configKey = getConfigKey(collectionMintKeypair.publicKey);

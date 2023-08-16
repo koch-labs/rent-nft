@@ -19,7 +19,7 @@ pub mod rent_nft {
         id: Pubkey,
         uri: String,
         time_period: u32,
-        tax_rate: u32,
+        tax_rate: u64,
         min_price: u64,
     ) -> Result<()> {
         instructions::create_collection(ctx, id, uri, time_period, tax_rate, min_price)
@@ -35,6 +35,10 @@ pub mod rent_nft {
 
     pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
         instructions::update_bid(ctx, amount)
+    }
+
+    pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
+        instructions::claim_token(ctx)
     }
 
     pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {

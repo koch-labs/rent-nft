@@ -12,6 +12,7 @@ import {
   createInitializePermanentDelegateInstruction,
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountIdempotentInstruction,
 } from "@solana/spl-token";
 import { Program } from "@coral-xyz/anchor";
 import {
@@ -159,7 +160,7 @@ describe(suiteName, () => {
       .createToken(uri)
       .accounts({
         config: values.configKey,
-        receiver: values.holder.publicKey,
+        receiver: values.admin.publicKey,
         admin: values.admin.publicKey,
         authoritiesGroup: values.authoritiesGroupKey,
         collectionAuthority: values.collectionAuthority,
@@ -172,7 +173,7 @@ describe(suiteName, () => {
           values.collectionMintKeypair.publicKey,
           values.tokenMintKeypair.publicKey
         ),
-        tokenAccount: values.holderTokenMintAccount,
+        tokenAccount: values.adminTokenMintAccount,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
         metadataProgram: NFT_STANDARD_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
@@ -196,6 +197,112 @@ describe(suiteName, () => {
     );
     expect(tokenState.deposited.toString()).to.equal("0");
 
+    // First holder claiming the token
+    await program.methods
+      .createBid()
+      .accounts({
+        bidder: values.holder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.holderBidStateKey,
+      })
+      .rpc({ skipPreflight: true });
+
+    let bidState = await program.account.bidState.fetch(
+      values.holderBidStateKey
+    );
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.holder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal("0");
+
+    await program.methods
+      .updateBid(values.depositedAmount.mul(new anchor.BN(2)))
+      .accounts({
+        bidder: values.holder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.holderBidStateKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        bidderAccount: values.holderTaxAccount,
+        bidsAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.holder])
+      .rpc({ skipPreflight: true });
+
+    bidState = await program.account.bidState.fetch(values.holderBidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.holder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal(
+      values.depositedAmount.mul(new anchor.BN(2)).toString()
+    );
+
+    await program.methods
+      .updateBid(values.depositedAmount.neg())
+      .accounts({
+        bidder: values.holder.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        tokenState: values.tokenStateKey,
+        bidState: values.holderBidStateKey,
+        taxMint: values.taxMintKeypair.publicKey,
+        bidderAccount: values.holderTaxAccount,
+        bidsAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.holder])
+      .rpc({ skipPreflight: true });
+
+    bidState = await program.account.bidState.fetch(values.holderBidStateKey);
+    expect(bidState.tokenState.toString()).to.equal(
+      values.tokenStateKey.toString()
+    );
+    expect(bidState.bidder.toString()).to.equal(
+      values.holder.publicKey.toString()
+    );
+    expect(bidState.amount.toString()).to.equal(
+      values.depositedAmount.toString()
+    );
+
+    let bidAccount = await connection.getTokenAccountBalance(values.bidAccount);
+    expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
+
+    await program.methods
+      .claimToken()
+      .accounts({
+        newOwner: values.holder.publicKey,
+        collectionAuthority: values.collectionAuthority,
+        config: values.configKey,
+        tokenMint: values.tokenMintKeypair.publicKey,
+        tokenState: values.tokenStateKey,
+        newOwnerTokenAccount: values.holderTokenMintAccount,
+        oldOwnerTokenAccount: values.adminTokenMintAccount,
+        ownerBidState: values.holderBidStateKey,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .preInstructions([
+        createAssociatedTokenAccountIdempotentInstruction(
+          values.holder.publicKey,
+          values.holderTokenMintAccount,
+          values.holder.publicKey,
+          values.tokenMintKeypair.publicKey,
+          TOKEN_2022_PROGRAM_ID
+        ),
+      ])
+      .signers([values.holder])
+      .rpc({ skipPreflight: true });
+
+    // Buy the token
     await program.methods
       .createBid()
       .accounts({
@@ -207,19 +314,8 @@ describe(suiteName, () => {
       })
       .rpc({ skipPreflight: true });
 
-    let bidState = await program.account.bidState.fetch(
-      values.bidderBidStateKey
-    );
-    expect(bidState.tokenState.toString()).to.equal(
-      values.tokenStateKey.toString()
-    );
-    expect(bidState.bidder.toString()).to.equal(
-      values.bidder.publicKey.toString()
-    );
-    expect(bidState.amount.toString()).to.equal("0");
-
     await program.methods
-      .updateBid(values.depositedAmount.mul(new anchor.BN(2)))
+      .updateBid(values.depositedAmount)
       .accounts({
         bidder: values.bidder.publicKey,
         config: values.configKey,
@@ -234,48 +330,6 @@ describe(suiteName, () => {
       .signers([values.bidder])
       .rpc({ skipPreflight: true });
 
-    bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
-    expect(bidState.tokenState.toString()).to.equal(
-      values.tokenStateKey.toString()
-    );
-    expect(bidState.bidder.toString()).to.equal(
-      values.bidder.publicKey.toString()
-    );
-    expect(bidState.amount.toString()).to.equal(
-      values.depositedAmount.mul(new anchor.BN(2)).toString()
-    );
-
-    await program.methods
-      .updateBid(values.depositedAmount.neg())
-      .accounts({
-        bidder: values.bidder.publicKey,
-        config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
-        tokenState: values.tokenStateKey,
-        bidState: values.bidderBidStateKey,
-        taxMint: values.taxMintKeypair.publicKey,
-        bidderAccount: values.bidderTaxAccount,
-        bidsAccount: values.bidAccount,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-      })
-      .signers([values.bidder])
-      .rpc({ skipPreflight: true });
-
-    bidState = await program.account.bidState.fetch(values.bidderBidStateKey);
-    expect(bidState.tokenState.toString()).to.equal(
-      values.tokenStateKey.toString()
-    );
-    expect(bidState.bidder.toString()).to.equal(
-      values.bidder.publicKey.toString()
-    );
-    expect(bidState.amount.toString()).to.equal(
-      values.depositedAmount.toString()
-    );
-
-    let bidAccount = await connection.getTokenAccountBalance(values.bidAccount);
-    expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
-
-    // Buy the token for the first time
     await program.methods
       .buyToken(values.newTokenPrice)
       .accounts({
@@ -285,12 +339,22 @@ describe(suiteName, () => {
         collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         tokenMint: values.tokenMintKeypair.publicKey,
-        ownerTokenAccount: values.holderTaxAccount,
+        ownerTokenAccount: values.holderTokenMintAccount,
         buyerTokenAccount: values.bidderTokenMintAccount,
         buyerBidState: values.bidderBidStateKey,
         ownerBidState: values.holderBidStateKey,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .preInstructions([
+        createAssociatedTokenAccountIdempotentInstruction(
+          values.bidder.publicKey,
+          values.bidderTokenMintAccount,
+          values.bidder.publicKey,
+          values.tokenMintKeypair.publicKey,
+          TOKEN_2022_PROGRAM_ID
+        ),
+      ])
+      .signers([values.bidder])
       .rpc({ skipPreflight: true });
 
     // console.log(await program.account.tokenState.fetch(tokenStateKey));

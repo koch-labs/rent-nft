@@ -19,7 +19,7 @@ pub fn create_collection(
     id: Pubkey,
     uri: String,
     time_period: u32,
-    tax_rate: u32,
+    tax_rate: u64,
     min_price: u64,
 ) -> Result<()> {
     msg!("Creating a collection");
