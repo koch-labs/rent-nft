@@ -53,7 +53,7 @@ pub mod rent_nft {
         instructions::update_bid(ctx)
     }
 
-    // pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
-    //     instructions::set_bidding_rate(ctx, new_rate)
-    // }
+    pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
+        instructions::withdraw_tax(ctx)
+    }
 }

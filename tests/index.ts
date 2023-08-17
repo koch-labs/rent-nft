@@ -13,6 +13,8 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
+  getAccount,
+  getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
 import { Program } from "@coral-xyz/anchor";
 import {
@@ -25,6 +27,7 @@ import { RentNft } from "../target/types/rent_nft";
 import { TestValues, createValues } from "./values";
 
 import { expect } from "chai";
+import { sleep } from "./utils";
 
 const suiteName = "rent-nft";
 describe(suiteName, () => {
@@ -395,125 +398,41 @@ describe(suiteName, () => {
       .signers([values.bidder])
       .rpc({ skipPreflight: true });
 
-    // console.log(await program.account.tokenState.fetch(tokenStateKey));
-    // console.log(await program.account.bidState.fetch(bidStateKey));
+    collectionConfig = await program.account.collectionConfig.fetch(
+      values.configKey
+    );
 
-    // await program.methods
-    //   .updateBidState()
-    //   .accounts({
-    //     admin: admin.publicKey,
-    //     collectionMint: collectionMintKeypair.publicKey,
-    //     adminCollectionAccount: getAssociatedTokenAddressSync(
-    //       collectionMintKeypair.publicKey,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //     config: configKey,
-    //     collectionAuthority,
-    //     taxMint,
-    //     tokenState: tokenStateKey,
-    //     bidState: bidStateKey,
-    //     bidAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       collectionAuthority,
-    //       true
-    //     ),
-    //     adminAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //   })
-    //   .rpc({ skipPreflight: true });
-    // await program.methods
-    //   .setBiddingRate(biddingRate)
-    //   .accounts({
-    //     bidder: holder.publicKey,
-    //     admin: admin.publicKey,
-    //     collectionMint: collectionMintKeypair.publicKey,
-    //     adminCollectionAccount: getAssociatedTokenAddressSync(
-    //       collectionMintKeypair.publicKey,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //     config: configKey,
-    //     collectionAuthority,
-    //     taxMint,
-    //     tokenState: tokenStateKey,
-    //     bidState: bidStateKey,
-    //     bidAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       collectionAuthority,
-    //       true
-    //     ),
-    //     adminAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //   })
-    //   .signers([holder])
-    //   .rpc({ skipPreflight: true });
+    await program.methods
+      .withdrawTax()
+      .accounts({
+        admin: values.admin.publicKey,
+        config: values.configKey,
+        collectionAuthority: values.collectionAuthority,
+        taxMint: values.taxMintKeypair.publicKey,
+        adminAccount: values.adminTaxAccount,
+        bidsAccount: values.bidAccount,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.admin])
+      .rpc({ skipPreflight: true });
 
-    // let newBidAccount = await connection.getTokenAccountBalance(
-    //   getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
+    let configAfter = await program.account.collectionConfig.fetch(
+      values.configKey
+    );
+    expect(configAfter.collectedTax.toString()).to.equal("0");
+
+    // let tokenAccount = await getOrCreateAssociatedTokenAccount(
+    //   connection,
+    //   values.admin,
+    //   values.taxMintKeypair.publicKey,
+    //   values.admin.publicKey,
+    //   true,
+    //   "finalized",
+    //   undefined,
+    //   TOKEN_2022_PROGRAM_ID
     // );
-    // expect(newBidAccount.value.amount).to.equal(bidAccount.value.amount);
-
-    // tokenState = await program.account.tokenState.fetch(tokenStateKey);
-    // bidState = await program.account.bidState.fetch(bidStateKey);
-    // expect(bidState.biddingRate.toString()).to.equal(biddingRate.toString());
-    // expect(bidState.biddingPeriod.toString()).to.equal(
-    //   tokenState.lastPeriod.toString()
-    // );
-
-    // console.log(bidState);
-
-    // await sleep(timePeriod * 2);
-    // await program.methods
-    //   .setBiddingRate(new BN(0))
-    //   .accounts({
-    //     bidder: holder.publicKey,
-    //     admin: admin.publicKey,
-    //     collectionMint: collectionMintKeypair.publicKey,
-    //     adminCollectionAccount: getAssociatedTokenAddressSync(
-    //       collectionMintKeypair.publicKey,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //     config: configKey,
-    //     collectionAuthority,
-    //     taxMint,
-    //     tokenState: tokenStateKey,
-    //     bidState: bidStateKey,
-    //     bidAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       collectionAuthority,
-    //       true
-    //     ),
-    //     adminAccount: getAssociatedTokenAddressSync(
-    //       taxMint,
-    //       admin.publicKey,
-    //       true
-    //     ),
-    //   })
-    //   .preInstructions([
-    //     ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 }),
-    //   ])
-    //   .signers([holder])
-    //   .rpc({ skipPreflight: true });
-
-    // bidState = await program.account.bidState.fetch(bidStateKey);
-    // console.log(bidState);
-    // console.log(
-    //   await connection.getTokenAccountBalance(
-    //     getAssociatedTokenAddressSync(taxMint, collectionAuthority, true)
-    //   )
-    // );
-
-    // expect(bidState.biddingRate.toString()).to.equal("0");
-    // expect(bidState.biddingPeriod.toString()).to.equal(
-    //   tokenState.lastPeriod.toString()
+    // expect(tokenAccount.amount.toString()).to.equal(
+    //   collectionConfig.collectedTax.toString()
     // );
   });
 });

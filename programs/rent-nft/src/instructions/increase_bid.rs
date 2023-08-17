@@ -17,10 +17,7 @@ pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
-    config.total_deposited += amount;
-    token_state.deposited += amount;
-    bid_state.amount += amount;
-
+    let amount_before = ctx.accounts.bids_account.amount;
     transfer_checked(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -34,6 +31,12 @@ pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
         amount,
         ctx.accounts.tax_mint.decimals,
     )?;
+    ctx.accounts.bids_account.reload()?;
+
+    // Using the delta as the amount to account for transfer fees
+    let amount = ctx.accounts.bids_account.amount - amount_before;
+    token_state.deposited += amount;
+    bid_state.amount += amount;
 
     emit!(BidAmountChanged {
         collection: config.collection_mint.key(),
@@ -65,7 +68,6 @@ pub struct IncreaseBid<'info> {
 
     /// The config
     #[account(
-        mut,
         seeds = [
             &config.collection_mint.to_bytes(),
         ],

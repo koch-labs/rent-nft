@@ -82,28 +82,9 @@ pub struct BoughtToken {
 }
 
 #[event]
-pub struct UpdatedTokenState {
-    /// The collection
-    pub collection: Pubkey,
-
-    /// The contested mint
-    pub mint: Pubkey,
-
-    #[index]
-    pub token_state: Pubkey,
-}
-
-#[event]
-pub struct NewBiddingRate {
-    /// The collection
+pub struct WithdrewFees {
     #[index]
     pub collection: Pubkey,
 
-    /// The contested mint
-    #[index]
-    pub mint: Pubkey,
-
-    pub bid_state: Pubkey,
-
-    pub new_rate: u64,
+    pub amount: u64,
 }

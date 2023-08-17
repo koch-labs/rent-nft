@@ -24,11 +24,9 @@ pub fn update_bid(ctx: Context<UpdateBid>) -> Result<()> {
             // Owner can not pay, loose ownership
             token_state.deposited -= bid_state.amount;
             token_state.owner_bid_state = None;
-            config.total_deposited -= bid_state.amount;
             config.collected_tax += bid_state.amount;
             bid_state.amount = 0;
         } else {
-            config.total_deposited -= amount_owed;
             token_state.deposited -= amount_owed;
             bid_state.amount -= amount_owed;
             config.collected_tax += amount_owed;

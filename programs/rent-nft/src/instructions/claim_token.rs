@@ -24,7 +24,6 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
     let signer_seeds = &[&authority_seeds[..]];
 
     config.collected_tax += config.minimum_sell_price;
-    config.total_deposited -= config.minimum_sell_price;
     owner_bid_state.amount -= config.minimum_sell_price;
     owner_bid_state.selling_price = config.minimum_sell_price;
     token_state.current_selling_price = config.minimum_sell_price;
