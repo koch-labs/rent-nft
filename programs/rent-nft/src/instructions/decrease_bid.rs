@@ -1,4 +1,3 @@
-use crate::constants::*;
 use crate::events::*;
 use crate::{errors::*, state::*};
 use anchor_lang::prelude::*;
@@ -17,10 +16,9 @@ pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
-    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_bump = *ctx.bumps.get("config").unwrap();
     let authority_seeds = &[
-        &config.collection_mint.to_bytes(),
-        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        (&config.collection_mint.to_bytes()) as &[u8],
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
@@ -32,7 +30,7 @@ pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
                 mint: ctx.accounts.tax_mint.to_account_info(),
                 from: ctx.accounts.bids_account.to_account_info(),
                 to: ctx.accounts.bidder_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
+                authority: config.to_account_info(),
             },
             signer_seeds,
         ),
@@ -59,17 +57,6 @@ pub struct DecreaseBid<'info> {
     pub payer: Signer<'info>,
 
     pub bidder: Signer<'info>,
-
-    /// CHECK: Seeded authority
-    #[account(
-        mut,
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
 
     /// The config
     #[account(
@@ -124,7 +111,7 @@ pub struct DecreaseBid<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            collection_authority.key,
+            &config.key(),
             &tax_mint.key(),
             &token_program.key(),
         ),

@@ -1,4 +1,3 @@
-use crate::constants::*;
 use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
@@ -15,10 +14,9 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
     let token_state = &mut ctx.accounts.token_state;
     let owner_bid_state = &mut ctx.accounts.owner_bid_state;
 
-    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_bump = *ctx.bumps.get("config").unwrap();
     let authority_seeds = &[
-        &config.collection_mint.key().to_bytes(),
-        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        (&config.collection_mint.to_bytes()) as &[u8],
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
@@ -37,7 +35,7 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
                 from: ctx.accounts.old_owner_token_account.to_account_info(),
                 to: ctx.accounts.new_owner_token_account.to_account_info(),
                 mint: ctx.accounts.token_mint.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
+                authority: config.to_account_info(),
             },
             signer_seeds,
         ),
@@ -60,17 +58,6 @@ pub struct ClaimToken<'info> {
     pub payer: Signer<'info>,
 
     pub new_owner: Signer<'info>,
-
-    /// CHECK: Seeded authority
-    #[account(
-        mut,
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
 
     #[account(
         mut,

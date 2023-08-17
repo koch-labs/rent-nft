@@ -39,7 +39,6 @@ export interface TestValues {
   collectionData: string;
   collectionMetadata: PublicKey;
   collectionMintKeypair: Keypair;
-  collectionAuthority: PublicKey;
   configKey: PublicKey;
   tokenMintKeypair: Keypair;
   holderTokenMintAccount: PublicKey;
@@ -83,9 +82,6 @@ export const createValues = (): TestValues => {
   const collectionMintKeypair = Keypair.generate();
   const collectionMetadata = getMetadataKey(collectionMintKeypair.publicKey);
   const collectionData = "okokokkok";
-  const collectionAuthority = getCollectionAuthorityKey(
-    collectionMintKeypair.publicKey
-  );
   const collectionRate = new anchor.BN(10000 * 365 * 8640); // 1/10 of price per second
   const collectionPeriod = 2;
   const collectionMinimumPrice = new anchor.BN(100);
@@ -132,7 +128,7 @@ export const createValues = (): TestValues => {
   );
   const bidAccount = getAssociatedTokenAddressSync(
     taxMintKeypair.publicKey,
-    collectionAuthority,
+    configKey,
     true,
     TOKEN_2022_PROGRAM_ID
   );
@@ -154,7 +150,6 @@ export const createValues = (): TestValues => {
     collectionPeriod,
     collectionRate,
     collectionMinimumPrice,
-    collectionAuthority,
     configKey,
     tokenMintKeypair,
     holderTokenMintAccount,

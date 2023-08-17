@@ -1,4 +1,3 @@
-use crate::constants::*;
 use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
@@ -16,10 +15,9 @@ pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {
     let owner_bid_state = &mut ctx.accounts.owner_bid_state;
     let buyer_bid_state = &mut ctx.accounts.buyer_bid_state;
 
-    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_bump = *ctx.bumps.get("config").unwrap();
     let authority_seeds = &[
-        &config.collection_mint.key().to_bytes(),
-        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        (&config.collection_mint.key().to_bytes()) as &[u8],
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
@@ -41,7 +39,7 @@ pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {
                 from: ctx.accounts.owner_token_account.to_account_info(),
                 to: ctx.accounts.buyer_token_account.to_account_info(),
                 mint: ctx.accounts.token_mint.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
+                authority: config.to_account_info(),
             },
             signer_seeds,
         ),
@@ -67,17 +65,6 @@ pub struct BuyToken<'info> {
     pub owner: UncheckedAccount<'info>,
 
     pub buyer: Signer<'info>,
-
-    /// CHECK: Seeded authority
-    #[account(
-        mut,
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
 
     /// The config
     #[account(

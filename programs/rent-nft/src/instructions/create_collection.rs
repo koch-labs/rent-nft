@@ -1,4 +1,3 @@
-use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
@@ -31,10 +30,9 @@ pub fn create_collection(
     config.tax_rate = tax_rate;
     config.minimum_sell_price = min_price;
 
-    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_bump = *ctx.bumps.get("config").unwrap();
     let authority_seeds = &[
-        &ctx.accounts.collection_mint.key().to_bytes(),
-        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        (&ctx.accounts.collection_mint.key().to_bytes()) as &[u8],
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
@@ -45,7 +43,7 @@ pub fn create_collection(
         Create {
             payer: ctx.accounts.payer.to_account_info(),
             associated_token: ctx.accounts.bids_account.to_account_info(),
-            authority: ctx.accounts.collection_authority.to_account_info(),
+            authority: config.to_account_info(),
             mint: ctx.accounts.tax_mint.to_account_info(),
             system_program: ctx.accounts.system_program.to_account_info(),
             token_program: ctx.accounts.tax_token_program.to_account_info(),
@@ -57,7 +55,7 @@ pub fn create_collection(
             ctx.accounts.token_program.to_account_info(),
             MintTo {
                 to: ctx.accounts.admin_collection_mint_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
+                authority: config.to_account_info(),
                 mint: ctx.accounts.collection_mint.to_account_info(),
             },
             signer_seeds,
@@ -76,8 +74,8 @@ pub fn create_collection(
             signer_seeds,
         ),
         id,
-        ctx.accounts.collection_authority.key(),
-        ctx.accounts.collection_authority.key(),
+        config.key(),
+        config.key(),
     )?;
 
     create_external_metadata(
@@ -114,16 +112,6 @@ pub struct CreateCollection<'info> {
     #[account(mut)]
     pub admin: Signer<'info>,
 
-    /// CHECK: PDA
-    #[account(
-        seeds = [
-            &collection_mint.key().to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
-
     #[account(
         init,
         payer = payer,
@@ -145,7 +133,7 @@ pub struct CreateCollection<'info> {
     #[account(
         init,
         payer = payer,
-        mint::authority = collection_authority,
+        mint::authority = config,
         mint::decimals = 0,
         mint::token_program = token_program,
     )]
@@ -168,7 +156,7 @@ pub struct CreateCollection<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            collection_authority.key,
+            &config.key(),
             &tax_mint.key(),
             &tax_token_program.key(),
         ),

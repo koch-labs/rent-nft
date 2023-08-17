@@ -1,4 +1,3 @@
-use crate::constants::*;
 use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
@@ -14,10 +13,9 @@ use anchor_spl::{
 pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
     let config = &mut ctx.accounts.config;
 
-    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_bump = *ctx.bumps.get("config").unwrap();
     let authority_seeds = &[
-        &config.collection_mint.to_bytes(),
-        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        (&config.collection_mint.to_bytes()) as &[u8],
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
@@ -33,7 +31,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
                 mint: ctx.accounts.tax_mint.to_account_info(),
                 from: ctx.accounts.bids_account.to_account_info(),
                 to: ctx.accounts.admin_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
+                authority: config.to_account_info(),
             },
             signer_seeds,
         ),
@@ -54,17 +52,6 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
 #[derive(Accounts)]
 pub struct WithdrawTax<'info> {
     pub admin: Signer<'info>,
-
-    /// CHECK: Seeded authority
-    #[account(
-        mut,
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
 
     /// The config
     #[account(
@@ -107,7 +94,7 @@ pub struct WithdrawTax<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            collection_authority.key,
+            &config.key(),
             &tax_mint.key(),
             &tax_token_program.key(),
         ),

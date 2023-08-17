@@ -17,7 +17,6 @@ use nft_standard::{
     state::{AuthoritiesGroup, Metadata},
 };
 
-use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
 
@@ -31,10 +30,9 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
     token_state.token_mint = ctx.accounts.token_mint.key();
     token_state.current_selling_price = config.minimum_sell_price;
 
-    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_bump = *ctx.bumps.get("config").unwrap();
     let authority_seeds = &[
-        &ctx.accounts.collection_mint.key().to_bytes(),
-        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        (&ctx.accounts.collection_mint.key().to_bytes()) as &[u8],
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
@@ -43,11 +41,11 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
         &initialize_permanent_delegate(
             ctx.accounts.token_program.key,
             &ctx.accounts.token_mint.key(),
-            &ctx.accounts.collection_authority.key(),
+            &config.key(),
         )?,
         &[
             ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.collection_authority.to_account_info(),
+            config.to_account_info(),
             ctx.accounts.token_mint.to_account_info(),
         ],
         signer_seeds,
@@ -62,8 +60,8 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
             },
         ),
         0,
-        ctx.accounts.collection_authority.key,
-        Some(ctx.accounts.collection_authority.key),
+        &config.key(),
+        Some(&config.key()),
     )?;
 
     create_idempotent(CpiContext::new(
@@ -83,7 +81,7 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
             ctx.accounts.token_program.to_account_info(),
             MintTo {
                 to: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.collection_authority.to_account_info(),
+                authority: config.to_account_info(),
                 mint: ctx.accounts.token_mint.to_account_info(),
             },
             signer_seeds,
@@ -112,7 +110,7 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
         ctx.accounts.metadata_program.to_account_info(),
         IncludeInSet {
             payer: ctx.accounts.payer.to_account_info(),
-            inclusion_authority: ctx.accounts.collection_authority.to_account_info(),
+            inclusion_authority: config.to_account_info(),
             authorities_group: ctx.accounts.authorities_group.to_account_info(),
             parent_metadata: ctx.accounts.collection_metadata.to_account_info(),
             child_metadata: ctx.accounts.token_metadata.to_account_info(),
@@ -141,16 +139,6 @@ pub struct CreateToken<'info> {
 
     /// CHECK: Delegatable creation
     pub receiver: UncheckedAccount<'info>,
-
-    /// CHECK: Seeded authority
-    #[account(
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
 
     /// The config
     #[account(
@@ -224,7 +212,6 @@ pub struct CreateToken<'info> {
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
-    #[account(address = nft_standard::ID)]
     pub metadata_program: Program<'info, NftStandard>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,

@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 
-use crate::constants::*;
 use crate::events::*;
 use crate::state::*;
 
@@ -31,17 +30,6 @@ pub struct CreateBid<'info> {
 
     /// CHECK: Delegatable creation
     pub bidder: UncheckedAccount<'info>,
-
-    /// CHECK: Seeded authority
-    #[account(
-        mut,
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
 
     /// The config
     #[account(

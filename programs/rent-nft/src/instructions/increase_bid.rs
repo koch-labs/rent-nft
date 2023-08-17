@@ -1,4 +1,3 @@
-use crate::constants::*;
 use crate::events::*;
 use crate::{errors::*, state::*};
 use anchor_lang::prelude::*;
@@ -55,17 +54,6 @@ pub struct IncreaseBid<'info> {
 
     pub bidder: Signer<'info>,
 
-    /// CHECK: Seeded authority
-    #[account(
-        mut,
-        seeds = [
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-        ],
-        bump,
-    )]
-    pub collection_authority: UncheckedAccount<'info>,
-
     /// The config
     #[account(
         seeds = [
@@ -119,7 +107,7 @@ pub struct IncreaseBid<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            collection_authority.key,
+            &config.key(),
             &tax_mint.key(),
             &token_program.key(),
         ),

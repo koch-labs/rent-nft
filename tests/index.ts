@@ -127,7 +127,6 @@ describe(suiteName, () => {
         admin: values.admin.publicKey,
         taxMint: values.taxMintKeypair.publicKey,
         authoritiesGroup: values.authoritiesGroupKey,
-        collectionAuthority: values.collectionAuthority,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
@@ -166,7 +165,6 @@ describe(suiteName, () => {
         receiver: values.admin.publicKey,
         admin: values.admin.publicKey,
         authoritiesGroup: values.authoritiesGroupKey,
-        collectionAuthority: values.collectionAuthority,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
         tokenMint: values.tokenMintKeypair.publicKey,
@@ -206,7 +204,6 @@ describe(suiteName, () => {
       .accounts({
         bidder: values.holder.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         bidState: values.holderBidStateKey,
       })
@@ -228,7 +225,6 @@ describe(suiteName, () => {
       .accounts({
         bidder: values.holder.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         bidState: values.holderBidStateKey,
         taxMint: values.taxMintKeypair.publicKey,
@@ -265,7 +261,6 @@ describe(suiteName, () => {
       .accounts({
         bidder: values.holder.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         bidState: values.holderBidStateKey,
         taxMint: values.taxMintKeypair.publicKey,
@@ -304,7 +299,6 @@ describe(suiteName, () => {
       .claimToken()
       .accounts({
         newOwner: values.holder.publicKey,
-        collectionAuthority: values.collectionAuthority,
         config: values.configKey,
         tokenMint: values.tokenMintKeypair.publicKey,
         tokenState: values.tokenStateKey,
@@ -331,7 +325,6 @@ describe(suiteName, () => {
       .accounts({
         bidder: values.bidder.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         bidState: values.bidderBidStateKey,
       })
@@ -342,7 +335,6 @@ describe(suiteName, () => {
       .accounts({
         bidder: values.bidder.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         bidState: values.bidderBidStateKey,
         taxMint: values.taxMintKeypair.publicKey,
@@ -369,7 +361,6 @@ describe(suiteName, () => {
         owner: values.holder.publicKey,
         buyer: values.bidder.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         tokenState: values.tokenStateKey,
         tokenMint: values.tokenMintKeypair.publicKey,
         ownerTokenAccount: values.holderTokenMintAccount,
@@ -407,7 +398,6 @@ describe(suiteName, () => {
       .accounts({
         admin: values.admin.publicKey,
         config: values.configKey,
-        collectionAuthority: values.collectionAuthority,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMintAccount: values.adminCollectionMintAccount,
         taxMint: values.taxMintKeypair.publicKey,
