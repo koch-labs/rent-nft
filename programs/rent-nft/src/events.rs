@@ -52,7 +52,7 @@ pub struct BidUpdated {
     #[index]
     pub mint: Pubkey,
 
-    pub amount: i128,
+    pub amount: u64,
 }
 
 #[event]

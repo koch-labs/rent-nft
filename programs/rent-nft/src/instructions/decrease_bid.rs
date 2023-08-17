@@ -10,78 +10,51 @@ use anchor_spl::{
     token_interface::{transfer_checked, TransferChecked},
 };
 
-pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
-    msg!("Updating bid account");
+pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
+    msg!("Decrease bid");
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
-    if amount > 0 {
-        let amount = amount as u64;
+    token_state.deposited -= amount;
+    bid_state.amount -= amount;
 
-        token_state.deposited += amount;
-        bid_state.amount += amount;
+    let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
+    let authority_seeds = &[
+        &config.collection_mint.to_bytes(),
+        COLLECTION_AUTHORITY_SEED.as_bytes(),
+        &[authority_bump],
+    ];
+    let signer_seeds = &[&authority_seeds[..]];
 
-        transfer_checked(
-            CpiContext::new(
-                ctx.accounts.token_program.to_account_info(),
-                TransferChecked {
-                    mint: ctx.accounts.tax_mint.to_account_info(),
-                    from: ctx.accounts.bidder_account.to_account_info(),
-                    to: ctx.accounts.bids_account.to_account_info(),
-                    authority: ctx.accounts.bidder.to_account_info(),
-                },
-            ),
-            amount,
-            ctx.accounts.tax_mint.decimals,
-        )?;
-    } else {
-        let amount = if (-amount) as u64 > bid_state.amount {
-            bid_state.amount
-        } else {
-            (-amount) as u64
-        };
-
-        token_state.deposited -= amount;
-        bid_state.amount -= amount;
-
-        let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
-        let authority_seeds = &[
-            &config.collection_mint.to_bytes(),
-            COLLECTION_AUTHORITY_SEED.as_bytes(),
-            &[authority_bump],
-        ];
-        let signer_seeds = &[&authority_seeds[..]];
-
-        transfer_checked(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                TransferChecked {
-                    mint: ctx.accounts.tax_mint.to_account_info(),
-                    from: ctx.accounts.bids_account.to_account_info(),
-                    to: ctx.accounts.bidder_account.to_account_info(),
-                    authority: ctx.accounts.collection_authority.to_account_info(),
-                },
-                signer_seeds,
-            ),
-            amount,
-            ctx.accounts.tax_mint.decimals,
-        )?;
-    }
+    transfer_checked(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            TransferChecked {
+                mint: ctx.accounts.tax_mint.to_account_info(),
+                from: ctx.accounts.bids_account.to_account_info(),
+                to: ctx.accounts.bidder_account.to_account_info(),
+                authority: ctx.accounts.collection_authority.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        amount,
+        ctx.accounts.tax_mint.decimals,
+    )?;
 
     emit!(BidUpdated {
         collection: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
         bidder: ctx.accounts.bidder.key(),
-        amount
+        amount: bid_state.amount
     });
 
     Ok(())
 }
 
 #[derive(Accounts)]
-pub struct UpdateBid<'info> {
+pub struct DecreaseBid<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 

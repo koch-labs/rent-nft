@@ -221,7 +221,7 @@ describe(suiteName, () => {
     expect(bidState.amount.toString()).to.equal("0");
 
     await program.methods
-      .updateBid(values.depositedAmount.mul(new anchor.BN(2)))
+      .increaseBid(values.depositedAmount.mul(new anchor.BN(2)))
       .accounts({
         bidder: values.holder.publicKey,
         config: values.configKey,
@@ -248,7 +248,7 @@ describe(suiteName, () => {
     );
 
     await program.methods
-      .updateBid(values.depositedAmount.neg())
+      .decreaseBid(values.depositedAmount)
       .accounts({
         bidder: values.holder.publicKey,
         config: values.configKey,
@@ -315,7 +315,7 @@ describe(suiteName, () => {
       .rpc({ skipPreflight: true });
 
     await program.methods
-      .updateBid(values.depositedAmount)
+      .increaseBid(values.depositedAmount)
       .accounts({
         bidder: values.bidder.publicKey,
         config: values.configKey,

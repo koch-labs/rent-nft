@@ -33,8 +33,12 @@ pub mod rent_nft {
         instructions::create_bid(ctx)
     }
 
-    pub fn update_bid(ctx: Context<UpdateBid>, amount: i128) -> Result<()> {
-        instructions::update_bid(ctx, amount)
+    pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
+        instructions::increase_bid(ctx, amount)
+    }
+
+    pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
+        instructions::decrease_bid(ctx, amount)
     }
 
     pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {

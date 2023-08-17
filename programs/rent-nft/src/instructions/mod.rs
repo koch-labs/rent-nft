@@ -4,7 +4,8 @@ mod create_bid;
 mod create_collection;
 mod create_token;
 // mod set_bidding_rate;
-mod update_bid;
+mod decrease_bid;
+mod increase_bid;
 // mod update_bid_state;
 // mod update_token_state;
 
@@ -14,6 +15,7 @@ pub use create_bid::*;
 pub use create_collection::*;
 pub use create_token::*;
 // pub use set_bidding_rate::*;
-pub use update_bid::*;
+pub use decrease_bid::*;
+pub use increase_bid::*;
 // pub use update_bid_state::*;
 // pub use update_token_state::*;
