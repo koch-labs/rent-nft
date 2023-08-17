@@ -14,7 +14,6 @@ export interface CreateCollectionArgs {
 export interface CreateCollectionAccounts {
   payer: PublicKey
   admin: PublicKey
-  collectionAuthority: PublicKey
   config: PublicKey
   taxMint: PublicKey
   authoritiesGroup: PublicKey
@@ -47,11 +46,6 @@ export function createCollection(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.admin, isSigner: true, isWritable: true },
-    {
-      pubkey: accounts.collectionAuthority,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.taxMint, isSigner: false, isWritable: false },
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: true },

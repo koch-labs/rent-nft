@@ -10,7 +10,6 @@ export interface IncreaseBidArgs {
 export interface IncreaseBidAccounts {
   payer: PublicKey
   bidder: PublicKey
-  collectionAuthority: PublicKey
   /** The config */
   config: PublicKey
   /** The token used to pay taxes */
@@ -34,7 +33,6 @@ export function increaseBid(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.bidder, isSigner: true, isWritable: false },
-    { pubkey: accounts.collectionAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.taxMint, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: true },

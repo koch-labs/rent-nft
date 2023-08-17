@@ -11,7 +11,6 @@ export interface CreateTokenAccounts {
   payer: PublicKey
   admin: PublicKey
   receiver: PublicKey
-  collectionAuthority: PublicKey
   /** The config */
   config: PublicKey
   collectionMint: PublicKey
@@ -47,11 +46,6 @@ export function createToken(
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.admin, isSigner: true, isWritable: true },
     { pubkey: accounts.receiver, isSigner: false, isWritable: false },
-    {
-      pubkey: accounts.collectionAuthority,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.collectionMint, isSigner: false, isWritable: false },
     {

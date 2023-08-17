@@ -38,11 +38,6 @@ export type RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false
@@ -149,11 +144,6 @@ export type RentNft = {
         },
         {
           "name": "receiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "collectionAuthority",
           "isMut": false,
           "isSigner": false
         },
@@ -275,11 +265,6 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": false,
           "isSigner": false,
@@ -328,11 +313,6 @@ export type RentNft = {
           "name": "bidder",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "config",
@@ -403,11 +383,6 @@ export type RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": false,
           "isSigner": false,
@@ -476,11 +451,6 @@ export type RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false
@@ -546,11 +516,6 @@ export type RentNft = {
           "name": "buyer",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "config",
@@ -663,17 +628,22 @@ export type RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "The config"
           ]
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMintAccount",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "taxMint",
@@ -700,6 +670,11 @@ export type RentNft = {
           "docs": [
             "Common Solana programs"
           ]
+        },
+        {
+          "name": "taxTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1055,11 +1030,6 @@ export const IDL: RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false
@@ -1166,11 +1136,6 @@ export const IDL: RentNft = {
         },
         {
           "name": "receiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "collectionAuthority",
           "isMut": false,
           "isSigner": false
         },
@@ -1292,11 +1257,6 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": false,
           "isSigner": false,
@@ -1345,11 +1305,6 @@ export const IDL: RentNft = {
           "name": "bidder",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "config",
@@ -1420,11 +1375,6 @@ export const IDL: RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": false,
           "isSigner": false,
@@ -1493,11 +1443,6 @@ export const IDL: RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false
@@ -1563,11 +1508,6 @@ export const IDL: RentNft = {
           "name": "buyer",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "config",
@@ -1680,17 +1620,22 @@ export const IDL: RentNft = {
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "The config"
           ]
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMintAccount",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "taxMint",
@@ -1717,6 +1662,11 @@ export const IDL: RentNft = {
           "docs": [
             "Common Solana programs"
           ]
+        },
+        {
+          "name": "taxTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []

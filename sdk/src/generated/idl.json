@@ -38,11 +38,6 @@
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false
@@ -149,11 +144,6 @@
         },
         {
           "name": "receiver",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "collectionAuthority",
           "isMut": false,
           "isSigner": false
         },
@@ -275,11 +265,6 @@
           "isSigner": false
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": false,
           "isSigner": false,
@@ -328,11 +313,6 @@
           "name": "bidder",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "config",
@@ -403,11 +383,6 @@
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": false,
           "isSigner": false,
@@ -476,11 +451,6 @@
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false
@@ -546,11 +516,6 @@
           "name": "buyer",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "config",
@@ -663,17 +628,22 @@
           "isSigner": true
         },
         {
-          "name": "collectionAuthority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "config",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "The config"
           ]
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMintAccount",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "taxMint",
@@ -700,6 +670,11 @@
           "docs": [
             "Common Solana programs"
           ]
+        },
+        {
+          "name": "taxTokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []

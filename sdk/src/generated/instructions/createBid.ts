@@ -6,7 +6,6 @@ import { PROGRAM_ID } from "../programId"
 export interface CreateBidAccounts {
   payer: PublicKey
   bidder: PublicKey
-  collectionAuthority: PublicKey
   /** The config */
   config: PublicKey
   /** The state for the token assessement */
@@ -24,7 +23,6 @@ export function createBid(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.bidder, isSigner: false, isWritable: false },
-    { pubkey: accounts.collectionAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: false },
     { pubkey: accounts.bidState, isSigner: false, isWritable: true },

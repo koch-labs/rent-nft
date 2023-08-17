@@ -11,7 +11,6 @@ export interface BuyTokenAccounts {
   payer: PublicKey
   owner: PublicKey
   buyer: PublicKey
-  collectionAuthority: PublicKey
   /** The config */
   config: PublicKey
   /** The state for the token assessement */
@@ -39,7 +38,6 @@ export function buyToken(
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.owner, isSigner: false, isWritable: false },
     { pubkey: accounts.buyer, isSigner: true, isWritable: false },
-    { pubkey: accounts.collectionAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenMint, isSigner: false, isWritable: false },

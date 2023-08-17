@@ -6,7 +6,6 @@ import { PROGRAM_ID } from "../programId"
 export interface ClaimTokenAccounts {
   payer: PublicKey
   newOwner: PublicKey
-  collectionAuthority: PublicKey
   config: PublicKey
   tokenState: PublicKey
   /** The mint of the token */
@@ -26,7 +25,6 @@ export function claimToken(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.newOwner, isSigner: true, isWritable: false },
-    { pubkey: accounts.collectionAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenMint, isSigner: false, isWritable: false },
