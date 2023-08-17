@@ -25,8 +25,13 @@ pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {
     let signer_seeds = &[&authority_seeds[..]];
 
     owner_bid_state.amount += token_state.current_selling_price;
+
     buyer_bid_state.amount -= token_state.current_selling_price;
     buyer_bid_state.selling_price = new_sell_price;
+
+    config.total_deposited -= token_state.current_selling_price;
+
+    token_state.deposited -= token_state.current_selling_price;
     token_state.current_selling_price = new_sell_price;
     token_state.owner_bid_state = Some(buyer_bid_state.key());
 

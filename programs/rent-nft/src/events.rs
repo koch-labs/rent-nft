@@ -41,7 +41,7 @@ pub struct CreatedBidState {
 }
 
 #[event]
-pub struct BidUpdated {
+pub struct BidAmountChanged {
     /// The collection
     pub collection: Pubkey,
 
@@ -53,6 +53,18 @@ pub struct BidUpdated {
     pub mint: Pubkey,
 
     pub amount: u64,
+}
+
+#[event]
+pub struct UpdatedBid {
+    /// The collection
+    pub collection: Pubkey,
+
+    /// The contested mint
+    pub mint: Pubkey,
+
+    #[index]
+    pub bid_state: Pubkey,
 }
 
 #[event]
@@ -79,18 +91,6 @@ pub struct UpdatedTokenState {
 
     #[index]
     pub token_state: Pubkey,
-}
-
-#[event]
-pub struct UpdatedBidState {
-    /// The collection
-    pub collection: Pubkey,
-
-    /// The contested mint
-    pub mint: Pubkey,
-
-    #[index]
-    pub bid_state: Pubkey,
 }
 
 #[event]

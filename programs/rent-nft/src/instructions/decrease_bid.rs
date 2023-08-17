@@ -1,6 +1,6 @@
 use crate::constants::*;
 use crate::events::*;
-use crate::state::*;
+use crate::{errors::*, state::*};
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::Mint;
 use anchor_spl::token_interface::TokenAccount;
@@ -11,14 +11,11 @@ use anchor_spl::{
 };
 
 pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
-    msg!("Decrease bid");
+    msg!("Decrease bid by {}", amount);
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
-
-    token_state.deposited -= amount;
-    bid_state.amount -= amount;
 
     let authority_bump = *ctx.bumps.get("collection_authority").unwrap();
     let authority_seeds = &[
@@ -39,11 +36,15 @@ pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
             },
             signer_seeds,
         ),
-        amount,
+        ctx.accounts.bids_account.amount * amount / config.total_deposited, // Account for tax fees
         ctx.accounts.tax_mint.decimals,
     )?;
 
-    emit!(BidUpdated {
+    config.total_deposited -= amount;
+    token_state.deposited -= amount;
+    bid_state.amount -= amount;
+
+    emit!(BidAmountChanged {
         collection: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
         bidder: ctx.accounts.bidder.key(),
@@ -73,6 +74,7 @@ pub struct DecreaseBid<'info> {
 
     /// The config
     #[account(
+        mut,
         seeds = [
             &config.collection_mint.to_bytes(),
         ],
@@ -107,6 +109,7 @@ pub struct DecreaseBid<'info> {
             &bidder.key().to_bytes(),
         ],
         bump,
+        constraint = bid_state.last_update == Clock::get()?.unix_timestamp @ RentNftError::OutOfDateBid,
     )]
     pub bid_state: Box<Account<'info, BidState>>,
 
@@ -132,6 +135,4 @@ pub struct DecreaseBid<'info> {
 
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
-    pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
 }

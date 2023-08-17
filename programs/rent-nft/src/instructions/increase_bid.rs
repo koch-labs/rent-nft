@@ -1,6 +1,6 @@
 use crate::constants::*;
 use crate::events::*;
-use crate::state::*;
+use crate::{errors::*, state::*};
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::Mint;
 use anchor_spl::token_interface::TokenAccount;
@@ -11,12 +11,13 @@ use anchor_spl::{
 };
 
 pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
-    msg!("Increase bid");
+    msg!("Increase bid by {}", amount);
 
     let config = &mut ctx.accounts.config;
     let token_state = &mut ctx.accounts.token_state;
     let bid_state = &mut ctx.accounts.bid_state;
 
+    config.total_deposited += amount;
     token_state.deposited += amount;
     bid_state.amount += amount;
 
@@ -34,7 +35,7 @@ pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
         ctx.accounts.tax_mint.decimals,
     )?;
 
-    emit!(BidUpdated {
+    emit!(BidAmountChanged {
         collection: config.collection_mint.key(),
         mint: token_state.token_mint.key(),
         bidder: ctx.accounts.bidder.key(),
@@ -64,6 +65,7 @@ pub struct IncreaseBid<'info> {
 
     /// The config
     #[account(
+        mut,
         seeds = [
             &config.collection_mint.to_bytes(),
         ],
@@ -98,6 +100,7 @@ pub struct IncreaseBid<'info> {
             &bidder.key().to_bytes(),
         ],
         bump,
+        constraint = bid_state.last_update == Clock::get()?.unix_timestamp @ RentNftError::OutOfDateBid,
     )]
     pub bid_state: Box<Account<'info, BidState>>,
 
@@ -123,6 +126,4 @@ pub struct IncreaseBid<'info> {
 
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
-    pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
 }

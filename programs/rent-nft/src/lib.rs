@@ -49,9 +49,9 @@ pub mod rent_nft {
         instructions::buy_token(ctx, new_sell_price)
     }
 
-    // pub fn update_bid_state(ctx: Context<UpdateBidState>) -> Result<()> {
-    //     instructions::update_bid_state(ctx)
-    // }
+    pub fn update_bid(ctx: Context<UpdateBid>) -> Result<()> {
+        instructions::update_bid(ctx)
+    }
 
     // pub fn set_bidding_rate(ctx: Context<SetBiddingRate>, new_rate: u64) -> Result<()> {
     //     instructions::set_bidding_rate(ctx, new_rate)

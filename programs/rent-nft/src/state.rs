@@ -19,6 +19,8 @@ pub struct CollectionConfig {
     pub minimum_sell_price: u64,
 
     pub collected_tax: u64,
+
+    pub total_deposited: u64,
 }
 
 impl CollectionConfig {
@@ -28,6 +30,7 @@ impl CollectionConfig {
         + 4 // Period
         + 8 // Rate
         + 8 // Min price
+        + 8 // Deposited
         + 8; // Collected
 }
 

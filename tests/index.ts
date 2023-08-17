@@ -233,6 +233,16 @@ describe(suiteName, () => {
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .preInstructions([
+        await program.methods
+          .updateBid()
+          .accounts({
+            config: values.configKey,
+            tokenState: values.tokenStateKey,
+            bidState: values.holderBidStateKey,
+          })
+          .instruction(),
+      ])
       .signers([values.holder])
       .rpc({ skipPreflight: true });
 
@@ -260,6 +270,16 @@ describe(suiteName, () => {
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .preInstructions([
+        await program.methods
+          .updateBid()
+          .accounts({
+            config: values.configKey,
+            tokenState: values.tokenStateKey,
+            bidState: values.holderBidStateKey,
+          })
+          .instruction(),
+      ])
       .signers([values.holder])
       .rpc({ skipPreflight: true });
 
@@ -327,6 +347,16 @@ describe(suiteName, () => {
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .preInstructions([
+        await program.methods
+          .updateBid()
+          .accounts({
+            config: values.configKey,
+            tokenState: values.tokenStateKey,
+            bidState: values.bidderBidStateKey,
+          })
+          .instruction(),
+      ])
       .signers([values.bidder])
       .rpc({ skipPreflight: true });
 
@@ -353,6 +383,14 @@ describe(suiteName, () => {
           values.tokenMintKeypair.publicKey,
           TOKEN_2022_PROGRAM_ID
         ),
+        await program.methods
+          .updateBid()
+          .accounts({
+            config: values.configKey,
+            tokenState: values.tokenStateKey,
+            bidState: values.holderBidStateKey,
+          })
+          .instruction(),
       ])
       .signers([values.bidder])
       .rpc({ skipPreflight: true });
