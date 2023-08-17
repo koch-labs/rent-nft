@@ -408,10 +408,13 @@ describe(suiteName, () => {
         admin: values.admin.publicKey,
         config: values.configKey,
         collectionAuthority: values.collectionAuthority,
+        collectionMint: values.collectionMintKeypair.publicKey,
+        collectionMintAccount: values.adminCollectionMintAccount,
         taxMint: values.taxMintKeypair.publicKey,
         adminAccount: values.adminTaxAccount,
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
+        taxTokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([values.admin])
       .rpc({ skipPreflight: true });

@@ -1,4 +1,5 @@
 use crate::constants::*;
+use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
@@ -73,8 +74,21 @@ pub struct WithdrawTax<'info> {
         ],
         bump,
         has_one = tax_mint,
+        has_one = collection_mint
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
+
+    pub collection_mint: InterfaceAccount<'info, Mint>,
+
+    #[account(
+        address = get_associated_token_address_with_program_id(
+            admin.key,
+            &collection_mint.key(),
+            &token_program.key(),
+        ),
+        constraint = collection_mint_account.amount == 1 @ RentNftError::NotAdmin,
+    )]
+    pub collection_mint_account: InterfaceAccount<'info, TokenAccount>,
 
     /// The token used to pay taxes
     #[account(mut)]
@@ -85,7 +99,7 @@ pub struct WithdrawTax<'info> {
         address = get_associated_token_address_with_program_id(
             admin.key,
             &tax_mint.key(),
-            &token_program.key(),
+            &tax_token_program.key(),
         ),
     )]
     pub admin_account: InterfaceAccount<'info, TokenAccount>,
@@ -95,11 +109,12 @@ pub struct WithdrawTax<'info> {
         address = get_associated_token_address_with_program_id(
             collection_authority.key,
             &tax_mint.key(),
-            &token_program.key(),
+            &tax_token_program.key(),
         ),
     )]
     pub bids_account: InterfaceAccount<'info, TokenAccount>,
 
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
+    pub tax_token_program: Interface<'info, TokenInterface>,
 }
