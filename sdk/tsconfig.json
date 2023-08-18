@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "lib": [
+      "es2015",
+      "DOM"
+    ],
+    "module": "CommonJS",
+    "target": "es6",
+    "esModuleInterop": true,
+    "outDir": "./build",
+    "sourceMap": true,
+    "declaration": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "resolveJsonModule": true
+  },
+}

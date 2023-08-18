@@ -1,6 +1,17 @@
 {
-  "name": "harberger-nft-sdk",
+  "name": "@koch-labs/rent-nft",
   "version": "0.0.1",
-  "main": "dist/index.js",
-  "license": "MIT"
+  "main": "build/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.28.1-beta.1",
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.78.4"
+  }
 }

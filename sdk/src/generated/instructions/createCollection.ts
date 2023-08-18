@@ -20,7 +20,6 @@ export interface CreateCollectionAccounts {
   collectionMint: PublicKey
   collectionMetadata: PublicKey
   adminCollectionMintAccount: PublicKey
-  bidsAccount: PublicKey
   /** Common Solana programs */
   taxTokenProgram: PublicKey
   tokenProgram: PublicKey
@@ -56,7 +55,6 @@ export function createCollection(
       isSigner: false,
       isWritable: true,
     },
-    { pubkey: accounts.bidsAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.taxTokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     {

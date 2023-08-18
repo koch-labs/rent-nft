@@ -68,11 +68,6 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "bidsAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "taxTokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -1056,11 +1051,6 @@ export const IDL: RentNft = {
         },
         {
           "name": "adminCollectionMintAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "bidsAccount",
           "isMut": true,
           "isSigner": false
         },
