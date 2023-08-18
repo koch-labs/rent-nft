@@ -130,11 +130,19 @@ describe(suiteName, () => {
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
-        bidsAccount: values.bidAccount,
         metadataProgram: NFT_STANDARD_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .postInstructions([
+        createAssociatedTokenAccountIdempotentInstruction(
+          values.admin.publicKey,
+          values.bidAccount,
+          values.configKey,
+          values.taxMintKeypair.publicKey,
+          TOKEN_2022_PROGRAM_ID
+        ),
+      ])
       .signers([values.admin, values.collectionMintKeypair])
       .rpc({ skipPreflight: true });
 

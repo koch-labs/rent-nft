@@ -98,7 +98,6 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
                 mint: ctx.accounts.token_mint.to_account_info(),
                 metadata: ctx.accounts.token_metadata.to_account_info(),
                 token_program: ctx.accounts.token_program.to_account_info(),
-                associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
             },
             signer_seeds,
