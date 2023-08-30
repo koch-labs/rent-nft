@@ -1,18 +1,13 @@
-use crate::events::*;
-use crate::state::*;
+use crate::{errors::*, events::*, state::*};
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token_interface::{mint_to, Mint, MintTo, TokenAccount, TokenInterface};
-use nft_standard::cpi::{
-    accounts::{CreateAuthoritiesGroup, CreateMetadata},
-    create_authorities_group, create_external_metadata,
-};
-use nft_standard::program::NftStandard;
+use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
+use nft_standard::cpi::update_authorities_group;
+use nft_standard::state::{AuthoritiesGroup, Metadata};
+use nft_standard::{cpi::accounts::UpdateAuthoritiesGroup, program::NftStandard};
 
 pub fn create_collection(
     ctx: Context<CreateCollection>,
-    id: Pubkey,
-    uri: String,
     time_period: u32,
     tax_rate: u64,
     min_price: u64,
@@ -26,55 +21,17 @@ pub fn create_collection(
     config.tax_rate = tax_rate;
     config.minimum_sell_price = min_price;
 
-    let authority_bump = *ctx.bumps.get("config").unwrap();
-    let authority_seeds = &[
-        (&ctx.accounts.collection_mint.key().to_bytes()) as &[u8],
-        &[authority_bump],
-    ];
-    let signer_seeds = &[&authority_seeds[..]];
-
-    mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            MintTo {
-                to: ctx.accounts.admin_collection_mint_account.to_account_info(),
-                authority: config.to_account_info(),
-                mint: ctx.accounts.collection_mint.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        1,
-    )?;
-
-    create_authorities_group(
-        CpiContext::new_with_signer(
+    update_authorities_group(
+        CpiContext::new(
             ctx.accounts.metadata_program.to_account_info(),
-            CreateAuthoritiesGroup {
-                payer: ctx.accounts.payer.to_account_info(),
+            UpdateAuthoritiesGroup {
+                update_authority: ctx.accounts.admin.to_account_info(),
                 authorities_group: ctx.accounts.authorities_group.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
             },
-            signer_seeds,
         ),
-        id,
         config.key(),
+        ctx.accounts.authorities_group.metadata_authority,
         config.key(),
-    )?;
-
-    create_external_metadata(
-        CpiContext::new_with_signer(
-            ctx.accounts.metadata_program.to_account_info(),
-            CreateMetadata {
-                payer: ctx.accounts.payer.to_account_info(),
-                authorities_group: ctx.accounts.authorities_group.to_account_info(),
-                mint: ctx.accounts.collection_mint.to_account_info(),
-                metadata: ctx.accounts.collection_metadata.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        uri,
     )?;
 
     emit!(CollectionCreated {
@@ -108,29 +65,26 @@ pub struct CreateCollection<'info> {
     #[account(mint::token_program = tax_token_program)]
     pub tax_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// CHECK: Verified by Koch Standard
     #[account(mut)]
-    pub authorities_group: UncheckedAccount<'info>,
+    pub authorities_group: Account<'info, AuthoritiesGroup>,
 
     #[account(
-        init,
-        payer = payer,
-        mint::authority = config,
+        mut,
+        mint::authority = admin,
         mint::decimals = 0,
         mint::token_program = token_program,
     )]
     pub collection_mint: InterfaceAccount<'info, Mint>,
 
-    /// CHECK: Verified by Koch Standard
     #[account(mut)]
-    pub collection_metadata: UncheckedAccount<'info>,
+    pub collection_metadata: Account<'info, Metadata>,
 
     #[account(
-        init,
-        payer = payer,
+        mut,
         associated_token::mint = collection_mint,
         associated_token::authority = admin,
         associated_token::token_program = token_program,
+        constraint = admin_collection_mint_account.amount > 0 @ RentNftError::OwnZero,
     )]
     pub admin_collection_mint_account: InterfaceAccount<'info, TokenAccount>,
 

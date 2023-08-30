@@ -14,15 +14,15 @@ declare_id!("FQ9MA87E8H8B3aGxnGQwmXNGzgRTap9WL9Yhk3GZT9w8");
 pub mod rent_nft {
     use super::*;
 
+    /// Initializes a collection from an existing metadata
+    /// The metadata update authority will be transfered to the collection
     pub fn create_collection(
         ctx: Context<CreateCollection>,
-        id: Pubkey,
-        uri: String,
         time_period: u32,
         tax_rate: u64,
         min_price: u64,
     ) -> Result<()> {
-        instructions::create_collection(ctx, id, uri, time_period, tax_rate, min_price)
+        instructions::create_collection(ctx, time_period, tax_rate, min_price)
     }
 
     pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {

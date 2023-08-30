@@ -2,6 +2,9 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum RentNftError {
+    #[msg("Admin should own at least one token")]
+    OwnZero,
+
     #[msg("Not the admin")]
     NotAdmin,
 
