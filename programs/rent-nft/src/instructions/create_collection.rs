@@ -1,10 +1,10 @@
 use crate::{errors::*, events::*, state::*};
 use anchor_lang::prelude::*;
-use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::associated_token::get_associated_token_address_with_program_id;
 use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
-use nft_standard::cpi::update_authorities_group;
-use nft_standard::state::{AuthoritiesGroup, Metadata};
-use nft_standard::{cpi::accounts::UpdateAuthoritiesGroup, program::NftStandard};
+use metadata_standard::cpi::update_authorities_group;
+use metadata_standard::state::{AuthoritiesGroup, Metadata};
+use metadata_standard::{cpi::accounts::UpdateAuthoritiesGroup, program::MetadataStandard};
 
 pub fn create_collection(
     ctx: Context<CreateCollection>,
@@ -81,9 +81,11 @@ pub struct CreateCollection<'info> {
 
     #[account(
         mut,
-        associated_token::mint = collection_mint,
-        associated_token::authority = admin,
-        associated_token::token_program = token_program,
+        address = get_associated_token_address_with_program_id(
+            admin.key,
+            &collection_mint.key(),
+            &token_program.key()
+        ),
         constraint = admin_collection_mint_account.amount > 0 @ RentNftError::OwnZero,
     )]
     pub admin_collection_mint_account: InterfaceAccount<'info, TokenAccount>,
@@ -91,8 +93,7 @@ pub struct CreateCollection<'info> {
     /// Common Solana programs
     pub tax_token_program: Interface<'info, TokenInterface>,
     pub token_program: Interface<'info, TokenInterface>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
-    pub metadata_program: Program<'info, NftStandard>,
+    pub metadata_program: Program<'info, MetadataStandard>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

@@ -15,7 +15,7 @@ filename = "deps/token2022_data.json"
 
 [[test.genesis]]
 address = "9msweUGitRR1ELUe4XZi6xhecPCko54kSqSnfWH7LLiZ"
-program = "deps/nft_standard.so"
+program = "deps/metadata_standard.so"
 
 # [test.validator]
 # url = "https://api.mainnet-beta.solana.com"

@@ -8,12 +8,12 @@ use anchor_spl::{
         InitializeMint, Mint, MintTo, TokenAccount, TokenInterface,
     },
 };
-use nft_standard::{
+use metadata_standard::{
     cpi::{
         accounts::{CreateMetadata, IncludeInSet},
         create_external_metadata, include_in_set,
     },
-    program::NftStandard,
+    program::MetadataStandard,
     state::{AuthoritiesGroup, Metadata},
 };
 
@@ -211,7 +211,7 @@ pub struct CreateToken<'info> {
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
-    pub metadata_program: Program<'info, NftStandard>,
+    pub metadata_program: Program<'info, MetadataStandard>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

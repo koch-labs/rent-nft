@@ -1,33 +1,26 @@
 import * as anchor from "@coral-xyz/anchor";
 
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import {
   TOKEN_2022_PROGRAM_ID,
   createAssociatedTokenAccountIdempotent,
   createMint,
   mintToChecked,
-  getMintLen,
-  ExtensionType,
-  createInitializeMintInstruction,
-  createInitializePermanentDelegateInstruction,
-  getAssociatedTokenAddressSync,
-  TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
-  getAccount,
-  getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
 import { Program } from "@coral-xyz/anchor";
 import {
-  NFT_STANDARD_PROGRAM_ID,
+  METADATA_STANDARD_PROGRAM_ID,
+  createAuthoritiesGroup,
   fetchMetadata,
   getInclusionKey,
-} from "@koch-labs/nft-standard";
+  mintNft,
+} from "@koch-labs/metadata-standard";
 
 import { RentNft } from "../target/types/rent_nft";
 import { TestValues, createValues } from "./values";
 
 import { expect } from "chai";
-import { sleep } from "./utils";
 
 const suiteName = "rent-nft";
 describe(suiteName, () => {
@@ -114,10 +107,31 @@ describe(suiteName, () => {
 
   it("Mint collection", async () => {
     // Mint collection
+    await createAuthoritiesGroup({
+      provider,
+      id: values.authoritiesGroupId,
+      updateAuthority: values.admin.publicKey,
+      metadataAuthority: values.admin.publicKey,
+      inclusionAuthority: values.admin.publicKey,
+    });
+    await mintNft({
+      provider,
+      authoritiesGroup: values.authoritiesGroupKey,
+      data: values.collectionData,
+      mintConfig: {
+        receiver: values.admin.publicKey,
+        mintOne: true,
+        initializeMint: true,
+        keypair: values.collectionMintKeypair,
+      },
+      signers: {
+        mintAuthority: values.admin,
+      },
+    });
+
+    // Create the collection
     await program.methods
       .createCollection(
-        values.authoritiesGroupId,
-        values.collectionData,
         values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice
@@ -130,7 +144,7 @@ describe(suiteName, () => {
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
-        metadataProgram: NFT_STANDARD_PROGRAM_ID,
+        metadataProgram: METADATA_STANDARD_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
@@ -143,7 +157,7 @@ describe(suiteName, () => {
           TOKEN_2022_PROGRAM_ID
         ),
       ])
-      .signers([values.admin, values.collectionMintKeypair])
+      .signers([values.admin])
       .rpc({ skipPreflight: true });
 
     let collectionConfig = await program.account.collectionConfig.fetch(
@@ -184,7 +198,7 @@ describe(suiteName, () => {
         ),
         tokenAccount: values.adminTokenMintAccount,
         adminCollectionMintAccount: values.adminCollectionMintAccount,
-        metadataProgram: NFT_STANDARD_PROGRAM_ID,
+        metadataProgram: METADATA_STANDARD_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .signers([values.admin, values.tokenMintKeypair])

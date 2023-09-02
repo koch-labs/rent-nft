@@ -21,7 +21,9 @@ import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 import {
   getAuthoritiesGroupKey,
   getMetadataKey,
-} from "@koch-labs/nft-standard";
+  MetadataData,
+} from "@koch-labs/metadata-standard";
+import { createExternalMetadataData } from "@koch-labs/metadata-standard";
 
 export interface TestValues {
   admin: Keypair;
@@ -36,7 +38,7 @@ export interface TestValues {
   collectionPeriod: number;
   collectionRate: anchor.BN;
   collectionMinimumPrice: anchor.BN;
-  collectionData: string;
+  collectionData: MetadataData;
   collectionMetadata: PublicKey;
   collectionMintKeypair: Keypair;
   configKey: PublicKey;
@@ -81,7 +83,7 @@ export const createValues = (): TestValues => {
   const authoritiesGroupKey = getAuthoritiesGroupKey(authoritiesGroupId);
   const collectionMintKeypair = Keypair.generate();
   const collectionMetadata = getMetadataKey(collectionMintKeypair.publicKey);
-  const collectionData = "okokokkok";
+  const collectionData = createExternalMetadataData("okokokkok");
   const collectionRate = new anchor.BN(10000 * 365 * 8640); // 1/10 of price per second
   const collectionPeriod = 2;
   const collectionMinimumPrice = new anchor.BN(100);

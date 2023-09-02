@@ -38,10 +38,10 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@koch-labs/nft-standard@0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@koch-labs/nft-standard/-/nft-standard-0.0.6.tgz#4cc1e605ff63e7bfe8b0648244c23e3363b2ef6d"
-  integrity sha512-B4gYUMAK1TCuNiwqwrHSHaVIeRkqReGIR4Ag3hnA7D80zjvx4F3lefwcblWQdy9hMFaerJzMlmkp+/gjaM2tNQ==
+"@koch-labs/metadata-standard@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@koch-labs/metadata-standard/-/metadata-standard-0.0.10.tgz#ac6cff1fd99fb552d8ab350b8225752b01943c85"
+  integrity sha512-U8OhM0KZUApuYuPn+7eEwXM9VdcHzoNQBj5+GCWQANw+WmQfPBCrzSkTDitGpdNcSQUWbGkHKx6OAq8EffWB3g==
   dependencies:
     "@coral-xyz/anchor" "0.28.0"
     "@solana/spl-token" "^0.3.8"
