@@ -17,7 +17,6 @@ export interface CreateCollectionAccounts {
   authoritiesGroup: PublicKey
   collectionMint: PublicKey
   collectionMetadata: PublicKey
-  adminCollectionMintAccount: PublicKey
   /** Common Solana programs */
   taxTokenProgram: PublicKey
   tokenProgram: PublicKey
@@ -49,11 +48,6 @@ export function createCollection(
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: true },
     { pubkey: accounts.collectionMint, isSigner: false, isWritable: true },
     { pubkey: accounts.collectionMetadata, isSigner: false, isWritable: true },
-    {
-      pubkey: accounts.adminCollectionMintAccount,
-      isSigner: false,
-      isWritable: true,
-    },
     { pubkey: accounts.taxTokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.metadataProgram, isSigner: false, isWritable: false },

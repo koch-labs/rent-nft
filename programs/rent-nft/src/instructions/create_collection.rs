@@ -1,7 +1,6 @@
-use crate::{errors::*, events::*, state::*};
+use crate::{events::*, state::*};
 use anchor_lang::prelude::*;
-use anchor_spl::associated_token::get_associated_token_address_with_program_id;
-use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
+use anchor_spl::token_interface::{Mint, TokenInterface};
 use metadata_standard::cpi::update_authorities_group;
 use metadata_standard::state::{AuthoritiesGroup, Metadata};
 use metadata_standard::{cpi::accounts::UpdateAuthoritiesGroup, program::MetadataStandard};
@@ -78,17 +77,6 @@ pub struct CreateCollection<'info> {
 
     #[account(mut)]
     pub collection_metadata: Account<'info, Metadata>,
-
-    #[account(
-        mut,
-        address = get_associated_token_address_with_program_id(
-            admin.key,
-            &collection_mint.key(),
-            &token_program.key()
-        ),
-        constraint = admin_collection_mint_account.amount > 0 @ RentNftError::OwnZero,
-    )]
-    pub admin_collection_mint_account: InterfaceAccount<'info, TokenAccount>,
 
     /// Common Solana programs
     pub tax_token_program: Interface<'info, TokenInterface>,

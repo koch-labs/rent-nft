@@ -67,11 +67,6 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "adminCollectionMintAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "taxTokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -233,6 +228,19 @@ export type RentNft = {
       "args": [
         {
           "name": "uri",
+          "type": "string"
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "name",
           "type": "string"
         }
       ]
@@ -614,7 +622,7 @@ export type RentNft = {
       "name": "withdrawTax",
       "accounts": [
         {
-          "name": "admin",
+          "name": "taxCollector",
           "isMut": false,
           "isSigner": true
         },
@@ -632,11 +640,6 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "collectionMintAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "taxMint",
           "isMut": true,
           "isSigner": false,
@@ -645,7 +648,7 @@ export type RentNft = {
           ]
         },
         {
-          "name": "adminAccount",
+          "name": "taxCollectorAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -950,8 +953,8 @@ export type RentNft = {
     },
     {
       "code": 6001,
-      "name": "NotAdmin",
-      "msg": "Not the admin"
+      "name": "NoAuthority",
+      "msg": "User does not have the authority"
     },
     {
       "code": 6002,
@@ -1055,11 +1058,6 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "adminCollectionMintAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "taxTokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -1221,6 +1219,19 @@ export const IDL: RentNft = {
       "args": [
         {
           "name": "uri",
+          "type": "string"
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "name",
           "type": "string"
         }
       ]
@@ -1602,7 +1613,7 @@ export const IDL: RentNft = {
       "name": "withdrawTax",
       "accounts": [
         {
-          "name": "admin",
+          "name": "taxCollector",
           "isMut": false,
           "isSigner": true
         },
@@ -1620,11 +1631,6 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "collectionMintAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "taxMint",
           "isMut": true,
           "isSigner": false,
@@ -1633,7 +1639,7 @@ export const IDL: RentNft = {
           ]
         },
         {
-          "name": "adminAccount",
+          "name": "taxCollectorAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1938,8 +1944,8 @@ export const IDL: RentNft = {
     },
     {
       "code": 6001,
-      "name": "NotAdmin",
-      "msg": "Not the admin"
+      "name": "NoAuthority",
+      "msg": "User does not have the authority"
     },
     {
       "code": 6002,

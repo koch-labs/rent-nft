@@ -1,6 +1,6 @@
 export type CustomError =
   | OwnZero
-  | NotAdmin
+  | NoAuthority
   | InvalidTokenStatePeriod
   | InvalidBidStatePeriod
   | BadPreviousOwner
@@ -19,14 +19,14 @@ export class OwnZero extends Error {
   }
 }
 
-export class NotAdmin extends Error {
+export class NoAuthority extends Error {
   static readonly code = 6001
   readonly code = 6001
-  readonly name = "NotAdmin"
-  readonly msg = "Not the admin"
+  readonly name = "NoAuthority"
+  readonly msg = "User does not have the authority"
 
   constructor(readonly logs?: string[]) {
-    super("6001: Not the admin")
+    super("6001: User does not have the authority")
   }
 }
 
@@ -104,7 +104,7 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
     case 6000:
       return new OwnZero(logs)
     case 6001:
-      return new NotAdmin(logs)
+      return new NoAuthority(logs)
     case 6002:
       return new InvalidTokenStatePeriod(logs)
     case 6003:

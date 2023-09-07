@@ -4,14 +4,13 @@ import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-esl
 import { PROGRAM_ID } from "../programId"
 
 export interface WithdrawTaxAccounts {
-  admin: PublicKey
+  taxCollector: PublicKey
   /** The config */
   config: PublicKey
   collectionMint: PublicKey
-  collectionMintAccount: PublicKey
   /** The token used to pay taxes */
   taxMint: PublicKey
-  adminAccount: PublicKey
+  taxCollectorAccount: PublicKey
   bidsAccount: PublicKey
   /** Common Solana programs */
   tokenProgram: PublicKey
@@ -23,16 +22,11 @@ export function withdrawTax(
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
-    { pubkey: accounts.admin, isSigner: true, isWritable: false },
+    { pubkey: accounts.taxCollector, isSigner: true, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.collectionMint, isSigner: false, isWritable: false },
-    {
-      pubkey: accounts.collectionMintAccount,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: accounts.taxMint, isSigner: false, isWritable: true },
-    { pubkey: accounts.adminAccount, isSigner: false, isWritable: true },
+    { pubkey: accounts.taxCollectorAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.bidsAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.taxTokenProgram, isSigner: false, isWritable: false },

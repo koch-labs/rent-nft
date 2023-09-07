@@ -145,7 +145,6 @@ describe(suiteName, () => {
         authoritiesGroup: values.authoritiesGroupKey,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
-        adminCollectionMintAccount: values.adminCollectionMintAccount,
         metadataProgram: METADATA_STANDARD_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
@@ -422,16 +421,24 @@ describe(suiteName, () => {
     await program.methods
       .withdrawTax()
       .accounts({
-        admin: values.admin.publicKey,
+        taxCollector: values.admin.publicKey,
         config: values.configKey,
         collectionMint: values.collectionMintKeypair.publicKey,
-        collectionMintAccount: values.adminCollectionMintAccount,
         taxMint: values.taxMintKeypair.publicKey,
-        adminAccount: values.adminTaxAccount,
+        taxCollectorAccount: values.adminTaxAccount,
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
       })
+      .preInstructions([
+        createAssociatedTokenAccountIdempotentInstruction(
+          values.admin.publicKey,
+          values.adminTaxAccount,
+          values.admin.publicKey,
+          values.taxMintKeypair.publicKey,
+          TOKEN_2022_PROGRAM_ID
+        ),
+      ])
       .signers([values.admin])
       .rpc({ skipPreflight: true });
 

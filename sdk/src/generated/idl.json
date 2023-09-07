@@ -67,11 +67,6 @@
           "isSigner": false
         },
         {
-          "name": "adminCollectionMintAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "taxTokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -233,6 +228,19 @@
       "args": [
         {
           "name": "uri",
+          "type": "string"
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "name",
           "type": "string"
         }
       ]
@@ -614,7 +622,7 @@
       "name": "withdrawTax",
       "accounts": [
         {
-          "name": "admin",
+          "name": "taxCollector",
           "isMut": false,
           "isSigner": true
         },
@@ -632,11 +640,6 @@
           "isSigner": false
         },
         {
-          "name": "collectionMintAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "taxMint",
           "isMut": true,
           "isSigner": false,
@@ -645,7 +648,7 @@
           ]
         },
         {
-          "name": "adminAccount",
+          "name": "taxCollectorAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -950,8 +953,8 @@
     },
     {
       "code": 6001,
-      "name": "NotAdmin",
-      "msg": "Not the admin"
+      "name": "NoAuthority",
+      "msg": "User does not have the authority"
     },
     {
       "code": 6002,

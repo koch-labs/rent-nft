@@ -5,8 +5,8 @@ pub enum RentNftError {
     #[msg("Admin should own at least one token")]
     OwnZero,
 
-    #[msg("Not the admin")]
-    NotAdmin,
+    #[msg("User does not have the authority")]
+    NoAuthority,
 
     #[msg("Invalid token state period")]
     InvalidTokenStatePeriod,

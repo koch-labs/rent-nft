@@ -5,6 +5,8 @@ import { PROGRAM_ID } from "../programId"
 
 export interface CreateTokenArgs {
   uri: string
+  contentHash: Array<number>
+  name: string
 }
 
 export interface CreateTokenAccounts {
@@ -35,7 +37,11 @@ export interface CreateTokenAccounts {
   rent: PublicKey
 }
 
-export const layout = borsh.struct([borsh.str("uri")])
+export const layout = borsh.struct([
+  borsh.str("uri"),
+  borsh.array(borsh.u8(), 32, "contentHash"),
+  borsh.str("name"),
+])
 
 export function createToken(
   args: CreateTokenArgs,
@@ -75,6 +81,8 @@ export function createToken(
   const len = layout.encode(
     {
       uri: args.uri,
+      contentHash: args.contentHash,
+      name: args.name,
     },
     buffer
   )

@@ -30,7 +30,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
             TransferChecked {
                 mint: ctx.accounts.tax_mint.to_account_info(),
                 from: ctx.accounts.bids_account.to_account_info(),
-                to: ctx.accounts.admin_account.to_account_info(),
+                to: ctx.accounts.tax_collector_account.to_account_info(),
                 authority: config.to_account_info(),
             },
             signer_seeds,
@@ -51,7 +51,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct WithdrawTax<'info> {
-    pub admin: Signer<'info>,
+    pub tax_collector: Signer<'info>,
 
     /// The config
     #[account(
@@ -60,22 +60,13 @@ pub struct WithdrawTax<'info> {
             &config.collection_mint.to_bytes(),
         ],
         bump,
-        has_one = tax_mint,
+        // Not checking the tax token, can be any token
         has_one = collection_mint
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
 
+    #[account(constraint = collection_mint.mint_authority == Some(tax_collector.key()).into() @ RentNftError::NoAuthority)]
     pub collection_mint: InterfaceAccount<'info, Mint>,
-
-    #[account(
-        address = get_associated_token_address_with_program_id(
-            admin.key,
-            &collection_mint.key(),
-            &token_program.key(),
-        ),
-        constraint = collection_mint_account.amount == 1 @ RentNftError::NotAdmin,
-    )]
-    pub collection_mint_account: InterfaceAccount<'info, TokenAccount>,
 
     /// The token used to pay taxes
     #[account(mut)]
@@ -84,12 +75,12 @@ pub struct WithdrawTax<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            admin.key,
+            tax_collector.key,
             &tax_mint.key(),
             &tax_token_program.key(),
         ),
     )]
-    pub admin_account: InterfaceAccount<'info, TokenAccount>,
+    pub tax_collector_account: InterfaceAccount<'info, TokenAccount>,
 
     #[account(
         mut,
