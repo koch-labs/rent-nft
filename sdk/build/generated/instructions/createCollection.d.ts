@@ -1,8 +1,6 @@
 import { TransactionInstruction, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 export interface CreateCollectionArgs {
-    id: PublicKey;
-    uri: string;
     timePeriod: number;
     taxRate: BN;
     minPrice: BN;
@@ -19,10 +17,13 @@ export interface CreateCollectionAccounts {
     /** Common Solana programs */
     taxTokenProgram: PublicKey;
     tokenProgram: PublicKey;
-    associatedTokenProgram: PublicKey;
     metadataProgram: PublicKey;
     systemProgram: PublicKey;
     rent: PublicKey;
 }
 export declare const layout: any;
+/**
+ * Initializes a collection from an existing metadata
+ * The metadata update authority will be transfered to the collection
+ */
 export declare function createCollection(args: CreateCollectionArgs, accounts: CreateCollectionAccounts, programId?: PublicKey): TransactionInstruction;

@@ -4,8 +4,6 @@ import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-esl
 import { PROGRAM_ID } from "../programId"
 
 export interface CreateCollectionArgs {
-  id: PublicKey
-  uri: string
   timePeriod: number
   taxRate: BN
   minPrice: BN
@@ -23,20 +21,21 @@ export interface CreateCollectionAccounts {
   /** Common Solana programs */
   taxTokenProgram: PublicKey
   tokenProgram: PublicKey
-  associatedTokenProgram: PublicKey
   metadataProgram: PublicKey
   systemProgram: PublicKey
   rent: PublicKey
 }
 
 export const layout = borsh.struct([
-  borsh.publicKey("id"),
-  borsh.str("uri"),
   borsh.u32("timePeriod"),
   borsh.u64("taxRate"),
   borsh.u64("minPrice"),
 ])
 
+/**
+ * Initializes a collection from an existing metadata
+ * The metadata update authority will be transfered to the collection
+ */
 export function createCollection(
   args: CreateCollectionArgs,
   accounts: CreateCollectionAccounts,
@@ -48,7 +47,7 @@ export function createCollection(
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.taxMint, isSigner: false, isWritable: false },
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: true },
-    { pubkey: accounts.collectionMint, isSigner: true, isWritable: true },
+    { pubkey: accounts.collectionMint, isSigner: false, isWritable: true },
     { pubkey: accounts.collectionMetadata, isSigner: false, isWritable: true },
     {
       pubkey: accounts.adminCollectionMintAccount,
@@ -57,11 +56,6 @@ export function createCollection(
     },
     { pubkey: accounts.taxTokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
-    {
-      pubkey: accounts.associatedTokenProgram,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: accounts.metadataProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
@@ -70,8 +64,6 @@ export function createCollection(
   const buffer = Buffer.alloc(1000)
   const len = layout.encode(
     {
-      id: args.id,
-      uri: args.uri,
       timePeriod: args.timePeriod,
       taxRate: args.taxRate,
       minPrice: args.minPrice,

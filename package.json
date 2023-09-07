@@ -1,6 +1,8 @@
 {
     "scripts": {
-        "gen": "anchor-client-gen target/idl/rent_nft.json sdk/src/generated && cp target/types/rent_nft.ts sdk/src/generated/types.ts && cp target/idl/rent_nft.json sdk/src/generated/idl.json",
+        "gen": "anchor-client-gen target/idl/rent_nft.json sdk/src/generated",
+        "idl": "cp target/types/rent_nft.ts sdk/src/generated/rentNft.ts && cp target/idl/rent_nft.json sdk/src/generated/idl.json",
+        "build": "anchor build && yarn gen && yarn idl && cd sdk && yarn build && cd ..",
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
     },

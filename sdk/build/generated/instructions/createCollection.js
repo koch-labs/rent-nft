@@ -28,12 +28,14 @@ const web3_js_1 = require("@solana/web3.js"); // eslint-disable-line @typescript
 const borsh = __importStar(require("@coral-xyz/borsh")); // eslint-disable-line @typescript-eslint/no-unused-vars
 const programId_1 = require("../programId");
 exports.layout = borsh.struct([
-    borsh.publicKey("id"),
-    borsh.str("uri"),
     borsh.u32("timePeriod"),
     borsh.u64("taxRate"),
     borsh.u64("minPrice"),
 ]);
+/**
+ * Initializes a collection from an existing metadata
+ * The metadata update authority will be transfered to the collection
+ */
 function createCollection(args, accounts, programId = programId_1.PROGRAM_ID) {
     const keys = [
         { pubkey: accounts.payer, isSigner: true, isWritable: true },
@@ -41,7 +43,7 @@ function createCollection(args, accounts, programId = programId_1.PROGRAM_ID) {
         { pubkey: accounts.config, isSigner: false, isWritable: true },
         { pubkey: accounts.taxMint, isSigner: false, isWritable: false },
         { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: true },
-        { pubkey: accounts.collectionMint, isSigner: true, isWritable: true },
+        { pubkey: accounts.collectionMint, isSigner: false, isWritable: true },
         { pubkey: accounts.collectionMetadata, isSigner: false, isWritable: true },
         {
             pubkey: accounts.adminCollectionMintAccount,
@@ -50,11 +52,6 @@ function createCollection(args, accounts, programId = programId_1.PROGRAM_ID) {
         },
         { pubkey: accounts.taxTokenProgram, isSigner: false, isWritable: false },
         { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
-        {
-            pubkey: accounts.associatedTokenProgram,
-            isSigner: false,
-            isWritable: false,
-        },
         { pubkey: accounts.metadataProgram, isSigner: false, isWritable: false },
         { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
         { pubkey: accounts.rent, isSigner: false, isWritable: false },
@@ -62,8 +59,6 @@ function createCollection(args, accounts, programId = programId_1.PROGRAM_ID) {
     const identifier = Buffer.from([156, 251, 92, 54, 233, 2, 16, 82]);
     const buffer = Buffer.alloc(1000);
     const len = exports.layout.encode({
-        id: args.id,
-        uri: args.uri,
         timePeriod: args.timePeriod,
         taxRate: args.taxRate,
         minPrice: args.minPrice,

@@ -29,6 +29,10 @@ exports.IDL = {
     "instructions": [
         {
             "name": "createCollection",
+            "docs": [
+                "Initializes a collection from an existing metadata",
+                "The metadata update authority will be transfered to the collection"
+            ],
             "accounts": [
                 {
                     "name": "payer",
@@ -58,7 +62,7 @@ exports.IDL = {
                 {
                     "name": "collectionMint",
                     "isMut": true,
-                    "isSigner": true
+                    "isSigner": false
                 },
                 {
                     "name": "collectionMetadata",
@@ -84,11 +88,6 @@ exports.IDL = {
                     "isSigner": false
                 },
                 {
-                    "name": "associatedTokenProgram",
-                    "isMut": false,
-                    "isSigner": false
-                },
-                {
                     "name": "metadataProgram",
                     "isMut": false,
                     "isSigner": false
@@ -105,14 +104,6 @@ exports.IDL = {
                 }
             ],
             "args": [
-                {
-                    "name": "id",
-                    "type": "publicKey"
-                },
-                {
-                    "name": "uri",
-                    "type": "string"
-                },
                 {
                     "name": "timePeriod",
                     "type": "u32"
@@ -952,39 +943,44 @@ exports.IDL = {
     "errors": [
         {
             "code": 6000,
+            "name": "OwnZero",
+            "msg": "Admin should own at least one token"
+        },
+        {
+            "code": 6001,
             "name": "NotAdmin",
             "msg": "Not the admin"
         },
         {
-            "code": 6001,
+            "code": 6002,
             "name": "InvalidTokenStatePeriod",
             "msg": "Invalid token state period"
         },
         {
-            "code": 6002,
+            "code": 6003,
             "name": "InvalidBidStatePeriod",
             "msg": "Invalid bid state period"
         },
         {
-            "code": 6003,
+            "code": 6004,
             "name": "BadPreviousOwner",
             "msg": "Invalid owner bid state passed"
         },
         {
-            "code": 6004,
+            "code": 6005,
             "name": "NotEnoughDeposited",
             "msg": "Owner bid state does not have enough deposited, token should return to minimum price"
         },
         {
-            "code": 6005,
+            "code": 6006,
             "name": "OutOfDateBid",
             "msg": "Owner bid state needs to be updated"
         },
         {
-            "code": 6006,
+            "code": 6007,
             "name": "InsufficientBid",
             "msg": "Needs a bigger amount to bid"
         }
     ]
 };
-//# sourceMappingURL=types.js.map
+//# sourceMappingURL=rentNft.js.map

@@ -1,29 +1,17 @@
 import * as anchor from "@coral-xyz/anchor";
 
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  Connection,
-  SystemProgram,
-} from "@solana/web3.js";
-import {
-  getBidStateKey,
-  getCollectionAuthorityKey,
-  getConfigKey,
-  getTokenStateKey,
-} from "../sdk/src";
+import { Keypair, PublicKey } from "@solana/web3.js";
+import { getBidStateKey, getConfigKey, getTokenStateKey } from "../sdk/src";
 import {
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
-import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 import {
   getAuthoritiesGroupKey,
   getMetadataKey,
   MetadataData,
+  createExternalMetadataData,
 } from "@koch-labs/metadata-standard";
-import { createExternalMetadataData } from "@koch-labs/metadata-standard";
 
 export interface TestValues {
   admin: Keypair;
