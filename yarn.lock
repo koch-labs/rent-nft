@@ -38,10 +38,10 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@koch-labs/metadata-standard@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@koch-labs/metadata-standard/-/metadata-standard-0.0.10.tgz#ac6cff1fd99fb552d8ab350b8225752b01943c85"
-  integrity sha512-U8OhM0KZUApuYuPn+7eEwXM9VdcHzoNQBj5+GCWQANw+WmQfPBCrzSkTDitGpdNcSQUWbGkHKx6OAq8EffWB3g==
+"@koch-labs/metadata-standard@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@koch-labs/metadata-standard/-/metadata-standard-0.0.11.tgz#b27dd1d1fa0342fae5a5aef781161e0f07adb877"
+  integrity sha512-vvRw2SQmrFJ9y/SHvpt0GgaUtn5heORpYG9KE9fTOKbpjfykPxLxaTowDbDnfFWA3FeCK1NsPkYjfA5NQN7Zkw==
   dependencies:
     "@coral-xyz/anchor" "0.28.0"
     "@solana/spl-token" "^0.3.8"

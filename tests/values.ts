@@ -38,6 +38,7 @@ export interface TestValues {
   collectionPeriod: number;
   collectionRate: anchor.BN;
   collectionMinimumPrice: anchor.BN;
+  collectionName: string;
   collectionData: MetadataData;
   collectionMetadata: PublicKey;
   collectionMintKeypair: Keypair;
@@ -84,6 +85,7 @@ export const createValues = (): TestValues => {
   const collectionMintKeypair = Keypair.generate();
   const collectionMetadata = getMetadataKey(collectionMintKeypair.publicKey);
   const collectionData = createExternalMetadataData("okokokkok");
+  const collectionName = "name collection";
   const collectionRate = new anchor.BN(10000 * 365 * 8640); // 1/10 of price per second
   const collectionPeriod = 2;
   const collectionMinimumPrice = new anchor.BN(100);
@@ -146,6 +148,7 @@ export const createValues = (): TestValues => {
     taxMintKeypair,
     authoritiesGroupId,
     authoritiesGroupKey,
+    collectionName,
     collectionData,
     collectionMetadata,
     collectionMintKeypair,

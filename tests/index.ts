@@ -117,6 +117,7 @@ describe(suiteName, () => {
     await mintNft({
       provider,
       authoritiesGroup: values.authoritiesGroupKey,
+      name: values.collectionName,
       data: values.collectionData,
       mintConfig: {
         receiver: values.admin.publicKey,
