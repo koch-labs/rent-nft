@@ -20,7 +20,12 @@ use metadata_standard::{
 use crate::events::*;
 use crate::state::*;
 
-pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
+pub fn create_token(
+    ctx: Context<CreateToken>,
+    uri: String,
+    content_hash: [u8; 32],
+    name: String,
+) -> Result<()> {
     msg!("Creating a token");
 
     let config = &mut ctx.accounts.config;
@@ -94,6 +99,7 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
             ctx.accounts.metadata_program.to_account_info(),
             CreateMetadata {
                 payer: ctx.accounts.payer.to_account_info(),
+                mint_authority: config.to_account_info(),
                 authorities_group: ctx.accounts.authorities_group.to_account_info(),
                 mint: ctx.accounts.token_mint.to_account_info(),
                 metadata: ctx.accounts.token_metadata.to_account_info(),
@@ -103,6 +109,8 @@ pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
             signer_seeds,
         ),
         uri,
+        content_hash,
+        name,
     )?;
 
     include_in_set(CpiContext::new_with_signer(

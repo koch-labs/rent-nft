@@ -25,8 +25,13 @@ pub mod rent_nft {
         instructions::create_collection(ctx, time_period, tax_rate, min_price)
     }
 
-    pub fn create_token(ctx: Context<CreateToken>, uri: String) -> Result<()> {
-        instructions::create_token(ctx, uri)
+    pub fn create_token(
+        ctx: Context<CreateToken>,
+        uri: String,
+        content_hash: [u8; 32],
+        name: String,
+    ) -> Result<()> {
+        instructions::create_token(ctx, uri, content_hash, name)
     }
 
     pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {

@@ -128,6 +128,7 @@ describe(suiteName, () => {
       signers: {
         mintAuthority: values.admin,
       },
+      confirmOptions: { skipPreflight: true },
     });
 
     // Create the collection
@@ -182,7 +183,7 @@ describe(suiteName, () => {
     const uri = "ijsiodfjsodifjo";
     // Mint a token
     await program.methods
-      .createToken(uri)
+      .createToken(uri, Array(32).fill(0), values.collectionName)
       .accounts({
         config: values.configKey,
         receiver: values.admin.publicKey,
