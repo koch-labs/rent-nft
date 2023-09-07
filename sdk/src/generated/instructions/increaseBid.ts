@@ -10,6 +10,7 @@ export interface IncreaseBidArgs {
 export interface IncreaseBidAccounts {
   payer: PublicKey
   bidder: PublicKey
+  depositor: PublicKey
   /** The config */
   config: PublicKey
   /** The token used to pay taxes */
@@ -17,7 +18,7 @@ export interface IncreaseBidAccounts {
   /** The state for the token assessement */
   tokenState: PublicKey
   bidState: PublicKey
-  bidderAccount: PublicKey
+  depositorAccount: PublicKey
   bidsAccount: PublicKey
   /** Common Solana programs */
   tokenProgram: PublicKey
@@ -32,12 +33,13 @@ export function increaseBid(
 ) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
-    { pubkey: accounts.bidder, isSigner: true, isWritable: false },
+    { pubkey: accounts.bidder, isSigner: false, isWritable: false },
+    { pubkey: accounts.depositor, isSigner: true, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.taxMint, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: true },
     { pubkey: accounts.bidState, isSigner: false, isWritable: true },
-    { pubkey: accounts.bidderAccount, isSigner: false, isWritable: true },
+    { pubkey: accounts.depositorAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.bidsAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ]

@@ -9,4 +9,4 @@ id.json
 .env
 
 # SDK
-/build
+build

@@ -22,7 +22,7 @@ pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
             ctx.accounts.token_program.to_account_info(),
             TransferChecked {
                 mint: ctx.accounts.tax_mint.to_account_info(),
-                from: ctx.accounts.bidder_account.to_account_info(),
+                from: ctx.accounts.depositor_account.to_account_info(),
                 to: ctx.accounts.bids_account.to_account_info(),
                 authority: ctx.accounts.bidder.to_account_info(),
             },
@@ -52,7 +52,10 @@ pub struct IncreaseBid<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    pub bidder: Signer<'info>,
+    /// CHECK: Can deposit in someone's account
+    pub bidder: AccountInfo<'info>,
+
+    pub depositor: Signer<'info>,
 
     /// The config
     #[account(
@@ -97,12 +100,12 @@ pub struct IncreaseBid<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            bidder.key,
+            depositor.key,
             &tax_mint.key(),
             &token_program.key(),
         ),
     )]
-    pub bidder_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub depositor_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,

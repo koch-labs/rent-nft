@@ -298,6 +298,11 @@ export type RentNft = {
         {
           "name": "bidder",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "depositor",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -330,7 +335,7 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "bidderAccount",
+          "name": "depositorAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1281,6 +1286,11 @@ export const IDL: RentNft = {
         {
           "name": "bidder",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "depositor",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -1313,7 +1323,7 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "bidderAccount",
+          "name": "depositorAccount",
           "isMut": true,
           "isSigner": false
         },

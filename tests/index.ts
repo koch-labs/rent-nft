@@ -247,11 +247,12 @@ describe(suiteName, () => {
       .increaseBid(values.depositedAmount.mul(new anchor.BN(2)))
       .accounts({
         bidder: values.holder.publicKey,
+        depositor: values.holder.publicKey,
         config: values.configKey,
         tokenState: values.tokenStateKey,
         bidState: values.holderBidStateKey,
         taxMint: values.taxMintKeypair.publicKey,
-        bidderAccount: values.holderTaxAccount,
+        depositorAccount: values.holderTaxAccount,
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
@@ -357,11 +358,12 @@ describe(suiteName, () => {
       .increaseBid(values.depositedAmount)
       .accounts({
         bidder: values.bidder.publicKey,
+        depositor: values.bidder.publicKey,
         config: values.configKey,
         tokenState: values.tokenStateKey,
         bidState: values.bidderBidStateKey,
         taxMint: values.taxMintKeypair.publicKey,
-        bidderAccount: values.bidderTaxAccount,
+        depositorAccount: values.bidderTaxAccount,
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })

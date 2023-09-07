@@ -298,6 +298,11 @@
         {
           "name": "bidder",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "depositor",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -330,7 +335,7 @@
           "isSigner": false
         },
         {
-          "name": "bidderAccount",
+          "name": "depositorAccount",
           "isMut": true,
           "isSigner": false
         },
