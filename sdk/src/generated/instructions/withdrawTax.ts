@@ -7,9 +7,8 @@ export interface WithdrawTaxAccounts {
   taxCollector: PublicKey
   /** The config */
   config: PublicKey
-  collectionMint: PublicKey
-  /** The token used to pay taxes */
-  taxMint: PublicKey
+  /** The token to withdraw */
+  mint: PublicKey
   taxCollectorAccount: PublicKey
   bidsAccount: PublicKey
   /** Common Solana programs */
@@ -24,8 +23,7 @@ export function withdrawTax(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.taxCollector, isSigner: true, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
-    { pubkey: accounts.collectionMint, isSigner: false, isWritable: false },
-    { pubkey: accounts.taxMint, isSigner: false, isWritable: true },
+    { pubkey: accounts.mint, isSigner: false, isWritable: true },
     { pubkey: accounts.taxCollectorAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.bidsAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },

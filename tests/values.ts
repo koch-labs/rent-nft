@@ -16,6 +16,8 @@ import {
 export interface TestValues {
   admin: Keypair;
   adminTaxAccount: PublicKey;
+  taxCollector: Keypair;
+  taxCollectorAccount: PublicKey;
   holder: Keypair;
   holderTaxAccount: PublicKey;
   bidder: Keypair;
@@ -47,12 +49,19 @@ export interface TestValues {
 
 export const createValues = (): TestValues => {
   const admin = Keypair.generate();
+  const taxCollector = Keypair.generate();
   const holder = Keypair.generate();
   const bidder = Keypair.generate();
   const taxMintKeypair = Keypair.generate();
   const adminTaxAccount = getAssociatedTokenAddressSync(
     taxMintKeypair.publicKey,
     admin.publicKey,
+    true,
+    TOKEN_2022_PROGRAM_ID
+  );
+  const taxCollectorAccount = getAssociatedTokenAddressSync(
+    taxMintKeypair.publicKey,
+    taxCollector.publicKey,
     true,
     TOKEN_2022_PROGRAM_ID
   );
@@ -128,9 +137,11 @@ export const createValues = (): TestValues => {
   const newTokenPrice = new anchor.BN(200);
   return {
     admin,
+    taxCollector,
     holder,
     bidder,
     adminTaxAccount,
+    taxCollectorAccount,
     holderTaxAccount,
     bidderTaxAccount,
     taxMintKeypair,

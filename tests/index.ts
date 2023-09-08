@@ -36,11 +36,13 @@ describe(suiteName, () => {
     values = createValues();
 
     await Promise.all(
-      [values.admin, values.holder, values.bidder].map(async (kp, i) => {
-        await connection.confirmTransaction(
-          await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
-        );
-      })
+      [values.admin, values.holder, values.taxCollector, values.bidder].map(
+        async (kp, i) => {
+          await connection.confirmTransaction(
+            await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
+          );
+        }
+      )
     );
 
     await createMint(
@@ -134,6 +136,7 @@ describe(suiteName, () => {
     // Create the collection
     await program.methods
       .createCollection(
+        values.taxCollector.publicKey,
         values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice
@@ -421,25 +424,24 @@ describe(suiteName, () => {
     await program.methods
       .withdrawTax()
       .accounts({
-        taxCollector: values.admin.publicKey,
+        taxCollector: values.taxCollector.publicKey,
         config: values.configKey,
-        collectionMint: values.collectionMintKeypair.publicKey,
-        taxMint: values.taxMintKeypair.publicKey,
-        taxCollectorAccount: values.adminTaxAccount,
+        mint: values.taxMintKeypair.publicKey,
+        taxCollectorAccount: values.taxCollectorAccount,
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .preInstructions([
         createAssociatedTokenAccountIdempotentInstruction(
-          values.admin.publicKey,
-          values.adminTaxAccount,
-          values.admin.publicKey,
+          values.taxCollector.publicKey,
+          values.taxCollectorAccount,
+          values.taxCollector.publicKey,
           values.taxMintKeypair.publicKey,
           TOKEN_2022_PROGRAM_ID
         ),
       ])
-      .signers([values.admin])
+      .signers([values.taxCollector])
       .rpc({ skipPreflight: true });
 
     let configAfter = await program.account.collectionConfig.fetch(

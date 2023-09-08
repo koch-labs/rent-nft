@@ -97,6 +97,10 @@ export type RentNft = {
       ],
       "args": [
         {
+          "name": "taxCollector",
+          "type": "publicKey"
+        },
+        {
           "name": "timePeriod",
           "type": "u32"
         },
@@ -635,16 +639,11 @@ export type RentNft = {
           ]
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "taxMint",
+          "name": "mint",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The token used to pay taxes"
+            "The token to withdraw"
           ]
         },
         {
@@ -695,6 +694,13 @@ export type RentNft = {
             "name": "taxMint",
             "docs": [
               "The mint of the tax token"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "taxCollector",
+            "docs": [
+              "The account allowed to collect taxes"
             ],
             "type": "publicKey"
           },
@@ -1088,6 +1094,10 @@ export const IDL: RentNft = {
       ],
       "args": [
         {
+          "name": "taxCollector",
+          "type": "publicKey"
+        },
+        {
           "name": "timePeriod",
           "type": "u32"
         },
@@ -1626,16 +1636,11 @@ export const IDL: RentNft = {
           ]
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "taxMint",
+          "name": "mint",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The token used to pay taxes"
+            "The token to withdraw"
           ]
         },
         {
@@ -1686,6 +1691,13 @@ export const IDL: RentNft = {
             "name": "taxMint",
             "docs": [
               "The mint of the tax token"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "taxCollector",
+            "docs": [
+              "The account allowed to collect taxes"
             ],
             "type": "publicKey"
           },

@@ -4,6 +4,7 @@ import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-esl
 import { PROGRAM_ID } from "../programId"
 
 export interface CreateCollectionArgs {
+  taxCollector: PublicKey
   timePeriod: number
   taxRate: BN
   minPrice: BN
@@ -26,6 +27,7 @@ export interface CreateCollectionAccounts {
 }
 
 export const layout = borsh.struct([
+  borsh.publicKey("taxCollector"),
   borsh.u32("timePeriod"),
   borsh.u64("taxRate"),
   borsh.u64("minPrice"),
@@ -58,6 +60,7 @@ export function createCollection(
   const buffer = Buffer.alloc(1000)
   const len = layout.encode(
     {
+      taxCollector: args.taxCollector,
       timePeriod: args.timePeriod,
       taxRate: args.taxRate,
       minPrice: args.minPrice,

@@ -18,11 +18,12 @@ pub mod rent_nft {
     /// The metadata update authority will be transfered to the collection
     pub fn create_collection(
         ctx: Context<CreateCollection>,
+        tax_collector: Pubkey,
         time_period: u32,
         tax_rate: u64,
         min_price: u64,
     ) -> Result<()> {
-        instructions::create_collection(ctx, time_period, tax_rate, min_price)
+        instructions::create_collection(ctx, tax_collector, time_period, tax_rate, min_price)
     }
 
     pub fn create_token(

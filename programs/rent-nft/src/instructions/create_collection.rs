@@ -7,6 +7,7 @@ use metadata_standard::{cpi::accounts::UpdateAuthoritiesGroup, program::Metadata
 
 pub fn create_collection(
     ctx: Context<CreateCollection>,
+    tax_collector: Pubkey,
     time_period: u32,
     tax_rate: u64,
     min_price: u64,
@@ -16,6 +17,7 @@ pub fn create_collection(
 
     config.collection_mint = ctx.accounts.collection_mint.key();
     config.tax_mint = ctx.accounts.tax_mint.key();
+    config.tax_collector = tax_collector;
     config.time_period = time_period;
     config.tax_rate = tax_rate;
     config.minimum_sell_price = min_price;
@@ -75,7 +77,10 @@ pub struct CreateCollection<'info> {
     )]
     pub collection_mint: InterfaceAccount<'info, Mint>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        constraint = collection_metadata.mint == collection_mint.key(),
+    )]
     pub collection_metadata: Account<'info, Metadata>,
 
     /// Common Solana programs

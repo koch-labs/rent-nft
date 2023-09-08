@@ -97,6 +97,10 @@
       ],
       "args": [
         {
+          "name": "taxCollector",
+          "type": "publicKey"
+        },
+        {
           "name": "timePeriod",
           "type": "u32"
         },
@@ -635,16 +639,11 @@
           ]
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "taxMint",
+          "name": "mint",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The token used to pay taxes"
+            "The token to withdraw"
           ]
         },
         {
@@ -695,6 +694,13 @@
             "name": "taxMint",
             "docs": [
               "The mint of the tax token"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "taxCollector",
+            "docs": [
+              "The account allowed to collect taxes"
             ],
             "type": "publicKey"
           },

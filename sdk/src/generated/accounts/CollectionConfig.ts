@@ -8,6 +8,8 @@ export interface CollectionConfigFields {
   collectionMint: PublicKey
   /** The mint of the tax token */
   taxMint: PublicKey
+  /** The account allowed to collect taxes */
+  taxCollector: PublicKey
   /** Seconds in a time period */
   timePeriod: number
   /** Basis points per year of tax on the selling price */
@@ -21,6 +23,8 @@ export interface CollectionConfigJSON {
   collectionMint: string
   /** The mint of the tax token */
   taxMint: string
+  /** The account allowed to collect taxes */
+  taxCollector: string
   /** Seconds in a time period */
   timePeriod: number
   /** Basis points per year of tax on the selling price */
@@ -38,6 +42,8 @@ export class CollectionConfig {
   readonly collectionMint: PublicKey
   /** The mint of the tax token */
   readonly taxMint: PublicKey
+  /** The account allowed to collect taxes */
+  readonly taxCollector: PublicKey
   /** Seconds in a time period */
   readonly timePeriod: number
   /** Basis points per year of tax on the selling price */
@@ -52,6 +58,7 @@ export class CollectionConfig {
   static readonly layout = borsh.struct([
     borsh.publicKey("collectionMint"),
     borsh.publicKey("taxMint"),
+    borsh.publicKey("taxCollector"),
     borsh.u32("timePeriod"),
     borsh.u64("taxRate"),
     borsh.u64("minimumSellPrice"),
@@ -61,6 +68,7 @@ export class CollectionConfig {
   constructor(fields: CollectionConfigFields) {
     this.collectionMint = fields.collectionMint
     this.taxMint = fields.taxMint
+    this.taxCollector = fields.taxCollector
     this.timePeriod = fields.timePeriod
     this.taxRate = fields.taxRate
     this.minimumSellPrice = fields.minimumSellPrice
@@ -113,6 +121,7 @@ export class CollectionConfig {
     return new CollectionConfig({
       collectionMint: dec.collectionMint,
       taxMint: dec.taxMint,
+      taxCollector: dec.taxCollector,
       timePeriod: dec.timePeriod,
       taxRate: dec.taxRate,
       minimumSellPrice: dec.minimumSellPrice,
@@ -124,6 +133,7 @@ export class CollectionConfig {
     return {
       collectionMint: this.collectionMint.toString(),
       taxMint: this.taxMint.toString(),
+      taxCollector: this.taxCollector.toString(),
       timePeriod: this.timePeriod,
       taxRate: this.taxRate.toString(),
       minimumSellPrice: this.minimumSellPrice.toString(),
@@ -135,6 +145,7 @@ export class CollectionConfig {
     return new CollectionConfig({
       collectionMint: new PublicKey(obj.collectionMint),
       taxMint: new PublicKey(obj.taxMint),
+      taxCollector: new PublicKey(obj.taxCollector),
       timePeriod: obj.timePeriod,
       taxRate: new BN(obj.taxRate),
       minimumSellPrice: new BN(obj.minimumSellPrice),

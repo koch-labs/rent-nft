@@ -1,4 +1,3 @@
-use crate::errors::*;
 use crate::events::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
@@ -28,7 +27,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
             TransferChecked {
-                mint: ctx.accounts.tax_mint.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
                 from: ctx.accounts.bids_account.to_account_info(),
                 to: ctx.accounts.tax_collector_account.to_account_info(),
                 authority: config.to_account_info(),
@@ -36,7 +35,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
             signer_seeds,
         ),
         amount,
-        ctx.accounts.tax_mint.decimals,
+        ctx.accounts.mint.decimals,
     )?;
 
     config.collected_tax = 0;
@@ -61,22 +60,19 @@ pub struct WithdrawTax<'info> {
         ],
         bump,
         // Not checking the tax token, can be any token
-        has_one = collection_mint
+        has_one = tax_collector,
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
 
-    #[account(constraint = collection_mint.mint_authority == Some(tax_collector.key()).into() @ RentNftError::NoAuthority)]
-    pub collection_mint: InterfaceAccount<'info, Mint>,
-
-    /// The token used to pay taxes
+    /// The token to withdraw
     #[account(mut)]
-    pub tax_mint: Box<InterfaceAccount<'info, Mint>>,
+    pub mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
             tax_collector.key,
-            &tax_mint.key(),
+            &mint.key(),
             &tax_token_program.key(),
         ),
     )]
@@ -86,7 +82,7 @@ pub struct WithdrawTax<'info> {
         mut,
         address = get_associated_token_address_with_program_id(
             &config.key(),
-            &tax_mint.key(),
+            &mint.key(),
             &tax_token_program.key(),
         ),
     )]
