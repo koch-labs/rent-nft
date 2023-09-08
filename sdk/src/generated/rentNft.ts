@@ -123,7 +123,7 @@ export type RentNft = {
           "isSigner": true
         },
         {
-          "name": "admin",
+          "name": "mintAuthority",
           "isMut": true,
           "isSigner": true
         },
@@ -142,11 +142,6 @@ export type RentNft = {
         },
         {
           "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "adminCollectionMintAccount",
           "isMut": false,
           "isSigner": false
         },
@@ -1120,7 +1115,7 @@ export const IDL: RentNft = {
           "isSigner": true
         },
         {
-          "name": "admin",
+          "name": "mintAuthority",
           "isMut": true,
           "isSigner": true
         },
@@ -1139,11 +1134,6 @@ export const IDL: RentNft = {
         },
         {
           "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "adminCollectionMintAccount",
           "isMut": false,
           "isSigner": false
         },

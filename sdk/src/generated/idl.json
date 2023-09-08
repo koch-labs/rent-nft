@@ -123,7 +123,7 @@
           "isSigner": true
         },
         {
-          "name": "admin",
+          "name": "mintAuthority",
           "isMut": true,
           "isSigner": true
         },
@@ -142,11 +142,6 @@
         },
         {
           "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "adminCollectionMintAccount",
           "isMut": false,
           "isSigner": false
         },

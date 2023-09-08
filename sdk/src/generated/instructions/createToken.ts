@@ -11,12 +11,11 @@ export interface CreateTokenArgs {
 
 export interface CreateTokenAccounts {
   payer: PublicKey
-  admin: PublicKey
+  mintAuthority: PublicKey
   receiver: PublicKey
   /** The config */
   config: PublicKey
   collectionMint: PublicKey
-  adminCollectionMintAccount: PublicKey
   collectionMetadata: PublicKey
   authoritiesGroup: PublicKey
   /** The mint of the new token */
@@ -50,15 +49,10 @@ export function createToken(
 ) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
-    { pubkey: accounts.admin, isSigner: true, isWritable: true },
+    { pubkey: accounts.mintAuthority, isSigner: true, isWritable: true },
     { pubkey: accounts.receiver, isSigner: false, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.collectionMint, isSigner: false, isWritable: false },
-    {
-      pubkey: accounts.adminCollectionMintAccount,
-      isSigner: false,
-      isWritable: false,
-    },
     { pubkey: accounts.collectionMetadata, isSigner: false, isWritable: true },
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenMint, isSigner: true, isWritable: true },

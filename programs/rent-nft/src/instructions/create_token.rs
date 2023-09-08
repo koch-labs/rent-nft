@@ -1,11 +1,9 @@
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
 use anchor_spl::{
-    associated_token::{
-        create_idempotent, get_associated_token_address_with_program_id, AssociatedToken, Create,
-    },
+    associated_token::{create_idempotent, AssociatedToken, Create},
     token_interface::{
         initialize_mint, mint_to, spl_token_2022::instruction::initialize_permanent_delegate,
-        InitializeMint, Mint, MintTo, TokenAccount, TokenInterface,
+        InitializeMint, Mint, MintTo, TokenInterface,
     },
 };
 use metadata_standard::{
@@ -17,8 +15,7 @@ use metadata_standard::{
     state::{AuthoritiesGroup, Metadata},
 };
 
-use crate::events::*;
-use crate::state::*;
+use crate::{errors::*, events::*, state::*};
 
 pub fn create_token(
     ctx: Context<CreateToken>,
@@ -142,7 +139,7 @@ pub struct CreateToken<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut)]
-    pub admin: Signer<'info>,
+    pub mint_authority: Signer<'info>,
 
     /// CHECK: Delegatable creation
     pub receiver: UncheckedAccount<'info>,
@@ -157,17 +154,10 @@ pub struct CreateToken<'info> {
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
 
-    pub collection_mint: Box<InterfaceAccount<'info, Mint>>,
-
     #[account(
-        address = get_associated_token_address_with_program_id(
-            admin.key,
-            &collection_mint.key(),
-            &token_program.key(),
-        ),
-        constraint = admin_collection_mint_account.amount == 1,
+        constraint = collection_mint.mint_authority == Some(mint_authority.key()).into() @ RentNftError::NoAuthority
     )]
-    pub admin_collection_mint_account: InterfaceAccount<'info, TokenAccount>,
+    pub collection_mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
@@ -178,7 +168,7 @@ pub struct CreateToken<'info> {
     pub authorities_group: Account<'info, AuthoritiesGroup>,
 
     /// The mint of the new token
-    /// CHECK: Will be initialized by Standard
+    /// CHECK: Initialized in instruction
     #[account(
         init,
         owner = token_program.key(),

@@ -189,7 +189,7 @@ describe(suiteName, () => {
       .accounts({
         config: values.configKey,
         receiver: values.admin.publicKey,
-        admin: values.admin.publicKey,
+        mintAuthority: values.admin.publicKey,
         authoritiesGroup: values.authoritiesGroupKey,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
@@ -201,7 +201,6 @@ describe(suiteName, () => {
           values.tokenMintKeypair.publicKey
         ),
         tokenAccount: values.adminTokenMintAccount,
-        adminCollectionMintAccount: values.adminCollectionMintAccount,
         metadataProgram: METADATA_STANDARD_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
