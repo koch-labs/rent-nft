@@ -136,6 +136,7 @@ describe(suiteName, () => {
     // Create the collection
     await program.methods
       .createCollection(
+        values.taxMintKeypair.publicKey,
         values.taxCollector.publicKey,
         values.collectionPeriod,
         values.collectionRate,
@@ -144,12 +145,10 @@ describe(suiteName, () => {
       .accounts({
         config: values.configKey,
         admin: values.admin.publicKey,
-        taxMint: values.taxMintKeypair.publicKey,
         authoritiesGroup: values.authoritiesGroupKey,
         collectionMint: values.collectionMintKeypair.publicKey,
         collectionMetadata: values.collectionMetadata,
         metadataProgram: METADATA_STANDARD_PROGRAM_ID,
-        taxTokenProgram: TOKEN_2022_PROGRAM_ID,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .postInstructions([
@@ -173,6 +172,26 @@ describe(suiteName, () => {
     expect(collectionConfig.taxMint.toString()).to.equal(
       values.taxMintKeypair.publicKey.toString()
     );
+
+    await program.methods
+      .updateCollection(
+        values.taxCollector.publicKey,
+        values.collectionPeriod,
+        values.collectionRate,
+        values.collectionMinimumPrice,
+        values.admin.publicKey
+      )
+      .accounts({
+        config: values.configKey,
+        admin: values.admin.publicKey,
+        authoritiesGroup: values.authoritiesGroupKey,
+        collectionMint: values.collectionMintKeypair.publicKey,
+        collectionMetadata: values.collectionMetadata,
+        metadataProgram: METADATA_STANDARD_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.admin])
+      .rpc({ skipPreflight: true });
 
     let collectionMetadata = await fetchMetadata(
       provider,
