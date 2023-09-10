@@ -36,11 +36,13 @@ pub mod rent_nft {
 
     pub fn update_collection(
         ctx: Context<UpdateCollection>,
-        tax_collector: Pubkey,
-        time_period: u32,
-        tax_rate: u64,
-        min_price: u64,
-        metadata_authority: Pubkey,
+        tax_collector: Option<Pubkey>,
+        time_period: Option<u32>,
+        tax_rate: Option<u64>,
+        min_price: Option<u64>,
+        uri: Option<String>,
+        content_hash: Option<[u8; 32]>,
+        name: Option<String>,
     ) -> Result<()> {
         instructions::update_collection(
             ctx,
@@ -48,7 +50,9 @@ pub mod rent_nft {
             time_period,
             tax_rate,
             min_price,
-            metadata_authority,
+            uri,
+            content_hash,
+            name,
         )
     }
 
@@ -59,6 +63,15 @@ pub mod rent_nft {
         name: String,
     ) -> Result<()> {
         instructions::create_token(ctx, uri, content_hash, name)
+    }
+
+    pub fn update_token(
+        ctx: Context<UpdateToken>,
+        uri: Option<String>,
+        content_hash: Option<[u8; 32]>,
+        name: Option<String>,
+    ) -> Result<()> {
+        instructions::update_token(ctx, uri, content_hash, name)
     }
 
     pub fn create_bid(ctx: Context<CreateBid>) -> Result<()> {

@@ -3,8 +3,15 @@ export type {
   CreateCollectionArgs,
   CreateCollectionAccounts,
 } from "./createCollection"
+export { updateCollection } from "./updateCollection"
+export type {
+  UpdateCollectionArgs,
+  UpdateCollectionAccounts,
+} from "./updateCollection"
 export { createToken } from "./createToken"
 export type { CreateTokenArgs, CreateTokenAccounts } from "./createToken"
+export { updateToken } from "./updateToken"
+export type { UpdateTokenArgs, UpdateTokenAccounts } from "./updateToken"
 export { createBid } from "./createBid"
 export type { CreateBidAccounts } from "./createBid"
 export { increaseBid } from "./increaseBid"

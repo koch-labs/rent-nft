@@ -3,15 +3,17 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface CreateCollectionArgs {
-  taxMint: PublicKey
-  taxCollector: PublicKey
-  timePeriod: number
-  taxRate: BN
-  minPrice: BN
+export interface UpdateCollectionArgs {
+  taxCollector: PublicKey | null
+  timePeriod: number | null
+  taxRate: BN | null
+  minPrice: BN | null
+  uri: string | null
+  contentHash: Array<number> | null
+  name: string | null
 }
 
-export interface CreateCollectionAccounts {
+export interface UpdateCollectionAccounts {
   payer: PublicKey
   admin: PublicKey
   config: PublicKey
@@ -21,25 +23,21 @@ export interface CreateCollectionAccounts {
   /** Common Solana programs */
   tokenProgram: PublicKey
   metadataProgram: PublicKey
-  systemProgram: PublicKey
-  rent: PublicKey
 }
 
 export const layout = borsh.struct([
-  borsh.publicKey("taxMint"),
-  borsh.publicKey("taxCollector"),
-  borsh.u32("timePeriod"),
-  borsh.u64("taxRate"),
-  borsh.u64("minPrice"),
+  borsh.option(borsh.publicKey(), "taxCollector"),
+  borsh.option(borsh.u32(), "timePeriod"),
+  borsh.option(borsh.u64(), "taxRate"),
+  borsh.option(borsh.u64(), "minPrice"),
+  borsh.option(borsh.str(), "uri"),
+  borsh.option(borsh.array(borsh.u8(), 32), "contentHash"),
+  borsh.option(borsh.str(), "name"),
 ])
 
-/**
- * Initializes a collection from an existing metadata
- * The metadata update authority will be transfered to the collection
- */
-export function createCollection(
-  args: CreateCollectionArgs,
-  accounts: CreateCollectionAccounts,
+export function updateCollection(
+  args: UpdateCollectionArgs,
+  accounts: UpdateCollectionAccounts,
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
@@ -47,22 +45,22 @@ export function createCollection(
     { pubkey: accounts.admin, isSigner: true, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: true },
-    { pubkey: accounts.collectionMint, isSigner: false, isWritable: true },
+    { pubkey: accounts.collectionMint, isSigner: false, isWritable: false },
     { pubkey: accounts.collectionMetadata, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.metadataProgram, isSigner: false, isWritable: false },
-    { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-    { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([156, 251, 92, 54, 233, 2, 16, 82])
+  const identifier = Buffer.from([97, 70, 36, 49, 138, 12, 199, 239])
   const buffer = Buffer.alloc(1000)
   const len = layout.encode(
     {
-      taxMint: args.taxMint,
       taxCollector: args.taxCollector,
       timePeriod: args.timePeriod,
       taxRate: args.taxRate,
       minPrice: args.minPrice,
+      uri: args.uri,
+      contentHash: args.contentHash,
+      name: args.name,
     },
     buffer
   )

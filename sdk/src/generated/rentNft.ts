@@ -47,11 +47,6 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "taxMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "authoritiesGroup",
           "isMut": true,
           "isSigner": false
@@ -67,17 +62,12 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "taxTokenProgram",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "metadataProgram",
@@ -97,6 +87,10 @@ export type RentNft = {
       ],
       "args": [
         {
+          "name": "taxMint",
+          "type": "publicKey"
+        },
+        {
           "name": "taxCollector",
           "type": "publicKey"
         },
@@ -111,6 +105,103 @@ export type RentNft = {
         {
           "name": "minPrice",
           "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateCollection",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authoritiesGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Common Solana programs"
+          ]
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "taxCollector",
+          "type": {
+            "option": "publicKey"
+          }
+        },
+        {
+          "name": "timePeriod",
+          "type": {
+            "option": "u32"
+          }
+        },
+        {
+          "name": "taxRate",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "minPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "uri",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },
@@ -241,6 +332,111 @@ export type RentNft = {
         {
           "name": "name",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateToken",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "currentAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The config"
+          ]
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authoritiesGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The mint of the new token"
+          ]
+        },
+        {
+          "name": "tokenMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata of the token"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The wrapper"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Common Solana programs"
+          ]
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "uri",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },
@@ -1039,11 +1235,6 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "taxMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "authoritiesGroup",
           "isMut": true,
           "isSigner": false
@@ -1059,17 +1250,12 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "taxTokenProgram",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "metadataProgram",
@@ -1089,6 +1275,10 @@ export const IDL: RentNft = {
       ],
       "args": [
         {
+          "name": "taxMint",
+          "type": "publicKey"
+        },
+        {
           "name": "taxCollector",
           "type": "publicKey"
         },
@@ -1103,6 +1293,103 @@ export const IDL: RentNft = {
         {
           "name": "minPrice",
           "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateCollection",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authoritiesGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Common Solana programs"
+          ]
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "taxCollector",
+          "type": {
+            "option": "publicKey"
+          }
+        },
+        {
+          "name": "timePeriod",
+          "type": {
+            "option": "u32"
+          }
+        },
+        {
+          "name": "taxRate",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "minPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "uri",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },
@@ -1233,6 +1520,111 @@ export const IDL: RentNft = {
         {
           "name": "name",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateToken",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "currentAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The config"
+          ]
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authoritiesGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The mint of the new token"
+          ]
+        },
+        {
+          "name": "tokenMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata of the token"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The wrapper"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Common Solana programs"
+          ]
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "uri",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "contentHash",
+          "type": {
+            "option": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },

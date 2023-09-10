@@ -179,7 +179,9 @@ describe(suiteName, () => {
         values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice,
-        values.admin.publicKey
+        values.collectionData.external.uri,
+        Array(32).fill(0),
+        values.collectionName
       )
       .accounts({
         config: values.configKey,
@@ -241,6 +243,24 @@ describe(suiteName, () => {
       values.tokenMintKeypair.publicKey.toString()
     );
     expect(tokenState.deposited.toString()).to.equal("0");
+
+    await program.methods
+      .updateToken(uri, Array(32).fill(0), values.collectionName)
+      .accounts({
+        config: values.configKey,
+        mintAuthority: values.admin.publicKey,
+        currentAuthority: values.admin.publicKey,
+        authoritiesGroup: values.authoritiesGroupKey,
+        collectionMint: values.collectionMintKeypair.publicKey,
+        collectionMetadata: values.collectionMetadata,
+        tokenMint: values.tokenMintKeypair.publicKey,
+        tokenState: values.tokenStateKey,
+        tokenMetadata: values.tokenMetadata,
+        metadataProgram: METADATA_STANDARD_PROGRAM_ID,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([values.admin])
+      .rpc({ skipPreflight: true });
 
     // First holder claiming the token
     await program.methods

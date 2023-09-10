@@ -23,7 +23,7 @@ pub fn create_collection(
     config.tax_rate = tax_rate;
     config.minimum_sell_price = min_price;
 
-    // Transfer collection metadata authority to the program
+    // Transfer collection authorities to the program
     // Needed to enforce programs rules on top
     // Mint authority still keeps the highest privilege
     update_authorities_group(
@@ -35,7 +35,7 @@ pub fn create_collection(
             },
         ),
         config.key(),
-        ctx.accounts.authorities_group.metadata_authority,
+        config.key(),
         config.key(),
     )?;
 

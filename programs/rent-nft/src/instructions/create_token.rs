@@ -62,8 +62,8 @@ pub fn create_token(
             },
         ),
         0,
-        &config.key(),
-        Some(&config.key()),
+        &ctx.accounts.mint_authority.key(),
+        Some(&ctx.accounts.mint_authority.key()),
     )?;
 
     create_idempotent(CpiContext::new(
@@ -79,31 +79,29 @@ pub fn create_token(
     ))?;
 
     mint_to(
-        CpiContext::new_with_signer(
+        CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             MintTo {
                 to: ctx.accounts.token_account.to_account_info(),
-                authority: config.to_account_info(),
+                authority: ctx.accounts.mint_authority.to_account_info(),
                 mint: ctx.accounts.token_mint.to_account_info(),
             },
-            signer_seeds,
         ),
         1,
     )?;
 
     create_external_metadata(
-        CpiContext::new_with_signer(
+        CpiContext::new(
             ctx.accounts.metadata_program.to_account_info(),
             CreateMetadata {
                 payer: ctx.accounts.payer.to_account_info(),
-                mint_authority: config.to_account_info(),
+                mint_authority: ctx.accounts.mint_authority.to_account_info(),
                 authorities_group: ctx.accounts.authorities_group.to_account_info(),
                 mint: ctx.accounts.token_mint.to_account_info(),
                 metadata: ctx.accounts.token_metadata.to_account_info(),
                 token_program: ctx.accounts.token_program.to_account_info(),
                 system_program: ctx.accounts.system_program.to_account_info(),
             },
-            signer_seeds,
         ),
         uri,
         content_hash,
