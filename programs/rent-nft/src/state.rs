@@ -10,9 +10,6 @@ pub struct CollectionConfig {
     /// The mint of the tax token
     pub tax_mint: Pubkey,
 
-    /// The account allowed to collect taxes
-    pub tax_collector: Pubkey,
-
     /// Seconds in a time period
     pub time_period: u32,
 
@@ -28,7 +25,6 @@ impl CollectionConfig {
     pub const LEN: usize = 8 // Discriminator
         + 32 // Collection
         + 32 // Tax
-        + 32 // Collector
         + 4 // Period
         + 8 // Rate
         + 8 // Min price

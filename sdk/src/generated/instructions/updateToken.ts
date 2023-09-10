@@ -18,11 +18,8 @@ export interface UpdateTokenAccounts {
   collectionMint: PublicKey
   collectionMetadata: PublicKey
   authoritiesGroup: PublicKey
-  /** The mint of the new token */
   tokenMint: PublicKey
-  /** Metadata of the token */
   tokenMetadata: PublicKey
-  /** The wrapper */
   tokenState: PublicKey
   /** Common Solana programs */
   tokenProgram: PublicKey
@@ -44,11 +41,11 @@ export function updateToken(
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.mintAuthority, isSigner: true, isWritable: true },
     { pubkey: accounts.currentAuthority, isSigner: false, isWritable: false },
-    { pubkey: accounts.config, isSigner: false, isWritable: false },
+    { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.collectionMint, isSigner: false, isWritable: false },
     { pubkey: accounts.collectionMetadata, isSigner: false, isWritable: false },
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: false },
-    { pubkey: accounts.tokenMint, isSigner: false, isWritable: false },
+    { pubkey: accounts.tokenMint, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenMetadata, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },

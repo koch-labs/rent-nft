@@ -91,10 +91,6 @@ export type RentNft = {
           "type": "publicKey"
         },
         {
-          "name": "taxCollector",
-          "type": "publicKey"
-        },
-        {
           "name": "timePeriod",
           "type": "u32"
         },
@@ -156,12 +152,6 @@ export type RentNft = {
         }
       ],
       "args": [
-        {
-          "name": "taxCollector",
-          "type": {
-            "option": "publicKey"
-          }
-        },
         {
           "name": "timePeriod",
           "type": {
@@ -355,7 +345,7 @@ export type RentNft = {
         },
         {
           "name": "config",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The config"
@@ -378,27 +368,18 @@ export type RentNft = {
         },
         {
           "name": "tokenMint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The mint of the new token"
-          ]
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "tokenMetadata",
           "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Metadata of the token"
-          ]
+          "isSigner": false
         },
         {
           "name": "tokenState",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The wrapper"
-          ]
+          "isSigner": false
         },
         {
           "name": "tokenProgram",
@@ -817,7 +798,7 @@ export type RentNft = {
       "name": "withdrawTax",
       "accounts": [
         {
-          "name": "taxCollector",
+          "name": "admin",
           "isMut": false,
           "isSigner": true
         },
@@ -830,6 +811,11 @@ export type RentNft = {
           ]
         },
         {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "mint",
           "isMut": true,
           "isSigner": false,
@@ -838,7 +824,7 @@ export type RentNft = {
           ]
         },
         {
-          "name": "taxCollectorAccount",
+          "name": "adminAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -885,13 +871,6 @@ export type RentNft = {
             "name": "taxMint",
             "docs": [
               "The mint of the tax token"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "taxCollector",
-            "docs": [
-              "The account allowed to collect taxes"
             ],
             "type": "publicKey"
           },
@@ -1279,10 +1258,6 @@ export const IDL: RentNft = {
           "type": "publicKey"
         },
         {
-          "name": "taxCollector",
-          "type": "publicKey"
-        },
-        {
           "name": "timePeriod",
           "type": "u32"
         },
@@ -1344,12 +1319,6 @@ export const IDL: RentNft = {
         }
       ],
       "args": [
-        {
-          "name": "taxCollector",
-          "type": {
-            "option": "publicKey"
-          }
-        },
         {
           "name": "timePeriod",
           "type": {
@@ -1543,7 +1512,7 @@ export const IDL: RentNft = {
         },
         {
           "name": "config",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The config"
@@ -1566,27 +1535,18 @@ export const IDL: RentNft = {
         },
         {
           "name": "tokenMint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The mint of the new token"
-          ]
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "tokenMetadata",
           "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Metadata of the token"
-          ]
+          "isSigner": false
         },
         {
           "name": "tokenState",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The wrapper"
-          ]
+          "isSigner": false
         },
         {
           "name": "tokenProgram",
@@ -2005,7 +1965,7 @@ export const IDL: RentNft = {
       "name": "withdrawTax",
       "accounts": [
         {
-          "name": "taxCollector",
+          "name": "admin",
           "isMut": false,
           "isSigner": true
         },
@@ -2018,6 +1978,11 @@ export const IDL: RentNft = {
           ]
         },
         {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "mint",
           "isMut": true,
           "isSigner": false,
@@ -2026,7 +1991,7 @@ export const IDL: RentNft = {
           ]
         },
         {
-          "name": "taxCollectorAccount",
+          "name": "adminAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -2073,13 +2038,6 @@ export const IDL: RentNft = {
             "name": "taxMint",
             "docs": [
               "The mint of the tax token"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "taxCollector",
-            "docs": [
-              "The account allowed to collect taxes"
             ],
             "type": "publicKey"
           },

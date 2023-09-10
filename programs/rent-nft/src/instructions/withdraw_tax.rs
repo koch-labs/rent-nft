@@ -29,7 +29,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
             TransferChecked {
                 mint: ctx.accounts.mint.to_account_info(),
                 from: ctx.accounts.bids_account.to_account_info(),
-                to: ctx.accounts.tax_collector_account.to_account_info(),
+                to: ctx.accounts.admin_account.to_account_info(),
                 authority: config.to_account_info(),
             },
             signer_seeds,
@@ -50,7 +50,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct WithdrawTax<'info> {
-    pub tax_collector: Signer<'info>,
+    pub admin: Signer<'info>,
 
     /// The config
     #[account(
@@ -60,9 +60,15 @@ pub struct WithdrawTax<'info> {
         ],
         bump,
         // Not checking the tax token, can be any token
-        has_one = tax_collector,
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
+
+    #[account(
+        mint::authority = admin,
+        mint::decimals = 0,
+        mint::token_program = token_program,
+    )]
+    pub collection_mint: InterfaceAccount<'info, Mint>,
 
     /// The token to withdraw
     #[account(mut)]
@@ -71,12 +77,12 @@ pub struct WithdrawTax<'info> {
     #[account(
         mut,
         address = get_associated_token_address_with_program_id(
-            tax_collector.key,
+            admin.key,
             &mint.key(),
             &tax_token_program.key(),
         ),
     )]
-    pub tax_collector_account: InterfaceAccount<'info, TokenAccount>,
+    pub admin_account: InterfaceAccount<'info, TokenAccount>,
 
     #[account(
         mut,

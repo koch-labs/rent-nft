@@ -36,13 +36,11 @@ describe(suiteName, () => {
     values = createValues();
 
     await Promise.all(
-      [values.admin, values.holder, values.taxCollector, values.bidder].map(
-        async (kp, i) => {
-          await connection.confirmTransaction(
-            await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
-          );
-        }
-      )
+      [values.admin, values.holder, values.bidder].map(async (kp, i) => {
+        await connection.confirmTransaction(
+          await connection.requestAirdrop(kp.publicKey, 10 * LAMPORTS_PER_SOL)
+        );
+      })
     );
 
     await createMint(
@@ -137,7 +135,6 @@ describe(suiteName, () => {
     await program.methods
       .createCollection(
         values.taxMintKeypair.publicKey,
-        values.taxCollector.publicKey,
         values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice
@@ -175,7 +172,6 @@ describe(suiteName, () => {
 
     await program.methods
       .updateCollection(
-        values.taxCollector.publicKey,
         values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice,
@@ -462,24 +458,25 @@ describe(suiteName, () => {
     await program.methods
       .withdrawTax()
       .accounts({
-        taxCollector: values.taxCollector.publicKey,
+        admin: values.admin.publicKey,
         config: values.configKey,
+        collectionMint: values.collectionMintKeypair.publicKey,
         mint: values.taxMintKeypair.publicKey,
-        taxCollectorAccount: values.taxCollectorAccount,
+        adminAccount: values.adminTaxAccount,
         bidsAccount: values.bidAccount,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
         taxTokenProgram: TOKEN_2022_PROGRAM_ID,
       })
       .preInstructions([
         createAssociatedTokenAccountIdempotentInstruction(
-          values.taxCollector.publicKey,
-          values.taxCollectorAccount,
-          values.taxCollector.publicKey,
+          values.admin.publicKey,
+          values.adminTaxAccount,
+          values.admin.publicKey,
           values.taxMintKeypair.publicKey,
           TOKEN_2022_PROGRAM_ID
         ),
       ])
-      .signers([values.taxCollector])
+      .signers([values.admin])
       .rpc({ skipPreflight: true });
 
     let configAfter = await program.account.collectionConfig.fetch(
