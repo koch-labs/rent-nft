@@ -7,6 +7,7 @@ import {
   getMetadataKey,
 } from "@koch-labs/metadata-standard";
 import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 
 const getProgram = (provider: Provider) => {
   return new Program<RentNft>(IDL as any, PROGRAM_ID, provider);
@@ -36,6 +37,37 @@ export default {
           tokenProgram: TOKEN_2022_PROGRAM_ID,
           metadataProgram: METADATA_STANDARD_PROGRAM_ID,
         }),
+      config,
+    };
+  },
+  createToken: ({
+    provider,
+    collectionMint,
+    authoritiesGroup,
+    uri,
+    contentHash,
+    name,
+  }: {
+    provider: Provider;
+    collectionMint: PublicKey;
+    authoritiesGroup: PublicKey;
+    uri: string;
+    contentHash: number[];
+    name: string;
+  }) => {
+    const program = getProgram(provider);
+    const config = getConfigKey(collectionMint);
+    return {
+      builder: program.methods.createToken(uri, contentHash, name).accounts({
+        payer: provider.publicKey,
+        mintAuthority: provider.publicKey,
+        config,
+        authoritiesGroup,
+        collectionMint,
+        collectionMetadata: getMetadataKey(collectionMint),
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        metadataProgram: METADATA_STANDARD_PROGRAM_ID,
+      }),
       config,
     };
   },
