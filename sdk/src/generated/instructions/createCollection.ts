@@ -5,7 +5,6 @@ import { PROGRAM_ID } from "../programId"
 
 export interface CreateCollectionArgs {
   taxMint: PublicKey
-  timePeriod: number
   taxRate: BN
   minPrice: BN
 }
@@ -26,7 +25,6 @@ export interface CreateCollectionAccounts {
 
 export const layout = borsh.struct([
   borsh.publicKey("taxMint"),
-  borsh.u32("timePeriod"),
   borsh.u64("taxRate"),
   borsh.u64("minPrice"),
 ])
@@ -57,7 +55,6 @@ export function createCollection(
   const len = layout.encode(
     {
       taxMint: args.taxMint,
-      timePeriod: args.timePeriod,
       taxRate: args.taxRate,
       minPrice: args.minPrice,
     },

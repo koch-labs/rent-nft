@@ -91,10 +91,6 @@
           "type": "publicKey"
         },
         {
-          "name": "timePeriod",
-          "type": "u32"
-        },
-        {
           "name": "taxRate",
           "type": "u64"
         },
@@ -152,12 +148,6 @@
         }
       ],
       "args": [
-        {
-          "name": "timePeriod",
-          "type": {
-            "option": "u32"
-          }
-        },
         {
           "name": "taxRate",
           "type": {
@@ -873,13 +863,6 @@
               "The mint of the tax token"
             ],
             "type": "publicKey"
-          },
-          {
-            "name": "timePeriod",
-            "docs": [
-              "Seconds in a time period"
-            ],
-            "type": "u32"
           },
           {
             "name": "taxRate",

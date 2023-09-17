@@ -19,31 +19,21 @@ pub mod rent_nft {
     pub fn create_collection(
         ctx: Context<CreateCollection>,
         tax_mint: Pubkey,
-        time_period: u32,
         tax_rate: u64,
         min_price: u64,
     ) -> Result<()> {
-        instructions::create_collection(ctx, tax_mint, time_period, tax_rate, min_price)
+        instructions::create_collection(ctx, tax_mint, tax_rate, min_price)
     }
 
     pub fn update_collection(
         ctx: Context<UpdateCollection>,
-        time_period: Option<u32>,
         tax_rate: Option<u64>,
         min_price: Option<u64>,
         uri: Option<String>,
         content_hash: Option<[u8; 32]>,
         name: Option<String>,
     ) -> Result<()> {
-        instructions::update_collection(
-            ctx,
-            time_period,
-            tax_rate,
-            min_price,
-            uri,
-            content_hash,
-            name,
-        )
+        instructions::update_collection(ctx, tax_rate, min_price, uri, content_hash, name)
     }
 
     pub fn create_token(

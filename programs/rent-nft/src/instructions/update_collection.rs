@@ -7,7 +7,6 @@ use metadata_standard::{cpi::accounts::UpdateMetadata, program::MetadataStandard
 
 pub fn update_collection(
     ctx: Context<UpdateCollection>,
-    time_period: Option<u32>,
     tax_rate: Option<u64>,
     min_price: Option<u64>,
     uri: Option<String>,
@@ -17,7 +16,6 @@ pub fn update_collection(
     msg!("Updating a collection");
     let config = &mut ctx.accounts.config;
 
-    config.time_period = time_period.unwrap_or(config.time_period);
     config.tax_rate = tax_rate.unwrap_or(config.tax_rate);
     config.minimum_sell_price = min_price.unwrap_or(config.minimum_sell_price);
 

@@ -91,10 +91,6 @@ export type RentNft = {
           "type": "publicKey"
         },
         {
-          "name": "timePeriod",
-          "type": "u32"
-        },
-        {
           "name": "taxRate",
           "type": "u64"
         },
@@ -152,12 +148,6 @@ export type RentNft = {
         }
       ],
       "args": [
-        {
-          "name": "timePeriod",
-          "type": {
-            "option": "u32"
-          }
-        },
         {
           "name": "taxRate",
           "type": {
@@ -873,13 +863,6 @@ export type RentNft = {
               "The mint of the tax token"
             ],
             "type": "publicKey"
-          },
-          {
-            "name": "timePeriod",
-            "docs": [
-              "Seconds in a time period"
-            ],
-            "type": "u32"
           },
           {
             "name": "taxRate",
@@ -1258,10 +1241,6 @@ export const IDL: RentNft = {
           "type": "publicKey"
         },
         {
-          "name": "timePeriod",
-          "type": "u32"
-        },
-        {
           "name": "taxRate",
           "type": "u64"
         },
@@ -1319,12 +1298,6 @@ export const IDL: RentNft = {
         }
       ],
       "args": [
-        {
-          "name": "timePeriod",
-          "type": {
-            "option": "u32"
-          }
-        },
         {
           "name": "taxRate",
           "type": {
@@ -2040,13 +2013,6 @@ export const IDL: RentNft = {
               "The mint of the tax token"
             ],
             "type": "publicKey"
-          },
-          {
-            "name": "timePeriod",
-            "docs": [
-              "Seconds in a time period"
-            ],
-            "type": "u32"
           },
           {
             "name": "taxRate",

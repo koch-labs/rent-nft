@@ -135,7 +135,6 @@ describe(suiteName, () => {
     await program.methods
       .createCollection(
         values.taxMintKeypair.publicKey,
-        values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice
       )
@@ -172,7 +171,6 @@ describe(suiteName, () => {
 
     await program.methods
       .updateCollection(
-        values.collectionPeriod,
         values.collectionRate,
         values.collectionMinimumPrice,
         values.collectionData.external.uri,

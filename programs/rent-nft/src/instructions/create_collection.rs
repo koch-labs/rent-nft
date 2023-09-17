@@ -8,7 +8,6 @@ use metadata_standard::{cpi::accounts::UpdateAuthoritiesGroup, program::Metadata
 pub fn create_collection(
     ctx: Context<CreateCollection>,
     tax_mint: Pubkey,
-    time_period: u32,
     tax_rate: u64,
     min_price: u64,
 ) -> Result<()> {
@@ -17,7 +16,6 @@ pub fn create_collection(
 
     config.collection_mint = ctx.accounts.collection_mint.key();
     config.tax_mint = tax_mint;
-    config.time_period = time_period;
     config.tax_rate = tax_rate;
     config.minimum_sell_price = min_price;
 

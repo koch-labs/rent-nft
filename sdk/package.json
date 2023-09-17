@@ -10,7 +10,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.28.1-beta.1",
+    "@coral-xyz/anchor": "0.28.1-beta.2",
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.78.4"
   }
