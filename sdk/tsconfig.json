@@ -8,7 +8,7 @@
       "DOM"
     ],
     "module": "CommonJS",
-    "target": "es6",
+    "target": "esnext",
     "esModuleInterop": true,
     "outDir": "./build",
     "sourceMap": true,
