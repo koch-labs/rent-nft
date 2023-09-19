@@ -56,9 +56,6 @@ pub fn update_collection(
 #[derive(Accounts)]
 pub struct UpdateCollection<'info> {
     #[account(mut)]
-    pub payer: Signer<'info>,
-
-    #[account(mut)]
     pub admin: Signer<'info>,
 
     #[account(

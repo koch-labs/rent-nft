@@ -12,7 +12,6 @@ export interface UpdateCollectionArgs {
 }
 
 export interface UpdateCollectionAccounts {
-  payer: PublicKey
   admin: PublicKey
   config: PublicKey
   authoritiesGroup: PublicKey
@@ -37,7 +36,6 @@ export function updateCollection(
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.admin, isSigner: true, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.authoritiesGroup, isSigner: false, isWritable: true },

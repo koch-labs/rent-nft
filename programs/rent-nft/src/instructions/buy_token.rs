@@ -58,9 +58,6 @@ pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct BuyToken<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
     /// CHECK: Verifying on bid state
     pub owner: UncheckedAccount<'info>,
 
@@ -75,6 +72,9 @@ pub struct BuyToken<'info> {
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
 
+    /// The mint of the token
+    pub token_mint: Box<InterfaceAccount<'info, Mint>>,
+
     /// The state for the token assessement
     #[account(
         mut,
@@ -88,9 +88,6 @@ pub struct BuyToken<'info> {
         constraint = token_state.owner_bid_state.unwrap() == owner_bid_state.key() @ RentNftError::BadPreviousOwner,
     )]
     pub token_state: Box<Account<'info, TokenState>>,
-
-    /// The mint of the token
-    pub token_mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
@@ -138,6 +135,4 @@ pub struct BuyToken<'info> {
 
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
-    pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
 }

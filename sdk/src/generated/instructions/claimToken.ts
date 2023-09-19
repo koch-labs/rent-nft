@@ -4,7 +4,6 @@ import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-esl
 import { PROGRAM_ID } from "../programId"
 
 export interface ClaimTokenAccounts {
-  payer: PublicKey
   newOwner: PublicKey
   config: PublicKey
   tokenState: PublicKey
@@ -15,7 +14,6 @@ export interface ClaimTokenAccounts {
   ownerBidState: PublicKey
   /** Common Solana programs */
   tokenProgram: PublicKey
-  systemProgram: PublicKey
 }
 
 export function claimToken(
@@ -23,7 +21,6 @@ export function claimToken(
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.newOwner, isSigner: true, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenState, isSigner: false, isWritable: true },
@@ -40,7 +37,6 @@ export function claimToken(
     },
     { pubkey: accounts.ownerBidState, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
-    { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([116, 206, 27, 191, 166, 19, 0, 73])
   const data = identifier

@@ -10,7 +10,6 @@ export interface UpdateTokenArgs {
 }
 
 export interface UpdateTokenAccounts {
-  payer: PublicKey
   mintAuthority: PublicKey
   currentAuthority: PublicKey
   /** The config */
@@ -38,7 +37,6 @@ export function updateToken(
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.mintAuthority, isSigner: true, isWritable: true },
     { pubkey: accounts.currentAuthority, isSigner: false, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: true },

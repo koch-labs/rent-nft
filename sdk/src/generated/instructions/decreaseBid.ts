@@ -8,7 +8,6 @@ export interface DecreaseBidArgs {
 }
 
 export interface DecreaseBidAccounts {
-  payer: PublicKey
   bidder: PublicKey
   /** The config */
   config: PublicKey
@@ -31,7 +30,6 @@ export function decreaseBid(
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.bidder, isSigner: true, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
     { pubkey: accounts.taxMint, isSigner: false, isWritable: false },

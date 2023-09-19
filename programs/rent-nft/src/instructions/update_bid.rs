@@ -46,9 +46,6 @@ pub fn update_bid(ctx: Context<UpdateBid>) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct UpdateBid<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
     /// The config
     #[account(
         mut,

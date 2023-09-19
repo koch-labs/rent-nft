@@ -8,7 +8,6 @@ export interface IncreaseBidArgs {
 }
 
 export interface IncreaseBidAccounts {
-  payer: PublicKey
   bidder: PublicKey
   depositor: PublicKey
   /** The config */
@@ -32,7 +31,6 @@ export function increaseBid(
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
-    { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.bidder, isSigner: false, isWritable: false },
     { pubkey: accounts.depositor, isSigner: true, isWritable: false },
     { pubkey: accounts.config, isSigner: false, isWritable: false },

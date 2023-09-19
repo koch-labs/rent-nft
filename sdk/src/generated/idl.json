@@ -104,11 +104,6 @@
       "name": "updateCollection",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "admin",
           "isMut": true,
           "isSigner": true
@@ -319,11 +314,6 @@
       "name": "updateToken",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "mintAuthority",
           "isMut": true,
           "isSigner": true
@@ -465,11 +455,6 @@
       "name": "increaseBid",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "bidder",
           "isMut": false,
           "isSigner": false
@@ -538,11 +523,6 @@
       "name": "decreaseBid",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "bidder",
           "isMut": false,
           "isSigner": true
@@ -606,11 +586,6 @@
       "name": "claimToken",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "newOwner",
           "isMut": false,
           "isSigner": true
@@ -655,11 +630,6 @@
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -667,11 +637,6 @@
     {
       "name": "buyToken",
       "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
         {
           "name": "owner",
           "isMut": false,
@@ -691,19 +656,19 @@
           ]
         },
         {
-          "name": "tokenState",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The state for the token assessement"
-          ]
-        },
-        {
           "name": "tokenMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "The mint of the token"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The state for the token assessement"
           ]
         },
         {
@@ -733,16 +698,6 @@
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -755,11 +710,6 @@
     {
       "name": "updateBid",
       "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
         {
           "name": "config",
           "isMut": true,

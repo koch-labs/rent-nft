@@ -53,9 +53,6 @@ pub fn decrease_bid(ctx: Context<DecreaseBid>, amount: u64) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct DecreaseBid<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
     pub bidder: Signer<'info>,
 
     /// The config

@@ -54,9 +54,6 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct ClaimToken<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
     pub new_owner: Signer<'info>,
 
     #[account(
@@ -111,5 +108,4 @@ pub struct ClaimToken<'info> {
 
     /// Common Solana programs
     pub token_program: Interface<'info, TokenInterface>,
-    pub system_program: Program<'info, System>,
 }

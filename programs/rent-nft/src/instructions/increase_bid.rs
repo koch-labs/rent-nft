@@ -49,9 +49,6 @@ pub fn increase_bid(ctx: Context<IncreaseBid>, amount: u64) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct IncreaseBid<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
     /// CHECK: Can deposit in someone's account
     pub bidder: AccountInfo<'info>,
 

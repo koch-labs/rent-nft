@@ -104,11 +104,6 @@ export type RentNft = {
       "name": "updateCollection",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "admin",
           "isMut": true,
           "isSigner": true
@@ -319,11 +314,6 @@ export type RentNft = {
       "name": "updateToken",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "mintAuthority",
           "isMut": true,
           "isSigner": true
@@ -465,11 +455,6 @@ export type RentNft = {
       "name": "increaseBid",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "bidder",
           "isMut": false,
           "isSigner": false
@@ -538,11 +523,6 @@ export type RentNft = {
       "name": "decreaseBid",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "bidder",
           "isMut": false,
           "isSigner": true
@@ -606,11 +586,6 @@ export type RentNft = {
       "name": "claimToken",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "newOwner",
           "isMut": false,
           "isSigner": true
@@ -655,11 +630,6 @@ export type RentNft = {
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -667,11 +637,6 @@ export type RentNft = {
     {
       "name": "buyToken",
       "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
         {
           "name": "owner",
           "isMut": false,
@@ -691,19 +656,19 @@ export type RentNft = {
           ]
         },
         {
-          "name": "tokenState",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The state for the token assessement"
-          ]
-        },
-        {
           "name": "tokenMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "The mint of the token"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The state for the token assessement"
           ]
         },
         {
@@ -733,16 +698,6 @@ export type RentNft = {
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -755,11 +710,6 @@ export type RentNft = {
     {
       "name": "updateBid",
       "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
         {
           "name": "config",
           "isMut": true,
@@ -1254,11 +1204,6 @@ export const IDL: RentNft = {
       "name": "updateCollection",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "admin",
           "isMut": true,
           "isSigner": true
@@ -1469,11 +1414,6 @@ export const IDL: RentNft = {
       "name": "updateToken",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "mintAuthority",
           "isMut": true,
           "isSigner": true
@@ -1615,11 +1555,6 @@ export const IDL: RentNft = {
       "name": "increaseBid",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "bidder",
           "isMut": false,
           "isSigner": false
@@ -1688,11 +1623,6 @@ export const IDL: RentNft = {
       "name": "decreaseBid",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "bidder",
           "isMut": false,
           "isSigner": true
@@ -1756,11 +1686,6 @@ export const IDL: RentNft = {
       "name": "claimToken",
       "accounts": [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "newOwner",
           "isMut": false,
           "isSigner": true
@@ -1805,11 +1730,6 @@ export const IDL: RentNft = {
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -1817,11 +1737,6 @@ export const IDL: RentNft = {
     {
       "name": "buyToken",
       "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
         {
           "name": "owner",
           "isMut": false,
@@ -1841,19 +1756,19 @@ export const IDL: RentNft = {
           ]
         },
         {
-          "name": "tokenState",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The state for the token assessement"
-          ]
-        },
-        {
           "name": "tokenMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "The mint of the token"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The state for the token assessement"
           ]
         },
         {
@@ -1883,16 +1798,6 @@ export const IDL: RentNft = {
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -1905,11 +1810,6 @@ export const IDL: RentNft = {
     {
       "name": "updateBid",
       "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
         {
           "name": "config",
           "isMut": true,
