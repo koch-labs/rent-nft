@@ -3,6 +3,10 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
+export interface ClaimTokenArgs {
+  newSellPrice: BN
+}
+
 export interface ClaimTokenAccounts {
   newOwner: PublicKey
   config: PublicKey
@@ -16,7 +20,10 @@ export interface ClaimTokenAccounts {
   tokenProgram: PublicKey
 }
 
+export const layout = borsh.struct([borsh.u64("newSellPrice")])
+
 export function claimToken(
+  args: ClaimTokenArgs,
   accounts: ClaimTokenAccounts,
   programId: PublicKey = PROGRAM_ID
 ) {
@@ -39,7 +46,14 @@ export function claimToken(
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([116, 206, 27, 191, 166, 19, 0, 73])
-  const data = identifier
+  const buffer = Buffer.alloc(1000)
+  const len = layout.encode(
+    {
+      newSellPrice: args.newSellPrice,
+    },
+    buffer
+  )
+  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
   const ix = new TransactionInstruction({ keys, programId, data })
   return ix
 }

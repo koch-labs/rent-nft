@@ -355,7 +355,7 @@ describe(suiteName, () => {
     expect(bidAccount.value.amount).to.equal(values.depositedAmount.toString());
 
     await program.methods
-      .claimToken()
+      .claimToken(values.collectionMinimumPrice)
       .accounts({
         newOwner: values.holder.publicKey,
         config: values.configKey,

@@ -118,6 +118,8 @@ export default {
         bidState: getBidStateKey(collectionMint, tokenMint, bidder),
       }),
       config,
+      tokenMint,
+      tokenProgram,
     };
   },
   increaseBid: ({
@@ -163,6 +165,7 @@ export default {
         taxMint,
         tokenState: getTokenStateKey(collectionMint, tokenMint),
         bidState: getBidStateKey(collectionMint, tokenMint, bidder),
+        tokenProgram,
       }),
       config,
     };
@@ -207,6 +210,8 @@ export default {
         config,
         tokenState: getTokenStateKey(collectionMint, tokenMint),
         bidState: getBidStateKey(collectionMint, tokenMint, bidder),
+        taxMint,
+        tokenProgram,
       }),
       config,
     };
@@ -216,13 +221,11 @@ export default {
     bidder = provider.publicKey,
     collectionMint,
     tokenMint,
-    tokenProgram = TOKEN_2022_PROGRAM_ID,
   }: {
     provider: Provider;
     bidder?: PublicKey;
     collectionMint: PublicKey;
     tokenMint: PublicKey;
-    tokenProgram?: PublicKey;
   }) => {
     const program = getProgram(provider);
     const config = getConfigKey(collectionMint);
@@ -237,6 +240,7 @@ export default {
   },
   claimToken: ({
     provider,
+    newSellPrice,
     oldOwner,
     newOwner = provider.publicKey,
     collectionMint,
@@ -244,6 +248,7 @@ export default {
     tokenProgram = TOKEN_2022_PROGRAM_ID,
   }: {
     provider: Provider;
+    newSellPrice: BN;
     oldOwner: PublicKey;
     newOwner?: PublicKey;
     collectionMint: PublicKey;
@@ -253,7 +258,7 @@ export default {
     const program = getProgram(provider);
     const config = getConfigKey(collectionMint);
     return {
-      builder: program.methods.claimToken().accounts({
+      builder: program.methods.claimToken(newSellPrice).accounts({
         newOwner,
         config,
         tokenState: getTokenStateKey(collectionMint, tokenMint),
@@ -266,11 +271,12 @@ export default {
         ),
         oldOwnerTokenAccount: getAssociatedTokenAddressSync(
           tokenMint,
-          newOwner,
+          oldOwner,
           true,
           tokenProgram
         ),
         ownerBidState: getBidStateKey(collectionMint, tokenMint, newOwner),
+        tokenProgram,
       }),
       config,
     };
@@ -315,6 +321,7 @@ export default {
         ),
         ownerBidState: getBidStateKey(collectionMint, tokenMint, owner),
         buyerBidState: getBidStateKey(collectionMint, tokenMint, buyer),
+        tokenProgram,
       }),
       config,
     };

@@ -66,8 +66,8 @@ pub mod rent_nft {
         instructions::decrease_bid(ctx, amount)
     }
 
-    pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
-        instructions::claim_token(ctx)
+    pub fn claim_token(ctx: Context<ClaimToken>, new_sell_price: u64) -> Result<()> {
+        instructions::claim_token(ctx, new_sell_price)
     }
 
     pub fn buy_token(ctx: Context<BuyToken>, new_sell_price: u64) -> Result<()> {

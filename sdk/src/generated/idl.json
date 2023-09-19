@@ -632,7 +632,12 @@
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newSellPrice",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "buyToken",

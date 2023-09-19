@@ -632,7 +632,12 @@ export type RentNft = {
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newSellPrice",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "buyToken",
@@ -1732,7 +1737,12 @@ export const IDL: RentNft = {
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newSellPrice",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "buyToken",

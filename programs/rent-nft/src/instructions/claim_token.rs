@@ -7,7 +7,7 @@ use anchor_spl::token_interface::{
     transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked,
 };
 
-pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
+pub fn claim_token(ctx: Context<ClaimToken>, new_sell_price: u64) -> Result<()> {
     msg!("Claiming a token");
 
     let config = &mut ctx.accounts.config;
@@ -23,8 +23,8 @@ pub fn claim_token(ctx: Context<ClaimToken>) -> Result<()> {
 
     config.collected_tax += config.minimum_sell_price;
     owner_bid_state.amount -= config.minimum_sell_price;
-    owner_bid_state.selling_price = config.minimum_sell_price;
-    token_state.current_selling_price = config.minimum_sell_price;
+    owner_bid_state.selling_price = new_sell_price;
+    token_state.current_selling_price = new_sell_price;
     token_state.owner_bid_state = Some(owner_bid_state.key());
 
     // Transfer the token
