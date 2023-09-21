@@ -14,9 +14,11 @@ pub fn update_bid(ctx: Context<UpdateBid>) -> Result<()> {
     if token_state.owner_bid_state.unwrap_or(Pubkey::default()) == bid_state.key() {
         // Only the owner pays a fee
         let elapsed_time = (current_time - bid_state.last_update) as u64;
-        let amount_owed = token_state.current_selling_price * elapsed_time * config.tax_rate
-            / 10000
-            / SECONDS_PER_YEAR;
+        let amount_owed = ((token_state.current_selling_price as u128)
+            * (elapsed_time as u128)
+            * (config.tax_rate as u128)
+            / 10000_u128
+            / SECONDS_PER_YEAR as u128) as u64;
 
         msg!("Owner {} owes {} tokens", bid_state.bidder, amount_owed);
 

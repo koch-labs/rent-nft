@@ -378,6 +378,13 @@ describe(suiteName, () => {
       .signers([values.holder])
       .rpc({ skipPreflight: true });
 
+    let bidStateAfter = await program.account.bidState.fetch(
+      values.holderBidStateKey
+    );
+    expect(bidStateAfter.amount.toString()).to.equal(
+      bidState.amount.sub(values.collectionMinimumPrice).toString()
+    );
+
     // Buy the token
     await program.methods
       .createBid()
@@ -453,6 +460,10 @@ describe(suiteName, () => {
       values.configKey
     );
 
+    let configBefore = await program.account.collectionConfig.fetch(
+      values.configKey
+    );
+    expect(configBefore.collectedTax.toString()).to.not.equal("0");
     await program.methods
       .withdrawTax()
       .accounts({
@@ -481,19 +492,5 @@ describe(suiteName, () => {
       values.configKey
     );
     expect(configAfter.collectedTax.toString()).to.equal("0");
-
-    // let tokenAccount = await getOrCreateAssociatedTokenAccount(
-    //   connection,
-    //   values.admin,
-    //   values.taxMintKeypair.publicKey,
-    //   values.admin.publicKey,
-    //   true,
-    //   "finalized",
-    //   undefined,
-    //   TOKEN_2022_PROGRAM_ID
-    // );
-    // expect(tokenAccount.amount.toString()).to.equal(
-    //   collectionConfig.collectedTax.toString()
-    // );
   });
 });
