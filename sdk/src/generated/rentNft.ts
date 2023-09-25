@@ -757,7 +757,7 @@ export type RentNft = {
         },
         {
           "name": "tokenState",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The state for the token assessement"
@@ -1899,7 +1899,7 @@ export const IDL: RentNft = {
         },
         {
           "name": "tokenState",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The state for the token assessement"

@@ -6,6 +6,8 @@ use anchor_lang::prelude::*;
 pub fn update_selling_price(ctx: Context<UpdateSellingPrice>, new_sell_price: u64) -> Result<()> {
     msg!("Updating bid state");
 
+    let token_state = &mut ctx.accounts.token_state;
+    token_state.current_selling_price = new_sell_price;
     let bid_state = &mut ctx.accounts.owner_bid_state;
     bid_state.selling_price = new_sell_price;
 
@@ -34,6 +36,7 @@ pub struct UpdateSellingPrice<'info> {
 
     /// The state for the token assessement
     #[account(
+        mut,
         seeds = [
             &config.collection_mint.to_bytes(),
             &token_state.token_mint.key().to_bytes()

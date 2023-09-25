@@ -26,7 +26,7 @@ export function updateSellingPrice(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.owner, isSigner: true, isWritable: true },
     { pubkey: accounts.config, isSigner: false, isWritable: false },
-    { pubkey: accounts.tokenState, isSigner: false, isWritable: false },
+    { pubkey: accounts.tokenState, isSigner: false, isWritable: true },
     { pubkey: accounts.ownerBidState, isSigner: false, isWritable: true },
   ]
   const identifier = Buffer.from([58, 75, 43, 244, 100, 238, 130, 69])

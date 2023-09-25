@@ -522,5 +522,10 @@ describe(suiteName, () => {
       ])
       .signers([values.bidder])
       .rpc({ skipPreflight: true });
+
+    tokenState = await program.account.tokenState.fetch(values.tokenStateKey);
+    expect(tokenState.currentSellingPrice.toString()).to.equal(
+      values.newTokenPrice.mul(new BN(2)).toString()
+    );
   });
 });
