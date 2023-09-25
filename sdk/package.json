@@ -1,6 +1,6 @@
 {
   "name": "@koch-labs/rent-nft",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "build/index.js",
   "license": "MIT",
   "scripts": {
