@@ -78,6 +78,13 @@ pub mod rent_nft {
         instructions::update_bid(ctx)
     }
 
+    pub fn update_selling_price(
+        ctx: Context<UpdateSellingPrice>,
+        new_sell_price: u64,
+    ) -> Result<()> {
+        instructions::update_selling_price(ctx, new_sell_price)
+    }
+
     pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
         instructions::withdraw_tax(ctx)
     }

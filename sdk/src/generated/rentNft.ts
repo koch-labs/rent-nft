@@ -740,6 +740,43 @@ export type RentNft = {
       "args": []
     },
     {
+      "name": "updateSellingPrice",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The config"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The state for the token assessement"
+          ]
+        },
+        {
+          "name": "ownerBidState",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newSellPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "withdrawTax",
       "accounts": [
         {
@@ -1843,6 +1880,43 @@ export const IDL: RentNft = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateSellingPrice",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "config",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The config"
+          ]
+        },
+        {
+          "name": "tokenState",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The state for the token assessement"
+          ]
+        },
+        {
+          "name": "ownerBidState",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newSellPrice",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "withdrawTax",

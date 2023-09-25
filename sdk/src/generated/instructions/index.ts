@@ -24,5 +24,10 @@ export { buyToken } from "./buyToken"
 export type { BuyTokenArgs, BuyTokenAccounts } from "./buyToken"
 export { updateBid } from "./updateBid"
 export type { UpdateBidAccounts } from "./updateBid"
+export { updateSellingPrice } from "./updateSellingPrice"
+export type {
+  UpdateSellingPriceArgs,
+  UpdateSellingPriceAccounts,
+} from "./updateSellingPrice"
 export { withdrawTax } from "./withdrawTax"
 export type { WithdrawTaxAccounts } from "./withdrawTax"

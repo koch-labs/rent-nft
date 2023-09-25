@@ -118,6 +118,7 @@ pub struct BuyToken<'info> {
         ],
         bump,
         constraint = buyer_bid_state.amount >= token_state.current_selling_price @ RentNftError::InsufficientBid,
+        constraint = buyer_bid_state.last_update == Clock::get()?.unix_timestamp @ RentNftError::OutOfDateBid,
     )]
     pub buyer_bid_state: Box<Account<'info, BidState>>,
 

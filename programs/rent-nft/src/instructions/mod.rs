@@ -7,6 +7,7 @@ mod decrease_bid;
 mod increase_bid;
 mod update_bid;
 mod update_collection;
+mod update_selling_price;
 mod update_token;
 mod withdraw_tax;
 
@@ -19,5 +20,6 @@ pub use decrease_bid::*;
 pub use increase_bid::*;
 pub use update_bid::*;
 pub use update_collection::*;
+pub use update_selling_price::*;
 pub use update_token::*;
 pub use withdraw_tax::*;

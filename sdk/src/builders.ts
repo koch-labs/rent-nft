@@ -326,6 +326,33 @@ export default {
       config,
     };
   },
+  updateSellingPrice: ({
+    provider,
+    owner = provider.publicKey,
+    collectionMint,
+    tokenMint,
+    newPrice,
+    tokenProgram = TOKEN_2022_PROGRAM_ID,
+  }: {
+    provider: Provider;
+    owner?: PublicKey;
+    collectionMint: PublicKey;
+    tokenMint: PublicKey;
+    newPrice: BN;
+    tokenProgram?: PublicKey;
+  }) => {
+    const program = getProgram(provider);
+    const config = getConfigKey(collectionMint);
+    return {
+      builder: program.methods.updateSellingPrice(newPrice).accounts({
+        owner,
+        config,
+        tokenState: getTokenStateKey(collectionMint, tokenMint),
+        ownerBidState: getBidStateKey(collectionMint, tokenMint, owner),
+      }),
+      config,
+    };
+  },
   withdrawTax: ({
     provider,
     admin = provider.publicKey,

@@ -21,6 +21,7 @@ import { RentNft } from "../target/types/rent_nft";
 import { TestValues, createValues } from "./values";
 
 import { expect } from "chai";
+import { BN } from "bn.js";
 
 const suiteName = "rent-nft";
 describe(suiteName, () => {
@@ -449,6 +450,14 @@ describe(suiteName, () => {
           .accounts({
             config: values.configKey,
             tokenState: values.tokenStateKey,
+            bidState: values.bidderBidStateKey,
+          })
+          .instruction(),
+        await program.methods
+          .updateBid()
+          .accounts({
+            config: values.configKey,
+            tokenState: values.tokenStateKey,
             bidState: values.holderBidStateKey,
           })
           .instruction(),
@@ -492,5 +501,26 @@ describe(suiteName, () => {
       values.configKey
     );
     expect(configAfter.collectedTax.toString()).to.equal("0");
+
+    await program.methods
+      .updateSellingPrice(values.newTokenPrice.mul(new BN(2)))
+      .accounts({
+        owner: values.bidder.publicKey,
+        config: values.configKey,
+        tokenState: values.tokenStateKey,
+        ownerBidState: values.bidderBidStateKey,
+      })
+      .preInstructions([
+        await program.methods
+          .updateBid()
+          .accounts({
+            config: values.configKey,
+            tokenState: values.tokenStateKey,
+            bidState: values.bidderBidStateKey,
+          })
+          .instruction(),
+      ])
+      .signers([values.bidder])
+      .rpc({ skipPreflight: true });
   });
 });
