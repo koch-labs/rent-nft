@@ -25,7 +25,7 @@ pub fn withdraw_tax(ctx: Context<WithdrawTax>) -> Result<()> {
 
     transfer_checked(
         CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.tax_token_program.to_account_info(),
             TransferChecked {
                 mint: ctx.accounts.mint.to_account_info(),
                 from: ctx.accounts.bids_account.to_account_info(),
@@ -59,15 +59,11 @@ pub struct WithdrawTax<'info> {
             &config.collection_mint.to_bytes(),
         ],
         bump,
+        has_one = collection_mint,
         // Not checking the tax token, can be any token
     )]
     pub config: Box<Account<'info, CollectionConfig>>,
 
-    #[account(
-        mint::authority = admin,
-        mint::decimals = 0,
-        mint::token_program = token_program,
-    )]
     pub collection_mint: InterfaceAccount<'info, Mint>,
 
     /// The token to withdraw
@@ -95,6 +91,5 @@ pub struct WithdrawTax<'info> {
     pub bids_account: InterfaceAccount<'info, TokenAccount>,
 
     /// Common Solana programs
-    pub token_program: Interface<'info, TokenInterface>,
     pub tax_token_program: Interface<'info, TokenInterface>,
 }

@@ -13,7 +13,6 @@ export interface WithdrawTaxAccounts {
   adminAccount: PublicKey
   bidsAccount: PublicKey
   /** Common Solana programs */
-  tokenProgram: PublicKey
   taxTokenProgram: PublicKey
 }
 
@@ -28,7 +27,6 @@ export function withdrawTax(
     { pubkey: accounts.mint, isSigner: false, isWritable: true },
     { pubkey: accounts.adminAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.bidsAccount, isSigner: false, isWritable: true },
-    { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.taxTokenProgram, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([220, 150, 84, 199, 3, 29, 223, 96])

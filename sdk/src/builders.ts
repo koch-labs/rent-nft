@@ -358,13 +358,13 @@ export default {
     admin = provider.publicKey,
     collectionMint,
     taxMint,
-    tokenProgram = TOKEN_2022_PROGRAM_ID,
+    taxTokenProgram = TOKEN_2022_PROGRAM_ID,
   }: {
     provider: Provider;
     admin?: PublicKey;
     collectionMint: PublicKey;
     taxMint: PublicKey;
-    tokenProgram?: PublicKey;
+    taxTokenProgram?: PublicKey;
   }) => {
     const program = getProgram(provider);
     const config = getConfigKey(collectionMint);
@@ -378,16 +378,15 @@ export default {
           taxMint,
           admin,
           true,
-          tokenProgram
+          taxTokenProgram
         ),
         bidsAccount: getAssociatedTokenAddressSync(
           taxMint,
           config,
           true,
-          tokenProgram
+          taxTokenProgram
         ),
-        taxTokenProgram: tokenProgram,
-        tokenProgram,
+        taxTokenProgram,
       }),
       config,
     };

@@ -4,7 +4,7 @@ use crate::state::*;
 use anchor_lang::prelude::*;
 
 pub fn update_selling_price(ctx: Context<UpdateSellingPrice>, new_sell_price: u64) -> Result<()> {
-    msg!("Updating bid state");
+    msg!("Updating selling price to {}", new_sell_price);
 
     let token_state = &mut ctx.accounts.token_state;
     token_state.current_selling_price = new_sell_price;

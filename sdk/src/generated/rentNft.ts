@@ -816,17 +816,12 @@ export type RentNft = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "taxTokenProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "taxTokenProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -1958,17 +1953,12 @@ export const IDL: RentNft = {
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
+          "name": "taxTokenProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "Common Solana programs"
           ]
-        },
-        {
-          "name": "taxTokenProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
